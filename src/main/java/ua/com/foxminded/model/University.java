@@ -1,10 +1,11 @@
 package ua.com.foxminded.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class University {
 
-	private List<Classroom> classRooms;
+	private List<Classroom> classrooms;
 	private List<Group> groups;
 	private List<Teacher> teachers;
 	private List<Lesson> lessons;
@@ -12,8 +13,18 @@ public class University {
 	private List<Student> students;
 	private List<Holiday> holidays;
 
-	public List<Classroom> getClassRooms() {
-		return classRooms;
+	public University() {
+		classrooms = new ArrayList<>();
+		groups = new ArrayList<>();
+		teachers = new ArrayList<>();
+		lessons = new ArrayList<>();
+		courses = new ArrayList<>();
+		students = new ArrayList<>();
+		holidays = new ArrayList<>();
+	}
+
+	public List<Classroom> getClassrooms() {
+		return classrooms;
 	}
 
 	public List<Group> getGroups() {
@@ -39,59 +50,5 @@ public class University {
 	public List<Holiday> getHolidays() {
 		return holidays;
 	}
-
-//	public void addGroup(Group group) {
-//
-//
-//	}
-//
-//	public void removeGroup(Group group) {
-//
-//	}
-//
-//	public void addTeacher(Teacher teacher) {
-//
-//	}
-//
-//	public void removeTeacher(Teacher teacher) {
-//
-//	}
-//
-//	public void addCourse(Course course) {
-//
-//	}
-//
-//	public void removeCourse(Course course) {
-//
-//	}
-//
-//	public void addClassroom(Classroom classroom) {
-//
-//	}
-//
-//	public void removeClassroom(Classroom classroom) {
-//
-//	}
-//
-//	public void addLesson(Lesson lesson) {
-//
-//	}
-//
-//	public void removeLesson(Lesson lesson) {
-//
-//	}
-//
-//	public void addStudent(Student student) {
-//
-//	}
-//
-//	public void removeStudent(Student student) {
-//
-//	}
-//
-//	public List<Lesson> viewSchedule() {
-//		return lessons;
-//
-//	}
 
 }

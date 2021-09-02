@@ -12,4 +12,14 @@ public class Time {
 		this.endTime = endTime;
 	}
 
+	public LocalTime getStartTime() {
+		return startTime;
+	}
+
+	public LocalTime getEndTime() {
+		return endTime;
+	}
+	
+	
+
 }

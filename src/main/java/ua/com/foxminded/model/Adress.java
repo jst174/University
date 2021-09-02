@@ -5,11 +5,11 @@ public class Adress {
 	private String country;
 	private String city;
 	private String street;
-	private int houseNumber;
-	private int apartamentNumber;
-	private int postcode;
+	private String houseNumber;
+	private String apartamentNumber;
+	private String postcode;
 
-	public Adress(String country, String city, String street, int houseNumber, int apartamentNumber, int postcode) {
+	public Adress(String country, String city, String street, String houseNumber, String apartamentNumber, String postcode) {
 		this.country = country;
 		this.city = city;
 		this.street = street;
@@ -30,16 +30,18 @@ public class Adress {
 		return street;
 	}
 
-	public int getHouseNumber() {
+	public String getHouseNumber() {
 		return houseNumber;
 	}
 
-	public int getApartamentNumber() {
+	public String getApartamentNumber() {
 		return apartamentNumber;
 	}
 
-	public int getPostcode() {
+	public String getPostcode() {
 		return postcode;
 	}
+	
+	
 
 }
