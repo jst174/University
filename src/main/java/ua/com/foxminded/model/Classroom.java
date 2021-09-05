@@ -1,14 +1,12 @@
 package ua.com.foxminded.model;
 
 public class Classroom {
-	private static int counter;
+
 	private int id;
 	private int number;
 	private int capacity;
 
 	public Classroom(int number, int capacity) {
-		counter++;
-		this.id = counter;
 		this.number = number;
 		this.capacity = capacity;
 	}
@@ -17,12 +15,25 @@ public class Classroom {
 		return id;
 	}
 
+	public void setId(int id) {
+		this.id = id;
+	}
+
 	public int getNumber() {
 		return number;
 	}
 
 	public int getCapacity() {
 		return capacity;
+	}
+
+	public void setCapacity(int capacity) {
+		this.capacity = capacity;
+	}
+
+	@Override
+	public String toString() {
+		return "number: " + number + "; capacity: " + capacity;
 	}
 
 }

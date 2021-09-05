@@ -3,15 +3,13 @@ package ua.com.foxminded.model;
 import java.time.LocalDate;
 
 public class Student extends Person {
-	private static int counter;
+
 	private int id;
 	private Group group;
 
-	public Student(String firstName, String lastName, LocalDate birthDate, String gender, Adress adress,
+	public Student(String firstName, String lastName, LocalDate birthDate, Gender gender, Adress adress,
 			String phoneNumber, String email) {
 		super(firstName, lastName, birthDate, gender, adress, phoneNumber, email);
-		counter++;
-		this.id = counter;
 	}
 
 	public void setGroup(Group group) {
@@ -24,6 +22,16 @@ public class Student extends Person {
 
 	public int getId() {
 		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	@Override
+	public String toString() {
+		return getFirstName() + " " + getLastName() + "; " + getBirthDate() + "; " + getGender() + "; " + getAdress()
+				+ "; " + getPhoneNumber() + "; " + getEmail() + "; " + group;
 	}
 
 }

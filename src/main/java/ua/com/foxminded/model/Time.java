@@ -4,6 +4,7 @@ import java.time.LocalTime;
 
 public class Time {
 
+	private int id;
 	private LocalTime startTime;
 	private LocalTime endTime;
 
@@ -18,6 +19,14 @@ public class Time {
 
 	public LocalTime getEndTime() {
 		return endTime;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
 	}
 	
 	

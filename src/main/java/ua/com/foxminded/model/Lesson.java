@@ -6,7 +6,6 @@ import java.util.List;
 
 public class Lesson {
 
-	private static int counter;
 	private int id;
 	private List<Group> groups;
 	private Course course;
@@ -17,8 +16,6 @@ public class Lesson {
 
 	public Lesson(Course course, List<Group> groups, Classroom classroom, Teacher teacher, LocalDate localDate,
 			Time time) {
-		counter++;
-		this.id = counter;
 		this.course = course;
 		this.classroom = classroom;
 		this.teacher = teacher;
@@ -26,14 +23,14 @@ public class Lesson {
 		this.time = time;
 		this.groups = groups;
 	}
-	
-	
 
 	public int getId() {
 		return id;
 	}
 
-
+	public void setId(int id) {
+		this.id = id;
+	}
 
 	public List<Group> getGroups() {
 		return groups;

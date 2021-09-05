@@ -4,15 +4,12 @@ import java.util.List;
 
 public class Group {
 
-	private static int counter;
 	private int id;
 	private String name;
 	private List<Student> students;
 
 	public Group(String name) {
-		counter++;
 		this.name = name;
-		this.id = counter;
 	}
 
 	public String getName() {
@@ -25,6 +22,14 @@ public class Group {
 
 	public int getId() {
 		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	@Override

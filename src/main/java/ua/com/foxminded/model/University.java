@@ -12,6 +12,7 @@ public class University {
 	private List<Course> courses;
 	private List<Student> students;
 	private List<Holiday> holidays;
+	private List<Time> times;
 
 	public University() {
 		classrooms = new ArrayList<>();
@@ -21,6 +22,7 @@ public class University {
 		courses = new ArrayList<>();
 		students = new ArrayList<>();
 		holidays = new ArrayList<>();
+		times = new ArrayList<>();
 	}
 
 	public List<Classroom> getClassrooms() {
@@ -49,6 +51,10 @@ public class University {
 
 	public List<Holiday> getHolidays() {
 		return holidays;
+	}
+
+	public List<Time> getTimes() {
+		return times;
 	}
 
 }

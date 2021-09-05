@@ -54,10 +54,6 @@ public class ScheduleFormater {
 		return String.format(formatPattern, Date, Start, End, Course, Group, Classroom, Teacher);
 	}
 
-	private int getMaxLengthField(List<Lesson> lessons, Function<Lesson, String> function) {
-		return lessons.stream().map(function::apply).mapToInt(String::length).max().orElse(0);
-	}
-
 	private Lesson getLessonWithMaxGroup(List<Lesson> lessons) {
 		int max = 0;
 		Lesson lessonWithMaxGroups = null;

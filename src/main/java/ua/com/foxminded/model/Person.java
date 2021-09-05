@@ -7,12 +7,12 @@ public abstract class Person {
 	private String firstName;
 	private String lastName;
 	private LocalDate birthDate;
-	private String gender;
+	private Gender gender;
 	private Adress adress;
 	private String phoneNumber;
 	private String email;
 
-	public Person(String firstName, String lastName, LocalDate birthDate, String gender, Adress adress,
+	public Person(String firstName, String lastName, LocalDate birthDate, Gender gender, Adress adress,
 			String phoneNumber, String email) {
 		this.firstName = firstName;
 		this.lastName = lastName;
@@ -35,7 +35,7 @@ public abstract class Person {
 		return birthDate;
 	}
 
-	public String getGender() {
+	public Gender getGender() {
 		return gender;
 	}
 
@@ -50,5 +50,18 @@ public abstract class Person {
 	public String getEmail() {
 		return email;
 	}
+
+	public void setAdress(Adress adress) {
+		this.adress = adress;
+	}
+
+	public void setPhoneNumber(String phoneNumber) {
+		this.phoneNumber = phoneNumber;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
 
 }

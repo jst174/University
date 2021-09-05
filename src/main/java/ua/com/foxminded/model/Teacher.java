@@ -6,24 +6,20 @@ import java.util.List;
 
 public class Teacher extends Person {
 
-	private static int counter;
-
 	private int id;
-	private String academicDegree;
+	private AcademicDegree academicDegree;
 	private List<Course> courses;
 	private List<Vacation> vacations;
 
-	public Teacher(String firstName, String lastName, LocalDate birthDate, String gender, Adress adress,
-			String phoneNumber, String email, String academicDegree) {
+	public Teacher(String firstName, String lastName, LocalDate birthDate, Gender gender, Adress adress,
+			String phoneNumber, String email, AcademicDegree academicDegree) {
 		super(firstName, lastName, birthDate, gender, adress, phoneNumber, email);
 		this.academicDegree = academicDegree;
 		courses = new ArrayList<>();
 		vacations = new ArrayList<>();
-		counter++;
-		this.id = counter;
 	}
 
-	public void setAcademicDegree(String academicDegree) {
+	public void setAcademicDegree(AcademicDegree academicDegree) {
 		this.academicDegree = academicDegree;
 	}
 
@@ -43,12 +39,22 @@ public class Teacher extends Person {
 		return vacations;
 	}
 
-	public String getAcademicDegree() {
+	public AcademicDegree getAcademicDegree() {
 		return academicDegree;
 	}
 
 	public int getId() {
 		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	@Override
+	public String toString() {
+		return getFirstName() + " " + getLastName() + "; " + getBirthDate() + "; " + getGender() + "; " + getAdress()
+				+ "; " + getPhoneNumber() + "; " + getEmail() + "; " + academicDegree;
 	}
 
 }

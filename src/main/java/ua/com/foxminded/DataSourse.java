@@ -19,9 +19,11 @@ import java.util.stream.Stream;
 
 import com.github.javafaker.Faker;
 
+import ua.com.foxminded.model.AcademicDegree;
 import ua.com.foxminded.model.Adress;
 import ua.com.foxminded.model.Classroom;
 import ua.com.foxminded.model.Course;
+import ua.com.foxminded.model.Gender;
 import ua.com.foxminded.model.Group;
 import ua.com.foxminded.model.Lesson;
 import ua.com.foxminded.model.Student;
@@ -36,7 +38,7 @@ public class DataSourse {
 	private Faker faker;
 
 	public DataSourse() throws IOException {
-		faker = new Faker(new Locale("RU"));
+		faker = new Faker(new Locale("US"));
 	}
 
 	public List<Student> getStudents() throws IOException {
@@ -130,12 +132,12 @@ public class DataSourse {
 		return LocalDate.ofEpochDay(randomDay);
 	}
 
-	private String generateGender() {
+	private Gender generateGender() {
 		int random = faker.number().numberBetween(0, 1);
 		if (random == 0) {
-			return "Man";
+			return Gender.Man;
 		} else {
-			return "Woman";
+			return Gender.Woman;
 		}
 	}
 
@@ -144,16 +146,16 @@ public class DataSourse {
 
 	}
 
-	private String generateAcademicDegrees() {
+	private AcademicDegree generateAcademicDegrees() {
 		int random = faker.number().numberBetween(0, 3);
 		if (random == 0) {
-			return "Associate";
+			return AcademicDegree.Associate;
 		} else if (random == 1) {
-			return "Bachelor's";
+			return AcademicDegree.Bachelor;
 		} else if (random == 2) {
-			return "Master's";
+			return AcademicDegree.Master;
 		} else {
-			return "Doctoral";
+			return AcademicDegree.Doctoral;
 		}
 	}
 

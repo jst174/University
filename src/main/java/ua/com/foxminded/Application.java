@@ -22,15 +22,16 @@ public class Application {
 		University university = new University();
 		DataSourse dataSourse = new DataSourse();
 
-		ScheduleFormater scheduleFormater = new ScheduleFormater();
-
 		university.getTeachers().addAll(dataSourse.getTeachers());
 		university.getClassrooms().addAll(dataSourse.getClassrooms());
 		university.getGroups().addAll(dataSourse.getGroups());
 		university.getStudents().addAll(dataSourse.getStudents());
+		university.getCourses().addAll(dataSourse.getCourses("courses.txt"));
+		university.getTimes().addAll(dataSourse.getTime());
 
 		Menu menu = new Menu();
 		menu.getMenu(university);
+
 	}
 
 }
