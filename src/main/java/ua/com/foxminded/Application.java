@@ -7,14 +7,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import ua.com.foxminded.model.Classroom;
-import ua.com.foxminded.model.Course;
-import ua.com.foxminded.model.Group;
-import ua.com.foxminded.model.Lesson;
-import ua.com.foxminded.model.Student;
-import ua.com.foxminded.model.Teacher;
-import ua.com.foxminded.model.Time;
-import ua.com.foxminded.model.University;
+import ua.com.foxminded.university.model.Classroom;
+import ua.com.foxminded.university.model.Course;
+import ua.com.foxminded.university.model.Group;
+import ua.com.foxminded.university.model.Lesson;
+import ua.com.foxminded.university.model.Student;
+import ua.com.foxminded.university.model.Teacher;
+import ua.com.foxminded.university.model.Time;
+import ua.com.foxminded.university.model.University;
 
 public class Application {
 

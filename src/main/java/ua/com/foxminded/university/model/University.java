@@ -1,4 +1,4 @@
-package ua.com.foxminded.model;
+package ua.com.foxminded.university.model;
 
 import java.util.ArrayList;
 import java.util.List;

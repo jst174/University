@@ -16,17 +16,17 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Scanner;
 
-import ua.com.foxminded.model.AcademicDegree;
-import ua.com.foxminded.model.Adress;
-import ua.com.foxminded.model.Classroom;
-import ua.com.foxminded.model.Course;
-import ua.com.foxminded.model.Gender;
-import ua.com.foxminded.model.Group;
-import ua.com.foxminded.model.Lesson;
-import ua.com.foxminded.model.Student;
-import ua.com.foxminded.model.Teacher;
-import ua.com.foxminded.model.Time;
-import ua.com.foxminded.model.University;
+import ua.com.foxminded.university.model.AcademicDegree;
+import ua.com.foxminded.university.model.Adress;
+import ua.com.foxminded.university.model.Classroom;
+import ua.com.foxminded.university.model.Course;
+import ua.com.foxminded.university.model.Gender;
+import ua.com.foxminded.university.model.Group;
+import ua.com.foxminded.university.model.Lesson;
+import ua.com.foxminded.university.model.Student;
+import ua.com.foxminded.university.model.Teacher;
+import ua.com.foxminded.university.model.Time;
+import ua.com.foxminded.university.model.University;
 
 public class Menu {
 
@@ -635,24 +635,24 @@ public class Menu {
 	}
 
 	private Gender getGender(String inputGender) {
-		if (inputGender.equals(Gender.Man.toString())) {
-			return Gender.Man;
-		} else if (inputGender.equals(Gender.Woman.toString())) {
-			return Gender.Woman;
+		if (inputGender.equals(Gender.MALE.toString())) {
+			return Gender.MALE;
+		} else if (inputGender.equals(Gender.FAMALE.toString())) {
+			return Gender.FAMALE;
 		} else {
 			throw new IllegalArgumentException("gender is incorrect");
 		}
 	}
 
 	private AcademicDegree getAcademicDegree(String input) {
-		if (input.equals(AcademicDegree.Associate.toString())) {
-			return AcademicDegree.Associate;
-		} else if (input.equals(AcademicDegree.Bachelor.toString())) {
-			return AcademicDegree.Bachelor;
-		} else if (input.equals(AcademicDegree.Master.toString())) {
-			return AcademicDegree.Master;
-		} else if (input.equals(AcademicDegree.Doctoral.toString())) {
-			return AcademicDegree.Doctoral;
+		if (input.equals(AcademicDegree.ASSOCIATE.toString())) {
+			return AcademicDegree.ASSOCIATE;
+		} else if (input.equals(AcademicDegree.BACHELOR.toString())) {
+			return AcademicDegree.BACHELOR;
+		} else if (input.equals(AcademicDegree.MASTER.toString())) {
+			return AcademicDegree.MASTER;
+		} else if (input.equals(AcademicDegree.DOCTORAL.toString())) {
+			return AcademicDegree.DOCTORAL;
 		} else {
 			throw new IllegalArgumentException("gender is incorrect");
 		}

@@ -1,4 +1,4 @@
-package ua.com.foxminded.model;
+package ua.com.foxminded.university.model;
 
 public class Adress {
 

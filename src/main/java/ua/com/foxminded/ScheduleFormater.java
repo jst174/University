@@ -6,10 +6,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.function.Function;
 
-import ua.com.foxminded.model.Course;
-import ua.com.foxminded.model.Group;
-import ua.com.foxminded.model.Lesson;
-import ua.com.foxminded.model.University;
+import ua.com.foxminded.university.model.Course;
+import ua.com.foxminded.university.model.Group;
+import ua.com.foxminded.university.model.Lesson;
+import ua.com.foxminded.university.model.University;
 
 public class ScheduleFormater {
 

@@ -19,17 +19,17 @@ import java.util.stream.Stream;
 
 import com.github.javafaker.Faker;
 
-import ua.com.foxminded.model.AcademicDegree;
-import ua.com.foxminded.model.Adress;
-import ua.com.foxminded.model.Classroom;
-import ua.com.foxminded.model.Course;
-import ua.com.foxminded.model.Gender;
-import ua.com.foxminded.model.Group;
-import ua.com.foxminded.model.Lesson;
-import ua.com.foxminded.model.Student;
-import ua.com.foxminded.model.Teacher;
-import ua.com.foxminded.model.Time;
-import ua.com.foxminded.model.University;
+import ua.com.foxminded.university.model.AcademicDegree;
+import ua.com.foxminded.university.model.Adress;
+import ua.com.foxminded.university.model.Classroom;
+import ua.com.foxminded.university.model.Course;
+import ua.com.foxminded.university.model.Gender;
+import ua.com.foxminded.university.model.Group;
+import ua.com.foxminded.university.model.Lesson;
+import ua.com.foxminded.university.model.Student;
+import ua.com.foxminded.university.model.Teacher;
+import ua.com.foxminded.university.model.Time;
+import ua.com.foxminded.university.model.University;
 
 public class DataSourse {
 
@@ -135,9 +135,9 @@ public class DataSourse {
 	private Gender generateGender() {
 		int random = faker.number().numberBetween(0, 1);
 		if (random == 0) {
-			return Gender.Man;
+			return Gender.MALE;
 		} else {
-			return Gender.Woman;
+			return Gender.FAMALE;
 		}
 	}
 
@@ -149,13 +149,13 @@ public class DataSourse {
 	private AcademicDegree generateAcademicDegrees() {
 		int random = faker.number().numberBetween(0, 3);
 		if (random == 0) {
-			return AcademicDegree.Associate;
+			return AcademicDegree.ASSOCIATE;
 		} else if (random == 1) {
-			return AcademicDegree.Bachelor;
+			return AcademicDegree.BACHELOR;
 		} else if (random == 2) {
-			return AcademicDegree.Master;
+			return AcademicDegree.MASTER;
 		} else {
-			return AcademicDegree.Doctoral;
+			return AcademicDegree.DOCTORAL;
 		}
 	}
 
