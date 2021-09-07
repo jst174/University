@@ -19,36 +19,36 @@ public class Teacher extends Person {
 		vacations = new ArrayList<>();
 	}
 
-	public void setAcademicDegree(AcademicDegree academicDegree) {
-		this.academicDegree = academicDegree;
-	}
-
-	public void setCourses(Course course) {
-		this.courses.add(course);
-	}
-
-	public void setVacations(Vacation vacation) {
-		this.vacations.add(vacation);
-	}
-
-	public List<Course> getCourses() {
-		return courses;
-	}
-
-	public List<Vacation> getVacations() {
-		return vacations;
-	}
-
-	public AcademicDegree getAcademicDegree() {
-		return academicDegree;
-	}
-
 	public int getId() {
 		return id;
 	}
 
 	public void setId(int id) {
 		this.id = id;
+	}
+
+	public AcademicDegree getAcademicDegree() {
+		return academicDegree;
+	}
+
+	public void setAcademicDegree(AcademicDegree academicDegree) {
+		this.academicDegree = academicDegree;
+	}
+
+	public List<Course> getCourses() {
+		return courses;
+	}
+
+	public void setCourses(List<Course> courses) {
+		this.courses = courses;
+	}
+
+	public List<Vacation> getVacations() {
+		return vacations;
+	}
+
+	public void setVacations(List<Vacation> vacations) {
+		this.vacations = vacations;
 	}
 
 	@Override

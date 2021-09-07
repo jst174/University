@@ -29,32 +29,64 @@ public class University {
 		return classrooms;
 	}
 
+	public void setClassrooms(List<Classroom> classrooms) {
+		this.classrooms = classrooms;
+	}
+
 	public List<Group> getGroups() {
 		return groups;
+	}
+
+	public void setGroups(List<Group> groups) {
+		this.groups = groups;
 	}
 
 	public List<Teacher> getTeachers() {
 		return teachers;
 	}
 
+	public void setTeachers(List<Teacher> teachers) {
+		this.teachers = teachers;
+	}
+
 	public List<Lesson> getLessons() {
 		return lessons;
+	}
+
+	public void setLessons(List<Lesson> lessons) {
+		this.lessons = lessons;
 	}
 
 	public List<Course> getCourses() {
 		return courses;
 	}
 
+	public void setCourses(List<Course> courses) {
+		this.courses = courses;
+	}
+
 	public List<Student> getStudents() {
 		return students;
+	}
+
+	public void setStudents(List<Student> students) {
+		this.students = students;
 	}
 
 	public List<Holiday> getHolidays() {
 		return holidays;
 	}
 
+	public void setHolidays(List<Holiday> holidays) {
+		this.holidays = holidays;
+	}
+
 	public List<Time> getTimes() {
 		return times;
+	}
+
+	public void setTimes(List<Time> times) {
+		this.times = times;
 	}
 
 }

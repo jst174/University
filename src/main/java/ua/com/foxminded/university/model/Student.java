@@ -12,20 +12,20 @@ public class Student extends Person {
 		super(firstName, lastName, birthDate, gender, adress, phoneNumber, email);
 	}
 
-	public void setGroup(Group group) {
-		this.group = group;
-	}
-
-	public Group getGroup() {
-		return group;
-	}
-
 	public int getId() {
 		return id;
 	}
 
 	public void setId(int id) {
 		this.id = id;
+	}
+
+	public Group getGroup() {
+		return group;
+	}
+
+	public void setGroup(Group group) {
+		this.group = group;
 	}
 
 	@Override

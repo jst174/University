@@ -16,16 +16,20 @@ public class Group {
 		return name;
 	}
 
-	public List<Student> getStudents() {
-		return students;
-	}
-
 	public int getId() {
 		return id;
 	}
 
 	public void setId(int id) {
 		this.id = id;
+	}
+
+	public List<Student> getStudents() {
+		return students;
+	}
+
+	public void setStudents(List<Student> students) {
+		this.students = students;
 	}
 
 	public void setName(String name) {

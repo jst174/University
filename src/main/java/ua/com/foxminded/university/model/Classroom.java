@@ -23,6 +23,10 @@ public class Classroom {
 		return number;
 	}
 
+	public void setNumber(int number) {
+		this.number = number;
+	}
+
 	public int getCapacity() {
 		return capacity;
 	}

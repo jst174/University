@@ -36,6 +36,10 @@ public class Lesson {
 		return groups;
 	}
 
+	public void setGroups(List<Group> groups) {
+		this.groups = groups;
+	}
+
 	public Course getCourse() {
 		return course;
 	}
@@ -64,8 +68,8 @@ public class Lesson {
 		return date;
 	}
 
-	public void setDate(LocalDate localDate) {
-		this.date = localDate;
+	public void setDate(LocalDate date) {
+		this.date = date;
 	}
 
 	public Time getTime() {
