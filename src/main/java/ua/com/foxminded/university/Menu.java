@@ -1,23 +1,17 @@
-package ua.com.foxminded;
+package ua.com.foxminded.university;
 
 import static java.lang.System.lineSeparator;
 
-import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Scanner;
 
 import ua.com.foxminded.university.model.AcademicDegree;
-import ua.com.foxminded.university.model.Adress;
+import ua.com.foxminded.university.model.Address;
 import ua.com.foxminded.university.model.Classroom;
 import ua.com.foxminded.university.model.Course;
 import ua.com.foxminded.university.model.Gender;
@@ -179,7 +173,7 @@ public class Menu {
 		System.out.println("enter adress (country, city, street, house number, apartament number, postcode)");
 		String inputAdress = scanner.nextLine();
 		String[] array = inputAdress.split(", ");
-		Adress adress = new Adress(array[0], array[1], array[2], array[3], array[4], array[5]);
+		Address adress = new Address(array[0], array[1], array[2], array[3], array[4], array[5]);
 		System.out.println("enter phone number");
 		String phoneNumber = scanner.nextLine();
 		System.out.println("enter email");
@@ -226,7 +220,7 @@ public class Menu {
 			System.out.println("enter adress (country, city, street, house number, apartament number, postcode)");
 			String inputAdress = scanner2.nextLine();
 			String[] array = inputAdress.split(", ");
-			Adress adress = new Adress(array[0], array[1], array[2], array[3], array[4], array[5]);
+			Address adress = new Address(array[0], array[1], array[2], array[3], array[4], array[5]);
 			updateStudent.setAdress(adress);
 		} else if (input.equals("b")) {
 			System.out.println("enter phone number");
@@ -270,7 +264,7 @@ public class Menu {
 		System.out.println("enter adress (country, city, street, house number, apartament number, postcode)");
 		String inputAdress = scanner.nextLine();
 		String[] array = inputAdress.split(", ");
-		Adress adress = new Adress(array[0], array[1], array[2], array[3], array[4], array[5]);
+		Address adress = new Address(array[0], array[1], array[2], array[3], array[4], array[5]);
 		System.out.println("enter phone number");
 		String phoneNumber = scanner.nextLine();
 		System.out.println("enter email");
@@ -321,7 +315,7 @@ public class Menu {
 			System.out.println("enter adress (country, city, street, house number, apartament number, postcode)");
 			String inputAdress = scanner2.nextLine();
 			String[] array = inputAdress.split(", ");
-			Adress adress = new Adress(array[0], array[1], array[2], array[3], array[4], array[5]);
+			Address adress = new Address(array[0], array[1], array[2], array[3], array[4], array[5]);
 			updateTeacher.setAdress(adress);
 		} else if (input.equals("b")) {
 			System.out.println("enter phone number");

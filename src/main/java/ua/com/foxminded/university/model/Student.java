@@ -7,7 +7,7 @@ public class Student extends Person {
 	private int id;
 	private Group group;
 
-	public Student(String firstName, String lastName, LocalDate birthDate, Gender gender, Adress adress,
+	public Student(String firstName, String lastName, LocalDate birthDate, Gender gender, Address adress,
 			String phoneNumber, String email) {
 		super(firstName, lastName, birthDate, gender, adress, phoneNumber, email);
 	}

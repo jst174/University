@@ -8,11 +8,11 @@ public abstract class Person {
 	private String lastName;
 	private LocalDate birthDate;
 	private Gender gender;
-	private Adress adress;
+	private Address adress;
 	private String phoneNumber;
 	private String email;
 
-	public Person(String firstName, String lastName, LocalDate birthDate, Gender gender, Adress adress,
+	public Person(String firstName, String lastName, LocalDate birthDate, Gender gender, Address adress,
 			String phoneNumber, String email) {
 		this.firstName = firstName;
 		this.lastName = lastName;
@@ -55,11 +55,11 @@ public abstract class Person {
 		this.gender = gender;
 	}
 
-	public Adress getAdress() {
+	public Address getAdress() {
 		return adress;
 	}
 
-	public void setAdress(Adress adress) {
+	public void setAdress(Address adress) {
 		this.adress = adress;
 	}
 

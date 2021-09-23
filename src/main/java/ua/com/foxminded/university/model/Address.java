@@ -1,25 +1,34 @@
 package ua.com.foxminded.university.model;
 
-public class Adress {
+public class Address {
 
+    private int id;
 	private String country;
 	private String city;
 	private String street;
 	private String houseNumber;
-	private String apartamentNumber;
+	private String apartmentNumber;
 	private String postcode;
 
-	public Adress(String country, String city, String street, String houseNumber, String apartamentNumber,
-			String postcode) {
+	public Address(String country, String city, String street, String houseNumber, String apartmentNumber,
+                   String postcode) {
 		this.country = country;
 		this.city = city;
 		this.street = street;
 		this.houseNumber = houseNumber;
-		this.apartamentNumber = apartamentNumber;
+		this.apartmentNumber = apartmentNumber;
 		this.postcode = postcode;
 	}
 
-	public String getCountry() {
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getCountry() {
 		return country;
 	}
 
@@ -51,12 +60,12 @@ public class Adress {
 		this.houseNumber = houseNumber;
 	}
 
-	public String getApartamentNumber() {
-		return apartamentNumber;
+	public String getApartmentNumber() {
+		return apartmentNumber;
 	}
 
-	public void setApartamentNumber(String apartamentNumber) {
-		this.apartamentNumber = apartamentNumber;
+	public void setApartmentNumber(String apartmentNumber) {
+		this.apartmentNumber = apartmentNumber;
 	}
 
 	public String getPostcode() {
@@ -69,7 +78,7 @@ public class Adress {
 
 	@Override
 	public String toString() {
-		return country + ", " + city + ", " + street + ", " + houseNumber + ", " + apartamentNumber + ", " + postcode;
+		return country + ", " + city + ", " + street + ", " + houseNumber + ", " + apartmentNumber + ", " + postcode;
 	}
 
 }

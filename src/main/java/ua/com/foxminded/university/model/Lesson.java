@@ -36,8 +36,8 @@ public class Lesson {
 		return groups;
 	}
 
-	public void setGroups(List<Group> groups) {
-		this.groups = groups;
+	public void setGroups(Group group) {
+		this.groups.add(group);
 	}
 
 	public Course getCourse() {
