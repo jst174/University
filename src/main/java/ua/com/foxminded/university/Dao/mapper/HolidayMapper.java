@@ -13,7 +13,7 @@ public class HolidayMapper implements RowMapper<Holiday> {
     @Override
     public Holiday mapRow(ResultSet rs, int rowNum) throws SQLException {
         Holiday holiday = new Holiday(rs.getString("holiday_name"),
-            rs.getDate("holiday_day").toLocalDate());
+            rs.getDate("holiday_date").toLocalDate());
         holiday.setId(rs.getInt("holiday_id"));
         return holiday;
     }

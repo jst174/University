@@ -14,7 +14,8 @@ public class StudentDao {
     private static final String SQL_INSERT_STUDENT =
         "INSERT INTO students(first_name,last_name,birthday,gender,address_id,phone_number,email) values (?,?,?,?,?,?,?)";
     private static final String SQL_FIND_STUDENT = "SELECT * FROM students WHERE student_id = ?";
-    private static final String SQL_UPDATE_STUDENT = "UPDATE students SET address_id = ?, phone_number = ?, email = ? WHERE student_id = ?";
+    private static final String SQL_UPDATE_STUDENT = "UPDATE students SET first_name = ?, last_name = ?, " +
+        "birthday = ?, gender = ?, address_id = ?, phone_number = ?, email = ?, group_id = ? WHERE student_id = ?";
     private static final String SQL_DELETE_STUDENT = "DELETE FROM students WHERE student_id = ?";
 
     @Autowired
@@ -43,9 +44,17 @@ public class StudentDao {
         return jdbcTemplate.queryForObject(SQL_FIND_STUDENT, studentMapper, id);
     }
 
-    public void update(Student student) {
+    public void update(int id, Student student) {
         jdbcTemplate.update(SQL_UPDATE_STUDENT,
-            student.getAdress().getId(), student.getPhoneNumber(), student.getEmail(), student.getId());
+            student.getFirstName(),
+            student.getLastName(),
+            Date.valueOf(student.getBirthDate()),
+            student.getGender().toString(),
+            student.getAdress().getId(),
+            student.getPhoneNumber(),
+            student.getEmail(),
+            student.getGroup().getId(),
+            id);
     }
 
     public void delete(int id) {

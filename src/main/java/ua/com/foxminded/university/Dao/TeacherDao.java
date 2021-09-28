@@ -5,10 +5,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ua.com.foxminded.university.Dao.mapper.TeacherMapper;
 import ua.com.foxminded.university.model.Teacher;
-import ua.com.foxminded.university.model.Vacation;
 
 import java.sql.Date;
-import java.util.List;
 
 @Component
 public class TeacherDao {
@@ -18,8 +16,12 @@ public class TeacherDao {
             "values (?,?,?,?,?,?,?,?)";
     private static final String SQL_FIND_TEACHER = "SELECT * FROM teachers WHERE teacher_id = ?";
     private static final String SQL_UPDATE_TEACHER =
-        "UPDATE teachers SET address_id = ?, phone_number = ?, email = ?, academic_degree = ?, vacation_id = ?";
+        "UPDATE teachers SET first_name = ?, last_name = ?, birthday = ?, gender = ?, address_id = ?, " +
+            "phone_number = ?, email = ?, academic_degree = ? WHERE teacher_id = ?";
     private static final String SQL_DELETE_TEACHER = "DELETE FROM teachers WHERE teacher_id = ?";
+
+    private static final String SQL_ADD_VACATION = "insert into teachers_vacations(teacher_id, vacation_id) values (?,?)";
+    private static final String SQL_ADD_COURSE = "insert into teachers_courses(teacher_id, course_id) values(?,?)";
 
     @Autowired
     private TeacherMapper teacherMapper;
@@ -46,12 +48,25 @@ public class TeacherDao {
         return jdbcTemplate.queryForObject(SQL_FIND_TEACHER, teacherMapper, id);
     }
 
-    public void update(Teacher teacher, int vacationId) {
-        jdbcTemplate.update(SQL_UPDATE_TEACHER, teacher.getAdress().getId(),
+    public void addVacation(int teacherId, int vacationId ){
+        jdbcTemplate.update(SQL_ADD_VACATION, teacherId, vacationId);
+    }
+
+    public void addCourse(int teacherId, int courseId){
+        jdbcTemplate.update(SQL_ADD_COURSE, teacherId, courseId);
+    }
+
+    public void update(int id, Teacher teacher) {
+        jdbcTemplate.update(SQL_UPDATE_TEACHER,
+            teacher.getFirstName(),
+            teacher.getLastName(),
+            teacher.getBirthDate(),
+            teacher.getGender().toString(),
+            teacher.getAdress().getId(),
             teacher.getPhoneNumber(),
             teacher.getEmail(),
             teacher.getAcademicDegree().toString(),
-            vacationId);
+            id);
     }
 
     public void delete(int id) {

@@ -500,7 +500,7 @@ public class Menu {
 			}
 		}
 
-		Lesson lesson = new Lesson(courseOfLesson, groups, classroomOfLesson, teacherOfLesson, date, timeOfLesson);
+		Lesson lesson = new Lesson(courseOfLesson, classroomOfLesson, teacherOfLesson, date, timeOfLesson);
 
 		university.getLessons().add(lesson);
 	}

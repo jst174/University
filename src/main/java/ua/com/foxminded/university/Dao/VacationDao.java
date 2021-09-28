@@ -13,7 +13,7 @@ public class VacationDao {
         "INSERT INTO vacations (start_vacation, end_vacation) values(?,?)";
     private static final String SQL_FIND_VACATION = "SELECT * FROM vacations WHERE vacation_id = ?";
     private static final String SQL_UPDATE_VACATION =
-        "UPDATE vacations SET start_vacation = ?, end_vacation = ? WHERE vacation_id = ?)";
+        "UPDATE vacations SET start_vacation = ?, end_vacation = ? WHERE vacation_id = ?";
     private static final String SQL_DELETE_VACATION = "DELETE FROM vacations WHERE vacation_id = ?";
 
     @Autowired
@@ -34,11 +34,11 @@ public class VacationDao {
         return jdbcTemplate.queryForObject(SQL_FIND_VACATION, vacationMapper, id);
     }
 
-    public void update(Vacation vacation) {
+    public void update(int id, Vacation vacation) {
         jdbcTemplate.update(SQL_UPDATE_VACATION,
             vacation.getStart(),
             vacation.getEnd(),
-            vacation.getId());
+            id);
     }
 
     public void delete(int id){

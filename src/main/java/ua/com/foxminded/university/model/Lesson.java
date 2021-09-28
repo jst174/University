@@ -3,6 +3,7 @@ package ua.com.foxminded.university.model;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Lesson {
 
@@ -14,14 +15,13 @@ public class Lesson {
 	private LocalDate date;
 	private Time time;
 
-	public Lesson(Course course, List<Group> groups, Classroom classroom, Teacher teacher, LocalDate localDate,
+	public Lesson(Course course, Classroom classroom, Teacher teacher, LocalDate localDate,
 			Time time) {
 		this.course = course;
 		this.classroom = classroom;
 		this.teacher = teacher;
 		this.date = localDate;
 		this.time = time;
-		this.groups = groups;
 	}
 
 	public int getId() {
@@ -36,8 +36,8 @@ public class Lesson {
 		return groups;
 	}
 
-	public void setGroups(Group group) {
-		this.groups.add(group);
+	public void setGroups(List<Group> groups) {
+		this.groups = groups;
 	}
 
 	public Course getCourse() {
@@ -86,4 +86,16 @@ public class Lesson {
 				+ ", localDate=" + date + ", time=" + time + "]";
 	}
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Lesson)) return false;
+        Lesson lesson = (Lesson) o;
+        return Objects.equals(groups, lesson.groups) && Objects.equals(course, lesson.course) && Objects.equals(classroom, lesson.classroom) && Objects.equals(teacher, lesson.teacher) && Objects.equals(date, lesson.date) && Objects.equals(time, lesson.time);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(groups, course, classroom, teacher, date, time);
+    }
 }

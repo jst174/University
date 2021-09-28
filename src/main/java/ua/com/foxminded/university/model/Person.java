@@ -1,6 +1,7 @@
 package ua.com.foxminded.university.model;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 public abstract class Person {
 
@@ -79,4 +80,16 @@ public abstract class Person {
 		this.email = email;
 	}
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Person person = (Person) o;
+        return Objects.equals(firstName, person.firstName) && Objects.equals(lastName, person.lastName) && Objects.equals(birthDate, person.birthDate) && gender == person.gender && Objects.equals(adress, person.adress) && Objects.equals(phoneNumber, person.phoneNumber) && Objects.equals(email, person.email);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(firstName, lastName, birthDate, gender, adress, phoneNumber, email);
+    }
 }

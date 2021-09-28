@@ -1,6 +1,7 @@
 package ua.com.foxminded.university.model;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 public class Student extends Person {
 
@@ -34,4 +35,17 @@ public class Student extends Person {
 				+ "; " + getPhoneNumber() + "; " + getEmail() + "; " + group;
 	}
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Student)) return false;
+        if (!super.equals(o)) return false;
+        Student student = (Student) o;
+        return Objects.equals(group, student.group);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), group);
+    }
 }

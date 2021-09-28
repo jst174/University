@@ -9,9 +9,9 @@ import ua.com.foxminded.university.model.Course;
 @Component
 public class CourseDao {
 
-    private static final String SQL_INSERT_COURSE = "INSERT INTO courses (course_name) value (?)";
+    private static final String SQL_INSERT_COURSE = "INSERT INTO courses (course_name) values (?)";
     private static final String SQL_FIND_COURSE = "SELECT * FROM courses WHERE course_id = ?";
-    private static final String SQL_UPDATE_COURSE = "UPDATE courses SET course_name = ?";
+    private static final String SQL_UPDATE_COURSE = "UPDATE courses SET course_name = ? WHERE course_id = ?";
     private static final String SQL_DELETE_COURSE = "DELETE FROM courses WHERE course_id = ?";
 
     @Autowired
@@ -32,8 +32,8 @@ public class CourseDao {
         return jdbcTemplate.queryForObject(SQL_FIND_COURSE, courseMapper, id);
     }
 
-    public void update(Course course) {
-        jdbcTemplate.update(SQL_UPDATE_COURSE, course.getName());
+    public void update(int id, Course course) {
+        jdbcTemplate.update(SQL_UPDATE_COURSE, course.getName(), id);
     }
 
     public void delete(int id) {

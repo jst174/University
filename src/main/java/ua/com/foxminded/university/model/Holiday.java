@@ -1,6 +1,7 @@
 package ua.com.foxminded.university.model;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 public class Holiday {
 
@@ -37,4 +38,16 @@ public class Holiday {
         this.date = date;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Holiday holiday = (Holiday) o;
+        return Objects.equals(name, holiday.name) && Objects.equals(date, holiday.date);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, date);
+    }
 }

@@ -96,8 +96,10 @@ public class DataSourse {
 	public Lesson generateLesson(LocalDate date, List<Group> groups) throws IOException {
 		int random1 = faker.number().numberBetween(0, 9);
 		int random2 = faker.number().numberBetween(0, 6);
-		return new Lesson(getCourses("courses.txt").get(random1), groups, getClassrooms().get(random1),
+		Lesson lesson = new Lesson(getCourses("courses.txt").get(random1), getClassrooms().get(random1),
 				getTeachers().get(random1), date, getTime().get(random2));
+        lesson.setGroups(groups);
+        return  lesson;
 
 	}
 

@@ -50,8 +50,13 @@ create table teachers
   phone_number    varchar,
   email           varchar,
   academic_degree varchar,
+  vacation_id     integer,
   foreign key (address_id) references addresses (address_id) on delete set null,
+  foreign key (vacation_id) references vacations (vacation_id)
 );
+
+
+
 
 
 drop table if exists courses cascade;
@@ -105,8 +110,8 @@ create table teachers_vacations
 drop table if exists teachers_courses cascade;
 create table teachers_courses
 (
-  teacher_id integer references teachers (teacher_id) on update cascade on delete cascade,
-  course_id  integer references courses (course_id) on update cascade on delete cascade,
+  teacher_id  integer references teachers (teacher_id) on update cascade on delete cascade,
+  course_id integer references courses (course_id) on update cascade on delete cascade,
   unique (teacher_id, course_id)
 );
 drop table if exists group_students cascade;

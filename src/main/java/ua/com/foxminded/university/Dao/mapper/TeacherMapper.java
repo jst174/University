@@ -20,8 +20,6 @@ public class TeacherMapper implements RowMapper<Teacher> {
 
     @Autowired
     private AddressDao addressDao;
-    @Autowired
-    private VacationDao vacationDao;
 
     @Override
     public Teacher mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -33,7 +31,6 @@ public class TeacherMapper implements RowMapper<Teacher> {
             rs.getString("phone_number"),
             rs.getString("email"),
             AcademicDegree.valueOf(rs.getString("academic_degree")));
-        teacher.setVacations(vacationDao.getById(rs.getInt("vacation_id")));
         teacher.setId(rs.getInt("teacher_id"));
         return teacher;
     }

@@ -1,6 +1,7 @@
 package ua.com.foxminded.university.model;
 
 import java.time.LocalTime;
+import java.util.Objects;
 
 public class Time {
 
@@ -37,4 +38,24 @@ public class Time {
 		this.endTime = endTime;
 	}
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Time time = (Time) o;
+        return Objects.equals(startTime, time.startTime) && Objects.equals(endTime, time.endTime);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(startTime, endTime);
+    }
+
+    @Override
+    public String toString() {
+        return "Time{" +
+            "startTime=" + startTime +
+            ", endTime=" + endTime +
+            '}';
+    }
 }
