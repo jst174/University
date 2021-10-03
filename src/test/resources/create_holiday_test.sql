@@ -1,1 +1,2 @@
-insert into holidays (holiday_name, holiday_date) values ('New Year', '2021-12-31');
+INSERT INTO holidays (name, date) VALUES ('New Year', '2021-12-31');
+INSERT INTO holidays (name, date) VALUES ('Day of knowledge', '2021-09-1');

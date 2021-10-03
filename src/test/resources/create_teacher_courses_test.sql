@@ -1,3 +1,3 @@
-insert into courses(course_name) values ('History');
-insert into courses(course_name) values ('Math');
-insert into courses(course_name) values ('Physics');
+INSERT INTO courses(name) VALUES ('History');
+INSERT INTO courses(name) VALUES ('Math');
+INSERT INTO courses(name) VALUES ('Physics');

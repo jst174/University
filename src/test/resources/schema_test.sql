@@ -1,125 +1,120 @@
-drop table if exists addresses cascade;
+DROP TABLE IF EXISTS addresses CASCADE;
 create table addresses
 (
-  address_id       serial primary key not null,
-  country          varchar,
-  city             varchar,
-  street           varchar,
-  house_number     varchar,
-  apartment_number varchar,
-  postcode         varchar
+  id               SERIAL PRIMARY KEY NOT NULL,
+  country          VARCHAR,
+  city             VARCHAR,
+  street           VARCHAR,
+  house_number     VARCHAR,
+  apartment_number VARCHAR,
+  postcode         VARCHAR
 );
-drop table if exists groups cascade;
-create table groups
+DROP TABLE IF EXISTS groups CASCADE;
+CREATE TABLE groups
 (
-  group_id   serial primary key not null,
-  group_name varchar
+  id   SERIAL PRIMARY KEY NOT NULL,
+  name VARCHAR
 );
-drop table if exists students cascade;
-create table students
+DROP TABLE IF EXISTS students CASCADE;
+CREATE TABLE students
 (
-  student_id   serial primary key not null,
-  first_name   varchar,
-  last_name    varchar,
-  birthday     date,
-  gender       varchar,
-  address_id   integer,
-  phone_number varchar,
-  email        varchar,
-  group_id     integer,
-  foreign key (address_id) references addresses (address_id) on delete set null,
-  foreign key (group_id) references groups (group_id) on delete set null
+  id           SERIAL PRIMARY KEY NOT NULL,
+  first_name   VARCHAR,
+  last_name    VARCHAR,
+  birthday     DATE,
+  gender       VARCHAR,
+  address_id   INTEGER,
+  phone_number VARCHAR,
+  email        VARCHAR,
+  group_id     INTEGER,
+  FOREIGN KEY (address_id) REFERENCES addresses (id) ON DELETE SET NULL,
+  FOREIGN KEY (group_id) REFERENCES groups (id) ON DELETE SET NULL
 );
-drop table if exists vacations cascade;
-create table vacations
+DROP TABLE IF EXISTS vacations CASCADE;
+CREATE TABLE vacations
 (
-  vacation_id    serial primary key not null,
-  start_vacation date,
-  end_vacation   date
+  id             SERIAL PRIMARY KEY NOT NULL,
+  start DATE,
+  ending   DATE
 );
 
-drop table if exists teachers cascade;
-create table teachers
+DROP TABLE IF EXISTS teachers CASCADE;
+CREATE TABLE teachers
 (
-  teacher_id      serial primary key not null,
-  first_name      varchar,
-  last_name       varchar,
-  birthday        date,
-  gender          varchar,
-  address_id      integer,
-  phone_number    varchar,
-  email           varchar,
-  academic_degree varchar,
-  vacation_id     integer,
-  foreign key (address_id) references addresses (address_id) on delete set null,
-  foreign key (vacation_id) references vacations (vacation_id)
+  id              SERIAL PRIMARY KEY NOT NULL,
+  first_name      VARCHAR,
+  last_name       VARCHAR,
+  birthday        DATE,
+  gender          VARCHAR,
+  address_id      INTEGER,
+  phone_number    VARCHAR,
+  email           VARCHAR,
+  academic_degree VARCHAR,
+  FOREIGN KEY (address_id) REFERENCES addresses (id) ON DELETE SET NULL
 );
 
 
-
-
-
-drop table if exists courses cascade;
-create table courses
+DROP TABLE IF EXISTS courses CASCADE;
+CREATE TABLE courses
 (
-  course_id   serial primary key not null,
-  course_name varchar
+  id   SERIAL PRIMARY KEY NOT NULL,
+  name VARCHAR
 );
-drop table if exists classrooms cascade;
-create table classrooms
+DROP TABLE IF EXISTS classrooms CASCADE;
+CREATE TABLE classrooms
 (
-  classroom_id serial primary key not null,
-  number       integer,
-  capacity     integer
+  id       SERIAL PRIMARY KEY NOT NULL,
+  number   INTEGER,
+  capacity INTEGER
 );
 
-drop table if exists time cascade;
-create table time
+DROP TABLE IF EXISTS times CASCADE;
+CREATE TABLE times
 (
-  time_id    serial primary key not null,
-  start_time time,
-  end_time   time
+  id    SERIAL PRIMARY KEY NOT NULL,
+  start TIME,
+  ending   TIME
 );
 
-drop table if exists holidays cascade;
-create table holidays
+DROP TABLE IF EXISTS holidays CASCADE;
+CREATE TABLE holidays
 (
-  holiday_id   serial primary key not null,
-  holiday_name varchar,
-  holiday_date date
+  id   SERIAL PRIMARY KEY NOT NULL,
+  name VARCHAR,
+  date DATE
 );
 
-drop table if exists lessons cascade;
-create table lessons
+DROP TABLE IF EXISTS lessons CASCADE;
+CREATE TABLE lessons
 (
-  lesson_id    serial primary key not null,
-  classroom_id integer references classrooms (classroom_id) on update cascade on delete cascade,
-  course_id    integer references courses (course_id) on update cascade on delete cascade,
-  teacher_id   integer references teachers (teacher_id) on update cascade on delete cascade,
-  lesson_date  date,
-  time_id  integer references time(time_id) on update cascade on delete cascade
+  id           SERIAL PRIMARY KEY NOT NULL,
+  classroom_id INTEGER REFERENCES classrooms (id) ON UPDATE CASCADE ON DELETE CASCADE,
+  course_id    INTEGER REFERENCES courses (id) ON UPDATE CASCADE ON DELETE CASCADE,
+  teacher_id   INTEGER REFERENCES teachers (id) ON UPDATE CASCADE ON DELETE CASCADE,
+  date         DATE,
+  time_id      INTEGER REFERENCES times (id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
-drop table if exists teachers_vacations cascade;
-create table teachers_vacations
+DROP TABLE IF EXISTS teachers_vacations CASCADE;
+CREATE TABLE teachers_vacations
 (
-  teacher_id  integer references teachers (teacher_id) on update cascade on delete cascade,
-  vacation_id integer references vacations (vacation_id) on update cascade on delete cascade,
-  unique (teacher_id, vacation_id)
+  teacher_id  INTEGER REFERENCES teachers (id) ON UPDATE CASCADE ON DELETE CASCADE,
+  vacation_id INTEGER REFERENCES vacations (id) ON UPDATE CASCADE ON DELETE CASCADE,
+  UNIQUE (teacher_id, vacation_id)
 );
-drop table if exists teachers_courses cascade;
-create table teachers_courses
+DROP TABLE IF EXISTS teachers_courses CASCADE;
+CREATE TABLE teachers_courses
 (
-  teacher_id  integer references teachers (teacher_id) on update cascade on delete cascade,
-  course_id integer references courses (course_id) on update cascade on delete cascade,
-  unique (teacher_id, course_id)
+  teacher_id INTEGER REFERENCES teachers (id) ON UPDATE CASCADE ON DELETE CASCADE,
+  course_id  INTEGER REFERENCES courses (id) ON UPDATE CASCADE ON DELETE CASCADE,
+  UNIQUE (teacher_id, course_id)
 );
-drop table if exists group_students cascade;
-create table group_students
+DROP TABLE IF EXISTS group_students CASCADE;
+CREATE TABLE group_students
 (
-  group_id   integer references groups (group_id) on update cascade on delete cascade,
-  student_id integer references students (student_id) on update cascade on delete cascade,
-  unique (group_id, student_id)
+  group_id   INTEGER REFERENCES groups (id) ON UPDATE CASCADE ON DELETE CASCADE,
+  student_id INTEGER REFERENCES students (id) ON UPDATE CASCADE ON DELETE CASCADE,
+  UNIQUE (group_id, student_id)
 );
 
 

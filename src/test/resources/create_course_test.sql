@@ -1,1 +1,2 @@
-insert into courses (course_name) values ('History');
+INSERT INTO courses (name) VALUES ('History');
+INSERT INTO courses (name) VALUES ('Music');

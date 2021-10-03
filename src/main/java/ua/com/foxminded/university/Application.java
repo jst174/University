@@ -1,35 +1,55 @@
 package ua.com.foxminded.university;
 
-import java.io.IOException;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import ua.com.foxminded.university.Dao.AddressDao;
-import ua.com.foxminded.university.Dao.StudentDao;
-import ua.com.foxminded.university.Dao.TeacherDao;
-import ua.com.foxminded.university.Dao.VacationDao;
-import ua.com.foxminded.university.SpringConfig;
+import ua.com.foxminded.university.config.SpringConfig;
+import ua.com.foxminded.university.dao.jdbc.*;
 import ua.com.foxminded.university.model.*;
+
+import java.time.LocalDate;
 
 public class Application {
 
-	public static void main(String[] args) throws Exception {
-		University university = new University();
-		DataSourse dataSourse = new DataSourse();
+    public static void main(String[] args) throws Exception {
+        University university = new University();
+        DataSource dataSource = new DataSource();
 
-		university.getTeachers().addAll(dataSourse.getTeachers());
-		university.getClassrooms().addAll(dataSourse.getClassrooms());
-		university.getGroups().addAll(dataSourse.getGroups());
-		university.getStudents().addAll(dataSourse.getStudents());
-		university.getCourses().addAll(dataSourse.getCourses("courses.txt"));
-		university.getTimes().addAll(dataSourse.getTime());
 
-		Menu menu = new Menu();
-		menu.getMenu(university);
-	}
+
+
+        ApplicationContext context = new AnnotationConfigApplicationContext(SpringConfig.class);
+        SqlScript sqlScript = new SqlScript(context.getBean(javax.sql.DataSource.class));
+        sqlScript.executeScript("schema.sql");
+
+        university.getTeachers().addAll(dataSource.getTeachers());
+        university.getClassrooms().addAll(dataSource.getClassrooms());
+        university.getGroups().addAll(dataSource.getGroups());
+        university.getStudents().addAll(dataSource.getStudents());
+        university.getCourses().addAll(dataSource.getCourses("courses.txt"));
+        university.getTimes().addAll(dataSource.getTime());
+
+//		Menu menu = new Menu();
+//		menu.getMenu(university);
+        JdbcStudentDao studentDao = context.getBean(JdbcStudentDao.class);
+        JdbcAddressDao addressDao = context.getBean(JdbcAddressDao.class);
+        JdbcTeacherDao teacherDao = context.getBean(JdbcTeacherDao.class);
+        JdbcVacationDao vacationDao = context.getBean(JdbcVacationDao.class);
+        JdbcGroupDao groupDao = context.getBean(JdbcGroupDao.class);
+
+        Student student1 = dataSource.generateStudent();
+        Teacher teacher1 = dataSource.generateTeacher();
+        Vacation vacation = new Vacation(
+            LocalDate.of(2021, 12, 5),
+            LocalDate.of(2021, 12, 10));
+
+
+        groupDao.create(new Group("fdsfds"));
+
+        addressDao.create(student1.getAdress());
+        studentDao.create(student1, 1);
+
+
+
+    }
 
 }
