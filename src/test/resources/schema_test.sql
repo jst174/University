@@ -30,13 +30,6 @@ CREATE TABLE students
   FOREIGN KEY (address_id) REFERENCES addresses (id) ON DELETE SET NULL,
   FOREIGN KEY (group_id) REFERENCES groups (id) ON DELETE SET NULL
 );
-DROP TABLE IF EXISTS vacations CASCADE;
-CREATE TABLE vacations
-(
-  id             SERIAL PRIMARY KEY NOT NULL,
-  start DATE,
-  ending   DATE
-);
 
 DROP TABLE IF EXISTS teachers CASCADE;
 CREATE TABLE teachers
@@ -51,6 +44,15 @@ CREATE TABLE teachers
   email           VARCHAR,
   academic_degree VARCHAR,
   FOREIGN KEY (address_id) REFERENCES addresses (id) ON DELETE SET NULL
+);
+
+DROP TABLE IF EXISTS vacations CASCADE;
+CREATE TABLE vacations
+(
+  id         SERIAL PRIMARY KEY NOT NULL,
+  start      DATE,
+  ending     DATE,
+  teacher_id INTEGER REFERENCES teachers (id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 
@@ -95,13 +97,6 @@ CREATE TABLE lessons
   time_id      INTEGER REFERENCES times (id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
-DROP TABLE IF EXISTS teachers_vacations CASCADE;
-CREATE TABLE teachers_vacations
-(
-  teacher_id  INTEGER REFERENCES teachers (id) ON UPDATE CASCADE ON DELETE CASCADE,
-  vacation_id INTEGER REFERENCES vacations (id) ON UPDATE CASCADE ON DELETE CASCADE,
-  UNIQUE (teacher_id, vacation_id)
-);
 DROP TABLE IF EXISTS teachers_courses CASCADE;
 CREATE TABLE teachers_courses
 (
@@ -109,13 +104,14 @@ CREATE TABLE teachers_courses
   course_id  INTEGER REFERENCES courses (id) ON UPDATE CASCADE ON DELETE CASCADE,
   UNIQUE (teacher_id, course_id)
 );
-DROP TABLE IF EXISTS group_students CASCADE;
-CREATE TABLE group_students
+
+DROP TABLE IF EXISTS lessons_groups CASCADE;
+CREATE TABLE lessons_groups
 (
-  group_id   INTEGER REFERENCES groups (id) ON UPDATE CASCADE ON DELETE CASCADE,
-  student_id INTEGER REFERENCES students (id) ON UPDATE CASCADE ON DELETE CASCADE,
-  UNIQUE (group_id, student_id)
-);
+  lesson_id INTEGER REFERENCES lessons (id) ON UPDATE CASCADE ON DELETE CASCADE,
+  group_id  INTEGER REFERENCES groups (id) ON UPDATE CASCADE ON DELETE CASCADE,
+  UNIQUE (lesson_id, group_id)
+)
 
 
 

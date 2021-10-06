@@ -5,15 +5,6 @@ import ua.com.foxminded.university.model.Holiday;
 
 import java.util.List;
 
-public interface HolidayDao {
+public interface HolidayDao extends Dao<Holiday> {
 
-    void create(Holiday holiday);
-
-    Holiday getById(int id);
-
-    void update(int id, Holiday holiday);
-
-    void delete(int id);
-
-    List<Holiday> getAll();
 }

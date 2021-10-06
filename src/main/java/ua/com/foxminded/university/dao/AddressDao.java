@@ -5,15 +5,6 @@ import ua.com.foxminded.university.model.Course;
 
 import java.util.List;
 
-public interface AddressDao {
+public interface AddressDao extends Dao<Address> {
 
-    void create(Address address);
-
-    Address getById(int id);
-
-    void update(int id, Address address);
-
-    void delete(int id);
-
-    List<Address> getAll();
 }

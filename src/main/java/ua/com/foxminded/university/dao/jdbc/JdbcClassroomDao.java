@@ -47,8 +47,8 @@ public class JdbcClassroomDao implements ClassroomDao {
         return jdbcTemplate.queryForObject(SQL_FIND_CLASSROOM, classroomMapper, id);
     }
 
-    public void update(int id, Classroom classroom) {
-        jdbcTemplate.update(SQL_UPDATE_CLASSROOM, classroom.getNumber(), classroom.getCapacity(), id);
+    public void update(Classroom classroom) {
+        jdbcTemplate.update(SQL_UPDATE_CLASSROOM, classroom.getNumber(), classroom.getCapacity(), classroom.getId());
     }
 
     public void delete(int id) {

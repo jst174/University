@@ -18,10 +18,10 @@ import java.util.List;
 public class JdbcVacationDao implements VacationDao {
 
     private static final String SQL_INSERT_VACATION =
-        "INSERT INTO vacations (start, ending) VALUES(?,?)";
+        "INSERT INTO vacations (start, ending, teacher_id) VALUES(?,?,?)";
     private static final String SQL_FIND_VACATION = "SELECT * FROM vacations WHERE id = ?";
     private static final String SQL_UPDATE_VACATION =
-        "UPDATE vacations SET start = ?, ending = ? WHERE id = ?";
+        "UPDATE vacations SET start = ?, ending = ?, teacher_id = ? WHERE id = ?";
     private static final String SQL_DELETE_VACATION = "DELETE FROM vacations WHERE id = ?";
     private static final String SQL_FIND_ALL = "SELECT * FROM vacations";
 
@@ -40,6 +40,7 @@ public class JdbcVacationDao implements VacationDao {
             PreparedStatement statement = connection.prepareStatement(SQL_INSERT_VACATION, Statement.RETURN_GENERATED_KEYS);
             statement.setDate(1, Date.valueOf(vacation.getStart()));
             statement.setDate(2, Date.valueOf(vacation.getEnd()));
+            statement.setInt(3, vacation.getTeacher().getId());
             return statement;
         }, keyHolder);
         vacation.setId((int)keyHolder.getKeys().get("id"));
@@ -49,11 +50,12 @@ public class JdbcVacationDao implements VacationDao {
         return jdbcTemplate.queryForObject(SQL_FIND_VACATION, vacationMapper, id);
     }
 
-    public void update(int id, Vacation vacation) {
+    public void update(Vacation vacation) {
         jdbcTemplate.update(SQL_UPDATE_VACATION,
             vacation.getStart(),
             vacation.getEnd(),
-            id);
+            vacation.getTeacher().getId(),
+            vacation.getId());
     }
 
     public void delete(int id) {

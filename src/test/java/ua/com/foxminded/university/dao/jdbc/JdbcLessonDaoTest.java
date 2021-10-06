@@ -9,8 +9,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.jdbc.JdbcTestUtils;
-import ua.com.foxminded.university.config.SpringConfigTest;
-import ua.com.foxminded.university.dao.jdbc.JdbcLessonDao;
+import ua.com.foxminded.university.config.DatabaseConfigTest;
 import ua.com.foxminded.university.model.*;
 
 import java.time.LocalDate;
@@ -21,7 +20,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {SpringConfigTest.class})
+@ContextConfiguration(classes = {DatabaseConfigTest.class})
 @Sql({"/create_lesson_test.sql"})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class JdbcLessonDaoTest {
@@ -78,7 +77,7 @@ public class JdbcLessonDaoTest {
             Gender.MALE,
             address,
             "5435345334",
-            "miller97@gmail.com",
+            "miller77@gmail.com",
             AcademicDegree.MASTER
         );
         teacher.setId(1);
@@ -102,6 +101,44 @@ public class JdbcLessonDaoTest {
     }
 
     @Test
+    public void givenUpdatedLesson_whenUpdate_thenUpdated() {
+        String SQL = "SELECT COUNT(0) FROM lessons WHERE classroom_id = 2 and course_id = 2 and teacher_id = 2 and " +
+            "date = '2021-06-10' and time_id = 2";
+        Address address = new Address("Russia", "Saint Petersburg", "Nevsky Prospect",
+            "15", "45", "342423");
+        address.setId(1);
+        Course course = new Course("Physics");
+        course.setId(2);
+        Classroom classroom = new Classroom(201, 60);
+        classroom.setId(2);
+        Teacher teacher = new Teacher(
+            "Bob",
+            "King",
+            LocalDate.of(1965, 11, 21),
+            Gender.MALE,
+            address,
+            "5345345",
+            "king65@gmail.com",
+            AcademicDegree.DOCTORAL
+        );
+        teacher.setId(2);
+        Time time = new Time(LocalTime.of(12, 0), LocalTime.of(13, 30));
+        time.setId(2);
+        Lesson updatedLesson = new Lesson(
+            course,
+            classroom,
+            teacher,
+            LocalDate.of(2021, 6, 10),
+            time
+        );
+        updatedLesson.setId(1);
+
+        lessonDao.update(updatedLesson);
+
+        assertEquals(1, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "lessons", SQL));
+    }
+
+    @Test
     public void givenId_whenDelete_thenDeleted() {
         lessonDao.delete(1);
 
@@ -109,7 +146,7 @@ public class JdbcLessonDaoTest {
     }
 
     @Test
-    public void whenGetAll_thenReturnAllLessons(){
+    public void whenGetAll_thenReturnAllLessons() {
         Address address = new Address("Russia", "Saint Petersburg", "Nevsky Prospect",
             "15", "45", "342423");
         address.setId(1);
@@ -120,7 +157,7 @@ public class JdbcLessonDaoTest {
             Gender.MALE,
             address,
             "5435345334",
-            "miller97@gmail.com",
+            "miller77@gmail.com",
             AcademicDegree.MASTER
         );
         teacher.setId(1);
@@ -143,5 +180,14 @@ public class JdbcLessonDaoTest {
         List<Lesson> actual = lessonDao.getAll();
 
         assertEquals(expected, actual);
+    }
+
+    @Test
+    public void whenAddGroup_thenAddNewGroupToLesson(){
+        lessonDao.addGroup(1,1);
+        lessonDao.addGroup(1,2);
+        lessonDao.addGroup(1,3);
+
+        assertEquals(3, JdbcTestUtils.countRowsInTable(jdbcTemplate,"lessons_groups"));
     }
 }

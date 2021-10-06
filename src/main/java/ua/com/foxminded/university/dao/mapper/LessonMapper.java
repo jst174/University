@@ -11,6 +11,7 @@ import ua.com.foxminded.university.model.Lesson;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 
 @Component
 public class LessonMapper implements RowMapper<Lesson> {
@@ -30,7 +31,7 @@ public class LessonMapper implements RowMapper<Lesson> {
             courseDao.getById(rs.getInt("id")),
             classroomDao.getById(rs.getInt("id")),
             teacherDao.getById(rs.getInt("id")),
-            rs.getDate("date").toLocalDate(),
+            rs.getObject("date", LocalDate.class),
             timeDao.getById(rs.getInt("id"))
         );
         lesson.setId(rs.getInt("id"));

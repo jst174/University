@@ -9,8 +9,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.jdbc.JdbcTestUtils;
-import ua.com.foxminded.university.config.SpringConfigTest;
-import ua.com.foxminded.university.dao.jdbc.JdbcTeacherDao;
+import ua.com.foxminded.university.config.DatabaseConfigTest;
 import ua.com.foxminded.university.model.*;
 
 import java.time.LocalDate;
@@ -20,9 +19,8 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {SpringConfigTest.class})
-@Sql({"/create_address_test.sql", "/create_teacher_test.sql", "/create_teacher_courses_test.sql",
-    "/create_teachers_vacation_test.sql"})
+@ContextConfiguration(classes = {DatabaseConfigTest.class})
+@Sql({"/create_address_test.sql", "/create_teacher_test.sql", "/create_teacher_courses_test.sql"})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class JdbcTeacherDaoTest {
 
@@ -46,8 +44,10 @@ public class JdbcTeacherDaoTest {
             "king97@yandex.ru",
             AcademicDegree.MASTER
         );
+        address.setId(1);
+        teacher.setAdress(address);
 
-        teacherDao.create(teacher, 1);
+        teacherDao.create(teacher);
 
         assertEquals(2, JdbcTestUtils.countRowsInTable(jdbcTemplate, "teachers"));
     }
@@ -90,8 +90,9 @@ public class JdbcTeacherDaoTest {
             "king97@yandex.ru",
             AcademicDegree.DOCTORAL
         );
+        updatedTeacher.setId(1);
 
-        teacherDao.update(1, updatedTeacher);
+        teacherDao.update(updatedTeacher);
 
         assertEquals(1, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "teachers", SQL));
     }
@@ -101,15 +102,6 @@ public class JdbcTeacherDaoTest {
         teacherDao.delete(1);
 
         assertEquals(0, JdbcTestUtils.countRowsInTable(jdbcTemplate, "teachers"));
-    }
-
-    @Test
-    public void givenTeacherIdAndVacationId_whenAddVacation_thenAddVacationToTeacher() {
-        teacherDao.addVacation(1, 1);
-        teacherDao.addVacation(1, 2);
-        teacherDao.addVacation(1, 3);
-
-        assertEquals(3, JdbcTestUtils.countRowsInTable(jdbcTemplate, "teachers_vacations"));
     }
 
     @Test

@@ -54,14 +54,14 @@ public class JdbcAddressDao implements AddressDao {
         return jdbcTemplate.queryForObject(SQL_FIND_ADDRESS, addressMapper, id);
     }
 
-    public void update(int id, Address address) {
+    public void update(Address address) {
         jdbcTemplate.update(SQL_UPDATE_ADDRESS, address.getCountry(),
             address.getCity(),
             address.getStreet(),
             address.getHouseNumber(),
             address.getApartmentNumber(),
             address.getPostcode(),
-            id);
+            address.getId());
     }
 
     public void delete(int id) {

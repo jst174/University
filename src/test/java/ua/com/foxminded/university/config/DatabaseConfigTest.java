@@ -12,7 +12,7 @@ import javax.sql.DataSource;
 
 @Configuration
 @ComponentScan("ua.com.foxminded.university")
-public class SpringConfigTest {
+public class DatabaseConfigTest extends DatabaseConfig{
 
     @Bean
     public DataSource dataSource(){
@@ -20,11 +20,6 @@ public class SpringConfigTest {
             .setType(EmbeddedDatabaseType.H2)
             .addScript("schema_test.sql")
             .build();
-    }
-
-    @Bean
-    public JdbcTemplate jdbcTemplate(DataSource dataSource) {
-        return new JdbcTemplate(dataSource);
     }
 
 }

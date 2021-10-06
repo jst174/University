@@ -35,7 +35,7 @@ public class JdbcStudentDao implements StudentDao {
         this.studentMapper = studentMapper;
     }
 
-    public void create(Student student, int addressId) {
+    public void create(Student student) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
             PreparedStatement statement = connection.prepareStatement(SQL_INSERT_STUDENT, Statement.RETURN_GENERATED_KEYS);
@@ -43,7 +43,7 @@ public class JdbcStudentDao implements StudentDao {
             statement.setString(2, student.getLastName());
             statement.setDate(3, Date.valueOf(student.getBirthDate()));
             statement.setString(4, student.getGender().toString());
-            statement.setInt(5, addressId);
+            statement.setInt(5, student.getAdress().getId());
             statement.setString(6, student.getPhoneNumber());
             statement.setString(7, student.getEmail());
             return statement;
@@ -55,7 +55,7 @@ public class JdbcStudentDao implements StudentDao {
         return jdbcTemplate.queryForObject(SQL_FIND_STUDENT, studentMapper, id);
     }
 
-    public void update(int id, Student student) {
+    public void update(Student student) {
         jdbcTemplate.update(SQL_UPDATE_STUDENT,
             student.getFirstName(),
             student.getLastName(),
@@ -65,7 +65,7 @@ public class JdbcStudentDao implements StudentDao {
             student.getPhoneNumber(),
             student.getEmail(),
             student.getGroup().getId(),
-            id);
+            student.getId());
     }
 
     public void delete(int id) {

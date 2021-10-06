@@ -45,8 +45,8 @@ public class JdbcCourseDao implements CourseDao {
         return jdbcTemplate.queryForObject(SQL_FIND_COURSE, courseMapper, id);
     }
 
-    public void update(int id, Course course) {
-        jdbcTemplate.update(SQL_UPDATE_COURSE, course.getName(), id);
+    public void update(Course course) {
+        jdbcTemplate.update(SQL_UPDATE_COURSE, course.getName(), course.getId());
     }
 
     public void delete(int id) {

@@ -46,10 +46,10 @@ public class JdbcTimeDao implements TimeDao {
         return jdbcTemplate.queryForObject(SQL_FIND_TIME, timeMapper, id);
     }
 
-    public void update(int id, Time time) {
+    public void update(Time time) {
         jdbcTemplate.update(SQL_UPDATE_TIME, time.getStartTime(),
             time.getEndTime(),
-            id);
+            time.getId());
     }
 
     public void delete(int id) {

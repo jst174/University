@@ -9,8 +9,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.jdbc.JdbcTestUtils;
-import ua.com.foxminded.university.config.SpringConfigTest;
-import ua.com.foxminded.university.dao.jdbc.JdbcCourseDao;
+import ua.com.foxminded.university.config.DatabaseConfigTest;
 import ua.com.foxminded.university.model.Course;
 
 import java.util.ArrayList;
@@ -19,7 +18,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {SpringConfigTest.class})
+@ContextConfiguration(classes = {DatabaseConfigTest.class})
 @Sql({"/create_course_test.sql"})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class JdbcCourseDaoTest {
@@ -51,8 +50,9 @@ public class JdbcCourseDaoTest {
     public void givenUpdatedCourseAndId_whenUpdated_thenUpdated() {
         String SQL = "SELECT COUNT(0) FROM courses WHERE name = 'Math'";
         Course updatedCourse = new Course("Math");
+        updatedCourse.setId(1);
 
-        courseDao.update(1, updatedCourse);
+        courseDao.update(updatedCourse);
 
         assertEquals(1, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "courses", SQL));
 

@@ -9,8 +9,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.jdbc.JdbcTestUtils;
-import ua.com.foxminded.university.config.SpringConfigTest;
-import ua.com.foxminded.university.dao.jdbc.JdbcAddressDao;
+import ua.com.foxminded.university.config.DatabaseConfigTest;
 import ua.com.foxminded.university.model.Address;
 
 import java.util.ArrayList;
@@ -19,7 +18,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {SpringConfigTest.class})
+@ContextConfiguration(classes = {DatabaseConfigTest.class})
 @Sql({"/create_address_test.sql"})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class JdbcAddressDaoTest {
@@ -56,8 +55,9 @@ public class JdbcAddressDaoTest {
             "and apartment_number = '192' and postcode = '432436'";
         Address updatedAddress = new Address("Russia", "Moscow", "Kutuzov Avenue",
             "43", "192", "432436");
+        updatedAddress.setId(1);
 
-        addressDao.update(1, updatedAddress);
+        addressDao.update(updatedAddress);
 
         assertEquals(1, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "addresses", SQL));
     }

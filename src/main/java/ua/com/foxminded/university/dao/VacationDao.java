@@ -5,14 +5,6 @@ import ua.com.foxminded.university.model.Vacation;
 
 import java.util.List;
 
-public interface VacationDao {
-    void create(Vacation vacation);
+public interface VacationDao extends Dao<Vacation> {
 
-    Vacation getById(int id);
-
-    void update(int id, Vacation vacation);
-
-    void delete(int id);
-
-    List<Vacation> getAll();
 }

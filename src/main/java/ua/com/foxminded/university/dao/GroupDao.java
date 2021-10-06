@@ -5,15 +5,6 @@ import ua.com.foxminded.university.model.Group;
 
 import java.util.List;
 
-public interface GroupDao {
+public interface GroupDao extends Dao<Group> {
 
-    void create(Group group);
-
-    Group getById(int id);
-
-    void update(int id, Group group);
-
-    void delete(int id);
-
-    List<Group> getAll();
 }

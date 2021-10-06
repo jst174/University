@@ -21,10 +21,11 @@ public class JdbcLessonDao implements LessonDao {
         "INSERT INTO lessons (classroom_id, course_id, teacher_id, date, time_id)" +
             "VALUES (?,?,?,?,?)";
     private static final String SQL_FIND_LESSON = "SELECT * FROM lessons WHERE id = ?";
-    private static final String SQL_UPDATE_LESSON = "UPDATE lessons SET group_id = ?, classroom_id = ?," +
-        "course_id = ?, teacher_id = ?, date = ?, time = ?";
+    private static final String SQL_UPDATE_LESSON = "UPDATE lessons SET classroom_id = ?," +
+        "course_id = ?, teacher_id = ?, date = ?, time_id = ? WHERE id = ?";
     private static final String SQL_DELETE_LESSON = "DELETE FROM lessons WHERE id = ?";
     private static final String SQL_FIND_ALL = "SELECT * FROM lessons";
+    private static final String SQL_ADD_GROUP = "INSERT INTO lessons_groups(lesson_id, group_id) VALUES (?,?)";
 
     private JdbcTemplate jdbcTemplate;
     private LessonMapper lessonMapper;
@@ -35,7 +36,7 @@ public class JdbcLessonDao implements LessonDao {
         this.lessonMapper = lessonMapper;
     }
 
-    public void create(Lesson lesson){
+    public void create(Lesson lesson) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
             PreparedStatement statement = connection.prepareStatement(SQL_INSERT_LESSON, Statement.RETURN_GENERATED_KEYS);
@@ -46,19 +47,25 @@ public class JdbcLessonDao implements LessonDao {
             statement.setInt(5, lesson.getTime().getId());
             return statement;
         }, keyHolder);
-        lesson.setId((int)keyHolder.getKeys().get("id"));
+        lesson.setId((int) keyHolder.getKeys().get("id"));
     }
 
-    public Lesson getById(int id){
-        return jdbcTemplate.queryForObject(SQL_FIND_LESSON,lessonMapper, id);
+    public Lesson getById(int id) {
+        return jdbcTemplate.queryForObject(SQL_FIND_LESSON, lessonMapper, id);
     }
 
     @Override
-    public void update(int id, Lesson lesson) {
-
+    public void update(Lesson lesson) {
+        jdbcTemplate.update(SQL_UPDATE_LESSON,
+            lesson.getClassroom().getId(),
+            lesson.getCourse().getId(),
+            lesson.getTeacher().getId(),
+            lesson.getDate(),
+            lesson.getTime().getId(),
+            lesson.getId());
     }
 
-    public void delete(int id){
+    public void delete(int id) {
         jdbcTemplate.update(SQL_DELETE_LESSON, id);
     }
 
@@ -67,4 +74,8 @@ public class JdbcLessonDao implements LessonDao {
         return jdbcTemplate.query(SQL_FIND_ALL, lessonMapper);
     }
 
+    @Override
+    public void addGroup(int lessonId, int groupId) {
+        jdbcTemplate.update(SQL_ADD_GROUP, lessonId, groupId);
+    }
 }

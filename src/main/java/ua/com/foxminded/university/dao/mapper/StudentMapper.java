@@ -10,6 +10,7 @@ import ua.com.foxminded.university.model.Student;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 
 @Component
 public class StudentMapper implements RowMapper<Student> {
@@ -22,7 +23,7 @@ public class StudentMapper implements RowMapper<Student> {
     public Student mapRow(ResultSet rs, int rowNum) throws SQLException {
         Student student = new Student(rs.getString("first_name"),
             rs.getString("last_name"),
-            rs.getDate("birthday").toLocalDate(),
+            rs.getObject("birthday", LocalDate.class),
             Gender.valueOf(rs.getString("gender")),
             addressDao.getById(rs.getInt("address_id")),
             rs.getString("phone_number"),

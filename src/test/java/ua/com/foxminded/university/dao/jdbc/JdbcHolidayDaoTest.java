@@ -9,8 +9,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.jdbc.JdbcTestUtils;
-import ua.com.foxminded.university.config.SpringConfigTest;
-import ua.com.foxminded.university.dao.jdbc.JdbcHolidayDao;
+import ua.com.foxminded.university.config.DatabaseConfigTest;
 import ua.com.foxminded.university.model.Holiday;
 
 import java.time.LocalDate;
@@ -20,7 +19,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {SpringConfigTest.class})
+@ContextConfiguration(classes = {DatabaseConfigTest.class})
 @Sql({"/create_holiday_test.sql"})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class JdbcHolidayDaoTest {
@@ -52,8 +51,9 @@ public class JdbcHolidayDaoTest {
     public void givenUpdatedHolidayAndId_whenUpdate_thenUpdated() {
         String SQL = "SELECT COUNT(0) FROM holidays WHERE name = 'Christmas' and date = '2022-01-07'";
         Holiday updatedHoliday = new Holiday("Christmas", LocalDate.of(2022, 01, 07));
+        updatedHoliday.setId(1);
 
-        holidayDao.update(1, updatedHoliday);
+        holidayDao.update(updatedHoliday);
 
         assertEquals(1, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "holidays", SQL));
     }

@@ -9,9 +9,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.jdbc.JdbcTestUtils;
-import ua.com.foxminded.university.config.SpringConfigTest;
-import ua.com.foxminded.university.dao.jdbc.JdbcTimeDao;
-import ua.com.foxminded.university.model.Lesson;
+import ua.com.foxminded.university.config.DatabaseConfigTest;
 import ua.com.foxminded.university.model.Time;
 
 import java.time.LocalTime;
@@ -21,7 +19,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {SpringConfigTest.class})
+@ContextConfiguration(classes = {DatabaseConfigTest.class})
 @Sql({"/create_time_test.sql"})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class JdbcTimeDaoTest {
@@ -53,8 +51,9 @@ public class JdbcTimeDaoTest {
     public void givenUpdatedTimeAndId_whenUpdate_thenUpdated() {
         String SQL = "SELECT COUNT(*) FROM times WHERE start = '8:15' and ending = '9:45'";
         Time updatedTime = new Time(LocalTime.of(8, 15), LocalTime.of(9, 45));
+        updatedTime.setId(1);
 
-        timeDao.update(1, updatedTime);
+        timeDao.update(updatedTime);
 
         assertEquals(1, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "times", SQL));
     }

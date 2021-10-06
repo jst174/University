@@ -48,8 +48,8 @@ public class JdbcHolidayDao implements HolidayDao {
         return jdbcTemplate.queryForObject(SQL_FIND_HOLIDAY, holidayMapper, id);
     }
 
-    public void update(int id, Holiday holiday) {
-        jdbcTemplate.update(SQL_UPDATE_HOLIDAY, holiday.getName(), holiday.getDate(),id);
+    public void update(Holiday holiday) {
+        jdbcTemplate.update(SQL_UPDATE_HOLIDAY, holiday.getName(), holiday.getDate(), holiday.getId());
     }
 
     public void delete(int id) {

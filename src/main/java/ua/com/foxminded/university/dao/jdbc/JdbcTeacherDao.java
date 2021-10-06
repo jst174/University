@@ -25,8 +25,6 @@ public class JdbcTeacherDao implements TeacherDao {
         "UPDATE teachers SET first_name = ?, last_name = ?, birthday = ?, gender = ?, address_id = ?, " +
             "phone_number = ?, email = ?, academic_degree = ? WHERE id = ?";
     private static final String SQL_DELETE_TEACHER = "DELETE FROM teachers WHERE id = ?";
-
-    private static final String SQL_ADD_VACATION = "INSERT INTO teachers_vacations(teacher_id, vacation_id) VALUES (?,?)";
     private static final String SQL_ADD_COURSE = "INSERT INTO teachers_courses(teacher_id, course_id) VALUES(?,?)";
     private static final String SQL_FIND_ALl = "SELECT * FROM teachers";
 
@@ -39,7 +37,7 @@ public class JdbcTeacherDao implements TeacherDao {
         this.teacherMapper = teacherMapper;
     }
 
-    public void create(Teacher teacher, int addressId) {
+    public void create(Teacher teacher) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
             PreparedStatement statement = connection.prepareStatement(SQL_INSERT_TEACHER, Statement.RETURN_GENERATED_KEYS);
@@ -47,28 +45,24 @@ public class JdbcTeacherDao implements TeacherDao {
             statement.setString(2, teacher.getLastName());
             statement.setDate(3, Date.valueOf(teacher.getBirthDate()));
             statement.setString(4, teacher.getGender().toString());
-            statement.setInt(5, addressId);
+            statement.setInt(5, teacher.getAdress().getId());
             statement.setString(6, teacher.getPhoneNumber());
             statement.setString(7, teacher.getEmail());
             statement.setString(8, teacher.getAcademicDegree().toString());
             return statement;
         }, keyHolder);
-        teacher.setId((int)keyHolder.getKeys().get("id"));
+        teacher.setId((int) keyHolder.getKeys().get("id"));
     }
 
     public Teacher getById(int id) {
         return jdbcTemplate.queryForObject(SQL_FIND_TEACHER, teacherMapper, id);
     }
 
-    public void addVacation(int teacherId, int vacationId ){
-        jdbcTemplate.update(SQL_ADD_VACATION, teacherId, vacationId);
-    }
-
-    public void addCourse(int teacherId, int courseId){
+    public void addCourse(int teacherId, int courseId) {
         jdbcTemplate.update(SQL_ADD_COURSE, teacherId, courseId);
     }
 
-    public void update(int id, Teacher teacher) {
+    public void update(Teacher teacher) {
         jdbcTemplate.update(SQL_UPDATE_TEACHER,
             teacher.getFirstName(),
             teacher.getLastName(),
@@ -78,7 +72,7 @@ public class JdbcTeacherDao implements TeacherDao {
             teacher.getPhoneNumber(),
             teacher.getEmail(),
             teacher.getAcademicDegree().toString(),
-            id);
+            teacher.getId());
     }
 
     public void delete(int id) {

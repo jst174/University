@@ -5,15 +5,8 @@ import ua.com.foxminded.university.model.Lesson;
 
 import java.util.List;
 
-public interface LessonDao {
+public interface LessonDao extends Dao<Lesson> {
 
-    void create(Lesson lesson);
+    void addGroup(int lessonId, int groupId);
 
-    Lesson getById(int id);
-
-    void update(int id, Lesson lesson);
-
-    void delete(int id);
-
-    List<Lesson> getAll();
 }

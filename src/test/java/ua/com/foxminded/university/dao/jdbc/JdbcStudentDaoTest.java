@@ -9,8 +9,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.jdbc.JdbcTestUtils;
-import ua.com.foxminded.university.config.SpringConfigTest;
-import ua.com.foxminded.university.dao.jdbc.JdbcStudentDao;
+import ua.com.foxminded.university.config.DatabaseConfigTest;
 import ua.com.foxminded.university.model.Address;
 import ua.com.foxminded.university.model.Gender;
 import ua.com.foxminded.university.model.Group;
@@ -24,7 +23,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {SpringConfigTest.class})
+@ContextConfiguration(classes = {DatabaseConfigTest.class})
 @Sql({"/create_address_test.sql", "/create_groups_test.sql", "/create_student_test.sql"})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class JdbcStudentDaoTest {
@@ -47,8 +46,10 @@ public class JdbcStudentDaoTest {
             "3622366",
             "king97@yandex.ru"
         );
+        address.setId(1);
+        student.setAdress(address);
 
-        studentDao.create(student, 1);
+        studentDao.create(student);
 
         assertEquals(2, JdbcTestUtils.countRowsInTable(jdbcTemplate, "students"));
     }
@@ -94,8 +95,9 @@ public class JdbcStudentDaoTest {
             "king97@yandex.ru"
         );
         updatedStudent.setGroup(group);
+        updatedStudent.setId(1);
 
-        studentDao.update(1, updatedStudent);
+        studentDao.update(updatedStudent);
 
         assertEquals(1, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "students", SQL));
 

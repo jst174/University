@@ -4,15 +4,6 @@ import ua.com.foxminded.university.model.Course;
 
 import java.util.List;
 
-public interface CourseDao {
+public interface CourseDao extends Dao<Course>{
 
-    void create(Course course);
-
-    Course getById(int id);
-
-    void update(int id, Course course);
-
-    void delete(int id);
-
-    List<Course> getAll();
 }
