@@ -28,7 +28,7 @@ public class JdbcAddressDao implements AddressDao {
 
     public JdbcAddressDao(JdbcTemplate jdbcTemplate, AddressMapper addressMapper) {
         this.jdbcTemplate = jdbcTemplate;
-        this.addressMapper  = addressMapper;
+        this.addressMapper = addressMapper;
     }
 
     public void create(Address address) {
@@ -43,7 +43,7 @@ public class JdbcAddressDao implements AddressDao {
             statement.setString(6, address.getPostcode());
             return statement;
         }, keyHolder);
-        address.setId((int)keyHolder.getKeys().get("id"));
+        address.setId((int) keyHolder.getKeys().get("id"));
 
     }
 
