@@ -1,6 +1,5 @@
 package ua.com.foxminded.university.dao.jdbc;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -28,7 +27,6 @@ public class JdbcVacationDao implements VacationDao {
     private VacationMapper vacationMapper;
     private JdbcTemplate jdbcTemplate;
 
-    @Autowired
     public JdbcVacationDao(JdbcTemplate jdbcTemplate, VacationMapper vacationMapper) {
         this.jdbcTemplate = jdbcTemplate;
         this.vacationMapper = vacationMapper;
@@ -38,8 +36,8 @@ public class JdbcVacationDao implements VacationDao {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
             PreparedStatement statement = connection.prepareStatement(SQL_INSERT_VACATION, Statement.RETURN_GENERATED_KEYS);
-            statement.setDate(1, Date.valueOf(vacation.getStart()));
-            statement.setDate(2, Date.valueOf(vacation.getEnd()));
+            statement.setObject(1, vacation.getStart());
+            statement.setObject(2, vacation.getEnd());
             statement.setInt(3, vacation.getTeacher().getId());
             return statement;
         }, keyHolder);

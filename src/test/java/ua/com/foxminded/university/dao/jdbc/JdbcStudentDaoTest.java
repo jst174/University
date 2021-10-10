@@ -1,5 +1,8 @@
 package ua.com.foxminded.university.dao.jdbc;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.test.jdbc.JdbcTestUtils.*;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +23,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {DatabaseConfigTest.class})
@@ -46,12 +48,12 @@ public class JdbcStudentDaoTest {
             "3622366",
             "king97@yandex.ru"
         );
-        address.setId(1);
-        student.setAdress(address);
+        student.setAddress(address);
+        int expectedRows = countRowsInTable(jdbcTemplate, "students") + 1;
 
         studentDao.create(student);
 
-        assertEquals(2, JdbcTestUtils.countRowsInTable(jdbcTemplate, "students"));
+        assertEquals(expectedRows, countRowsInTable(jdbcTemplate, "students"));
     }
 
     @Test
@@ -96,18 +98,21 @@ public class JdbcStudentDaoTest {
         );
         updatedStudent.setGroup(group);
         updatedStudent.setId(1);
+        int expectedRows = countRowsInTableWhere(jdbcTemplate, "students", SQL) + 1;
 
         studentDao.update(updatedStudent);
 
-        assertEquals(1, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "students", SQL));
+        assertEquals(expectedRows, countRowsInTableWhere(jdbcTemplate, "students", SQL));
 
     }
 
     @Test
     public void givenId_whenDelete_thenDeleted() {
+        int expectedRows = countRowsInTable(jdbcTemplate, "students") - 1;
+
         studentDao.delete(1);
 
-        assertEquals(0, JdbcTestUtils.countRowsInTable(jdbcTemplate, "students"));
+        assertEquals(0, countRowsInTable(jdbcTemplate, "students"));
     }
 
     @Test

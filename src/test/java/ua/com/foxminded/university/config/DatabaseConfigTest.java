@@ -1,18 +1,15 @@
 package ua.com.foxminded.university.config;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.*;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
+//import ua.com.foxminded.university.config.DatabaseConfig;
 
 import javax.sql.DataSource;
 
 @Configuration
-@ComponentScan("ua.com.foxminded.university")
-public class DatabaseConfigTest extends DatabaseConfig{
+@Import({DatabaseConfig.class})
+public class DatabaseConfigTest{
 
     @Bean
     public DataSource dataSource(){
@@ -21,9 +18,4 @@ public class DatabaseConfigTest extends DatabaseConfig{
             .addScript("schema_test.sql")
             .build();
     }
-
 }
-
-
-
-

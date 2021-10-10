@@ -54,7 +54,7 @@ public class Teacher extends Person {
 
 	@Override
 	public String toString() {
-		return getFirstName() + " " + getLastName() + "; " + getBirthDate() + "; " + getGender() + "; " + getAdress()
+		return getFirstName() + " " + getLastName() + "; " + getBirthDate() + "; " + getGender() + "; " + getAddress()
 				+ "; " + getPhoneNumber() + "; " + getEmail() + "; " + academicDegree;
 	}
 

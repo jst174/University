@@ -1,6 +1,5 @@
 package ua.com.foxminded.university.dao.jdbc;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -24,11 +23,9 @@ public class JdbcAddressDao implements AddressDao {
     private static final String SQL_DELETE_ADDRESS = "DELETE FROM addresses WHERE id = ?";
     private static final String SQL_FIND_ALL = "SELECT * FROM addresses";
 
-
     private JdbcTemplate jdbcTemplate;
     private AddressMapper addressMapper;
 
-    @Autowired
     public JdbcAddressDao(JdbcTemplate jdbcTemplate, AddressMapper addressMapper) {
         this.jdbcTemplate = jdbcTemplate;
         this.addressMapper  = addressMapper;

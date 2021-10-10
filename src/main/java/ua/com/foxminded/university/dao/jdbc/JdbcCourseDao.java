@@ -1,6 +1,5 @@
 package ua.com.foxminded.university.dao.jdbc;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -25,7 +24,6 @@ public class JdbcCourseDao implements CourseDao {
     private CourseMapper courseMapper;
     private JdbcTemplate jdbcTemplate;
 
-    @Autowired
     public JdbcCourseDao(JdbcTemplate jdbcTemplate, CourseMapper courseMapper) {
         this.jdbcTemplate = jdbcTemplate;
         this.courseMapper = courseMapper;

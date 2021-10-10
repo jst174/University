@@ -1,5 +1,8 @@
 package ua.com.foxminded.university.dao.jdbc;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.test.jdbc.JdbcTestUtils.*;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +19,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {DatabaseConfigTest.class})
@@ -44,12 +46,23 @@ public class JdbcTeacherDaoTest {
             "king97@yandex.ru",
             AcademicDegree.MASTER
         );
-        address.setId(1);
-        teacher.setAdress(address);
+        teacher.setAddress(address);
+        Course course1 = new Course("History");
+        Course course2 = new Course("Math");
+        Course course3 = new Course("Physic");
+        course1.setId(1);
+        course2.setId(2);
+        course3.setId(3);
+        teacher.getCourses().add(course1);
+        teacher.getCourses().add(course2);
+        teacher.getCourses().add(course3);
+        int expectedRows = countRowsInTable(jdbcTemplate, "teachers") + 1;
+        int expectedCoursesRows = countRowsInTable(jdbcTemplate, "teachers_courses") + 3;
 
         teacherDao.create(teacher);
 
-        assertEquals(2, JdbcTestUtils.countRowsInTable(jdbcTemplate, "teachers"));
+        assertEquals(expectedRows, countRowsInTable(jdbcTemplate, "teachers"));
+        assertEquals(expectedCoursesRows, countRowsInTable(jdbcTemplate, "teachers_courses"));
     }
 
     @Test
@@ -90,31 +103,30 @@ public class JdbcTeacherDaoTest {
             "king97@yandex.ru",
             AcademicDegree.DOCTORAL
         );
+        Course course1 = new Course("Art");
+        course1.setId(1);
+        updatedTeacher.getCourses().add(course1);
         updatedTeacher.setId(1);
+        int expectedRows = countRowsInTableWhere(jdbcTemplate, "teachers", SQL) + 1;
+        int expectedCoursesRows = countRowsInTable(jdbcTemplate, "teachers_courses") + 1;
 
         teacherDao.update(updatedTeacher);
 
-        assertEquals(1, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "teachers", SQL));
+        assertEquals(expectedRows, countRowsInTableWhere(jdbcTemplate, "teachers", SQL));
+        assertEquals(expectedCoursesRows, countRowsInTable(jdbcTemplate, "teachers_courses"));
     }
 
     @Test
     public void givenId_whenDelete_thenDeleted() {
+        int expectedRows = countRowsInTable(jdbcTemplate, "teachers") - 1;
+
         teacherDao.delete(1);
 
-        assertEquals(0, JdbcTestUtils.countRowsInTable(jdbcTemplate, "teachers"));
+        assertEquals(expectedRows, countRowsInTable(jdbcTemplate, "teachers"));
     }
 
     @Test
-    public void givenTeacherIdAndCourseId_whenAddCourse_thenAddCourseToTeacher() {
-        teacherDao.addCourse(1, 1);
-        teacherDao.addCourse(1, 2);
-        teacherDao.addCourse(1, 3);
-
-        assertEquals(3, JdbcTestUtils.countRowsInTable(jdbcTemplate, "teachers_courses"));
-    }
-
-    @Test
-    public void whenGetAll_thenReturnAllTeachers(){
+    public void whenGetAll_thenReturnAllTeachers() {
         Address address = new Address("Russia", "Saint Petersburg", "Nevsky Prospect",
             "15", "45", "342423");
         address.setId(1);

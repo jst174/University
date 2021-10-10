@@ -221,7 +221,7 @@ public class Menu {
 			String inputAdress = scanner2.nextLine();
 			String[] array = inputAdress.split(", ");
 			Address adress = new Address(array[0], array[1], array[2], array[3], array[4], array[5]);
-			updateStudent.setAdress(adress);
+			updateStudent.setAddress(adress);
 		} else if (input.equals("b")) {
 			System.out.println("enter phone number");
 			String phoneNumber = scanner2.nextLine();
@@ -316,7 +316,7 @@ public class Menu {
 			String inputAdress = scanner2.nextLine();
 			String[] array = inputAdress.split(", ");
 			Address adress = new Address(array[0], array[1], array[2], array[3], array[4], array[5]);
-			updateTeacher.setAdress(adress);
+			updateTeacher.setAddress(adress);
 		} else if (input.equals("b")) {
 			System.out.println("enter phone number");
 			String phoneNumber = scanner2.nextLine();

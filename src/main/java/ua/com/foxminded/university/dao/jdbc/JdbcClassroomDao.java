@@ -1,6 +1,5 @@
 package ua.com.foxminded.university.dao.jdbc;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -8,7 +7,6 @@ import org.springframework.stereotype.Component;
 import ua.com.foxminded.university.dao.ClassroomDao;
 import ua.com.foxminded.university.dao.mapper.ClassroomMapper;
 import ua.com.foxminded.university.model.Classroom;
-import ua.com.foxminded.university.model.Course;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
@@ -26,7 +24,6 @@ public class JdbcClassroomDao implements ClassroomDao {
     private ClassroomMapper classroomMapper;
     private JdbcTemplate jdbcTemplate;
 
-    @Autowired
     public JdbcClassroomDao(JdbcTemplate jdbcTemplate, ClassroomMapper classroomMapper) {
         this.jdbcTemplate = jdbcTemplate;
         this.classroomMapper = classroomMapper;

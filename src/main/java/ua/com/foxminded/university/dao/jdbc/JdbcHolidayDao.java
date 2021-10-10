@@ -1,6 +1,5 @@
 package ua.com.foxminded.university.dao.jdbc;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -26,7 +25,6 @@ public class JdbcHolidayDao implements HolidayDao {
     private HolidayMapper holidayMapper;
     private JdbcTemplate jdbcTemplate;
 
-    @Autowired
     public JdbcHolidayDao(JdbcTemplate jdbcTemplate, HolidayMapper holidayMapper) {
         this.jdbcTemplate = jdbcTemplate;
         this.holidayMapper = holidayMapper;
@@ -38,7 +36,7 @@ public class JdbcHolidayDao implements HolidayDao {
         jdbcTemplate.update(connection -> {
             PreparedStatement statement = connection.prepareStatement(SQL_INSERT_HOLIDAY, Statement.RETURN_GENERATED_KEYS);
             statement.setString(1, holiday.getName());
-            statement.setDate(2, Date.valueOf(holiday.getDate()));
+            statement.setObject(2, holiday.getDate());
             return statement;
         }, keyHolder);
         holiday.setId((int)keyHolder.getKeys().get("id"));

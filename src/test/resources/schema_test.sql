@@ -9,12 +9,21 @@ create table addresses
   apartment_number VARCHAR,
   postcode         VARCHAR
 );
+
 DROP TABLE IF EXISTS groups CASCADE;
 CREATE TABLE groups
 (
   id   SERIAL PRIMARY KEY NOT NULL,
   name VARCHAR
 );
+
+DROP TABLE IF EXISTS courses CASCADE;
+CREATE TABLE courses
+(
+  id   SERIAL PRIMARY KEY NOT NULL,
+  name VARCHAR
+);
+
 DROP TABLE IF EXISTS students CASCADE;
 CREATE TABLE students
 (
@@ -55,13 +64,6 @@ CREATE TABLE vacations
   teacher_id INTEGER REFERENCES teachers (id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
-
-DROP TABLE IF EXISTS courses CASCADE;
-CREATE TABLE courses
-(
-  id   SERIAL PRIMARY KEY NOT NULL,
-  name VARCHAR
-);
 DROP TABLE IF EXISTS classrooms CASCADE;
 CREATE TABLE classrooms
 (

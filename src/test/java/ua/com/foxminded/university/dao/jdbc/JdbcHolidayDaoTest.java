@@ -1,5 +1,7 @@
 package ua.com.foxminded.university.dao.jdbc;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.test.jdbc.JdbcTestUtils.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +18,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {DatabaseConfigTest.class})
@@ -32,10 +33,11 @@ public class JdbcHolidayDaoTest {
     @Test
     public void givenNewHoliday_whenCreate_thenCreated() {
         Holiday holiday = new Holiday("New Year", LocalDate.of(2021, 12, 31));
+        int expectedRows = countRowsInTable(jdbcTemplate, "holidays") + 1;
 
         holidayDao.create(holiday);
 
-        assertEquals(3, JdbcTestUtils.countRowsInTable(jdbcTemplate, "holidays"));
+        assertEquals(expectedRows, countRowsInTable(jdbcTemplate, "holidays"));
     }
 
     @Test
@@ -52,17 +54,20 @@ public class JdbcHolidayDaoTest {
         String SQL = "SELECT COUNT(0) FROM holidays WHERE name = 'Christmas' and date = '2022-01-07'";
         Holiday updatedHoliday = new Holiday("Christmas", LocalDate.of(2022, 01, 07));
         updatedHoliday.setId(1);
+        int expectedRows = countRowsInTableWhere(jdbcTemplate, "holidays", SQL) + 1;
 
         holidayDao.update(updatedHoliday);
 
-        assertEquals(1, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "holidays", SQL));
+        assertEquals(expectedRows, countRowsInTableWhere(jdbcTemplate, "holidays", SQL));
     }
 
     @Test
     public void givenId_whenDelete_thenDeleted(){
+        int expectedRows = countRowsInTable(jdbcTemplate, "holidays") - 1;
+
         holidayDao.delete(1);
 
-        assertEquals(1, JdbcTestUtils.countRowsInTable(jdbcTemplate, "holidays"));
+        assertEquals(expectedRows, countRowsInTable(jdbcTemplate, "holidays"));
     }
 
     @Test

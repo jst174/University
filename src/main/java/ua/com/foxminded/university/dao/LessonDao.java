@@ -7,6 +7,4 @@ import java.util.List;
 
 public interface LessonDao extends Dao<Lesson> {
 
-    void addGroup(int lessonId, int groupId);
-
 }

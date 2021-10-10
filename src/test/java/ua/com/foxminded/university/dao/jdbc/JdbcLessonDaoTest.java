@@ -1,5 +1,8 @@
 package ua.com.foxminded.university.dao.jdbc;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.test.jdbc.JdbcTestUtils.*;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +20,6 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {DatabaseConfigTest.class})
@@ -59,10 +61,21 @@ public class JdbcLessonDaoTest {
             LocalDate.of(2021, 9, 28),
             time
         );
+        Group group1 = new Group("FD-21");
+        Group group2 = new Group("GF-54");
+        group1.setId(1);
+        group2.setId(2);
+        List<Group> groups = new ArrayList<>();
+        groups.add(group1);
+        groups.add(group2);
+        lesson.setGroups(groups);
+        int expectedRows = countRowsInTable(jdbcTemplate, "lessons") + 1;
+        int expectedGroupRows = countRowsInTable(jdbcTemplate, "lessons_groups") + 2;
 
         lessonDao.create(lesson);
 
-        assertEquals(2, JdbcTestUtils.countRowsInTable(jdbcTemplate, "lessons"));
+        assertEquals(expectedRows, countRowsInTable(jdbcTemplate, "lessons"));
+        assertEquals(expectedGroupRows, countRowsInTable(jdbcTemplate, "lessons_groups"));
     }
 
     @Test
@@ -132,17 +145,30 @@ public class JdbcLessonDaoTest {
             time
         );
         updatedLesson.setId(1);
+        Group group1 = new Group("DF-23");
+        Group group2 = new Group("GF-33");
+        group1.setId(1);
+        group2.setId(2);
+        List<Group> groups = new ArrayList<>();
+        groups.add(group1);
+        groups.add(group2);
+        updatedLesson.setGroups(groups);
+        int expectedRows = countRowsInTableWhere(jdbcTemplate, "lessons", SQL) + 1;
+        int expectedGroupRows = countRowsInTable(jdbcTemplate, "lessons_groups") + 2;
 
         lessonDao.update(updatedLesson);
 
-        assertEquals(1, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "lessons", SQL));
+        assertEquals(expectedRows, countRowsInTableWhere(jdbcTemplate, "lessons", SQL));
+        assertEquals(expectedGroupRows, countRowsInTable(jdbcTemplate, "lessons_groups"));
     }
 
     @Test
     public void givenId_whenDelete_thenDeleted() {
+        int expectedRows = countRowsInTable(jdbcTemplate, "lessons") - 1;
+
         lessonDao.delete(1);
 
-        assertEquals(0, JdbcTestUtils.countRowsInTable(jdbcTemplate, "lessons"));
+        assertEquals(0, countRowsInTable(jdbcTemplate, "lessons"));
     }
 
     @Test
@@ -182,12 +208,4 @@ public class JdbcLessonDaoTest {
         assertEquals(expected, actual);
     }
 
-    @Test
-    public void whenAddGroup_thenAddNewGroupToLesson(){
-        lessonDao.addGroup(1,1);
-        lessonDao.addGroup(1,2);
-        lessonDao.addGroup(1,3);
-
-        assertEquals(3, JdbcTestUtils.countRowsInTable(jdbcTemplate,"lessons_groups"));
-    }
 }

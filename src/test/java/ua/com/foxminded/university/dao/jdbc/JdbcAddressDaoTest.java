@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.test.jdbc.JdbcTestUtils.*;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {DatabaseConfigTest.class})
@@ -32,10 +33,11 @@ public class JdbcAddressDaoTest {
     public void givenNewAddress_whenCreate_thenCreated() {
         Address address = new Address("Russia", "Saint Petersburg", "Nevsky Prospect",
             "15", "45", "342423");
+        int expectedRows = countRowsInTable(jdbcTemplate,"addresses") + 1;
 
         addressDao.create(address);
 
-        assertEquals(3, JdbcTestUtils.countRowsInTable(jdbcTemplate, "addresses"));
+        assertEquals(expectedRows, countRowsInTable(jdbcTemplate, "addresses"));
     }
 
     @Test
@@ -56,18 +58,20 @@ public class JdbcAddressDaoTest {
         Address updatedAddress = new Address("Russia", "Moscow", "Kutuzov Avenue",
             "43", "192", "432436");
         updatedAddress.setId(1);
+        int expectedRows = countRowsInTableWhere(jdbcTemplate, "addresses", SQL) + 1;
 
         addressDao.update(updatedAddress);
 
-        assertEquals(1, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "addresses", SQL));
+        assertEquals(expectedRows, countRowsInTableWhere(jdbcTemplate, "addresses", SQL));
     }
 
     @Test
     public void givenId_whenDelete_thenDeleted() {
+        int expectedRows = countRowsInTable(jdbcTemplate, "addresses") - 1;
 
         addressDao.delete(1);
 
-        assertEquals(1, JdbcTestUtils.countRowsInTable(jdbcTemplate, "addresses"));
+        assertEquals(expectedRows, countRowsInTable(jdbcTemplate, "addresses"));
     }
 
     @Test

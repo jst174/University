@@ -1,5 +1,8 @@
 package ua.com.foxminded.university.dao.jdbc;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.test.jdbc.JdbcTestUtils.*;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,8 +18,6 @@ import ua.com.foxminded.university.model.Classroom;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {DatabaseConfigTest.class})
 @Sql({"/create_classroom_test.sql"})
@@ -29,16 +30,17 @@ public class JdbcClassroomDaoTest {
     private JdbcTemplate jdbcTemplate;
 
     @Test
-    public void givenNewClassroom_whenCreate_thenCreated(){
+    public void givenNewClassroom_whenCreate_thenCreated() {
         Classroom classroom = new Classroom(102, 30);
+        int expectedRows = countRowsInTable(jdbcTemplate, "classrooms") + 1;
 
         classroomDao.create(classroom);
 
-        assertEquals(3, JdbcTestUtils.countRowsInTable(jdbcTemplate, "classrooms"));
+        assertEquals(expectedRows, countRowsInTable(jdbcTemplate, "classrooms"));
     }
 
     @Test
-    public void givenId_whenGetById_thenReturn(){
+    public void givenId_whenGetById_thenReturn() {
         Classroom expected = new Classroom(102, 30);
 
         Classroom actual = classroomDao.getById(1);
@@ -47,25 +49,28 @@ public class JdbcClassroomDaoTest {
     }
 
     @Test
-    public void givenUpdatedClassroomAndId_whenUpdate_thenUpdated(){
+    public void givenUpdatedClassroomAndId_whenUpdate_thenUpdated() {
         String SQL = "SELECT COUNT(0) FROM classrooms WHERE number = 105 and capacity = 40";
         Classroom updatedClassroom = new Classroom(105, 40);
         updatedClassroom.setId(1);
+        int expectedRows = countRowsInTableWhere(jdbcTemplate, "classrooms", SQL) + 1;
 
         classroomDao.update(updatedClassroom);
 
-        assertEquals(1, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "classrooms", SQL));
+        assertEquals(expectedRows, countRowsInTableWhere(jdbcTemplate, "classrooms", SQL));
     }
 
     @Test
-    public void givenId_whenDelete_thenDeleted(){
+    public void givenId_whenDelete_thenDeleted() {
+        int expectedRows = countRowsInTable(jdbcTemplate, "classrooms") - 1;
+
         classroomDao.delete(1);
 
-        assertEquals(1, JdbcTestUtils.countRowsInTable(jdbcTemplate, "classrooms"));
+        assertEquals(expectedRows, countRowsInTable(jdbcTemplate, "classrooms"));
     }
 
     @Test
-    public void whenGetAll_thenReturnAllClassrooms(){
+    public void whenGetAll_thenReturnAllClassrooms() {
         Classroom classroom1 = new Classroom(203, 60);
         Classroom classroom2 = new Classroom(102, 30);
         List<Classroom> expected = new ArrayList<>();

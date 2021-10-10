@@ -1,5 +1,7 @@
 package ua.com.foxminded.university.dao.jdbc;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.test.jdbc.JdbcTestUtils.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +18,6 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {DatabaseConfigTest.class})
@@ -32,10 +33,11 @@ public class JdbcTimeDaoTest {
     @Test
     public void givenNewTime_whenCreate_thenCreated() {
         Time time = new Time(LocalTime.of(10, 00), LocalTime.of(11, 30));
+        int expectedRows = countRowsInTable(jdbcTemplate, "times") + 1;
 
         timeDao.create(time);
 
-        assertEquals(3, JdbcTestUtils.countRowsInTable(jdbcTemplate, "times"));
+        assertEquals(expectedRows, countRowsInTable(jdbcTemplate, "times"));
     }
 
     @Test
@@ -52,17 +54,19 @@ public class JdbcTimeDaoTest {
         String SQL = "SELECT COUNT(*) FROM times WHERE start = '8:15' and ending = '9:45'";
         Time updatedTime = new Time(LocalTime.of(8, 15), LocalTime.of(9, 45));
         updatedTime.setId(1);
+        int expectedRows = countRowsInTableWhere(jdbcTemplate, "times", SQL) + 1;
 
         timeDao.update(updatedTime);
 
-        assertEquals(1, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "times", SQL));
+        assertEquals(expectedRows, countRowsInTableWhere(jdbcTemplate, "times", SQL));
     }
 
     @Test
     public void givenId_whenDelete_thenDeleted() {
+        int expectedRows = countRowsInTable(jdbcTemplate, "times") - 1;
         timeDao.delete(1);
 
-        assertEquals(1, JdbcTestUtils.countRowsInTable(jdbcTemplate, "times"));
+        assertEquals(expectedRows, countRowsInTable(jdbcTemplate, "times"));
     }
 
     @Test

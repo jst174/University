@@ -1,16 +1,20 @@
 package ua.com.foxminded.university.dao.jdbc;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ua.com.foxminded.university.dao.LessonDao;
 import ua.com.foxminded.university.dao.mapper.LessonMapper;
+import ua.com.foxminded.university.model.Course;
+import ua.com.foxminded.university.model.Group;
 import ua.com.foxminded.university.model.Lesson;
+import ua.com.foxminded.university.model.Teacher;
 
 import java.sql.Date;
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
@@ -30,7 +34,6 @@ public class JdbcLessonDao implements LessonDao {
     private JdbcTemplate jdbcTemplate;
     private LessonMapper lessonMapper;
 
-    @Autowired
     public JdbcLessonDao(JdbcTemplate jdbcTemplate, LessonMapper lessonMapper) {
         this.jdbcTemplate = jdbcTemplate;
         this.lessonMapper = lessonMapper;
@@ -43,11 +46,12 @@ public class JdbcLessonDao implements LessonDao {
             statement.setInt(1, lesson.getClassroom().getId());
             statement.setInt(2, lesson.getCourse().getId());
             statement.setInt(3, lesson.getTeacher().getId());
-            statement.setDate(4, Date.valueOf(lesson.getDate()));
+            statement.setObject(4, lesson.getDate());
             statement.setInt(5, lesson.getTime().getId());
             return statement;
         }, keyHolder);
         lesson.setId((int) keyHolder.getKeys().get("id"));
+        setGroups(lesson);
     }
 
     public Lesson getById(int id) {
@@ -63,6 +67,7 @@ public class JdbcLessonDao implements LessonDao {
             lesson.getDate(),
             lesson.getTime().getId(),
             lesson.getId());
+        setGroups(lesson);
     }
 
     public void delete(int id) {
@@ -74,8 +79,21 @@ public class JdbcLessonDao implements LessonDao {
         return jdbcTemplate.query(SQL_FIND_ALL, lessonMapper);
     }
 
-    @Override
-    public void addGroup(int lessonId, int groupId) {
-        jdbcTemplate.update(SQL_ADD_GROUP, lessonId, groupId);
+
+    private void setGroups(Lesson lesson) {
+        List<Group> groups = lesson.getGroups();
+        jdbcTemplate.batchUpdate(SQL_ADD_GROUP, new BatchPreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement ps, int i) throws SQLException {
+                Group group = groups.get(i);
+                ps.setInt(1, lesson.getId());
+                ps.setInt(2, group.getId());
+            }
+
+            @Override
+            public int getBatchSize() {
+                return groups.size();
+            }
+        });
     }
 }

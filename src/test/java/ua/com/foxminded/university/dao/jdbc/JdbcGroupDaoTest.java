@@ -1,5 +1,7 @@
 package ua.com.foxminded.university.dao.jdbc;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.test.jdbc.JdbcTestUtils.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +17,6 @@ import ua.com.foxminded.university.model.Group;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {DatabaseConfigTest.class})
@@ -31,10 +32,11 @@ public class JdbcGroupDaoTest {
     @Test
     public void givenNewGroup_whenCreate_thenCreated() {
         Group group = new Group("MJ-12");
+        int expectedRows = countRowsInTable(jdbcTemplate, "groups") + 1;
 
         groupDao.create(group);
 
-        assertEquals(3, JdbcTestUtils.countRowsInTable(jdbcTemplate, "groups"));
+        assertEquals(expectedRows, countRowsInTable(jdbcTemplate, "groups"));
 
     }
 
@@ -49,20 +51,23 @@ public class JdbcGroupDaoTest {
     public void givenUpdatedCroupAndId_thenUpdated() {
         String SQL = "SELECT COUNT(0) FROM groups WHERE name = 'JD-32'";
         Group updatedGroup = new Group("JD-32");
-        int beforeUpdate = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "groups", SQL);
+        int beforeUpdate = countRowsInTableWhere(jdbcTemplate, "groups", SQL);
         updatedGroup.setId(1);
+        int expectedRows = countRowsInTableWhere(jdbcTemplate, "groups", SQL) + 1;
 
         groupDao.update(updatedGroup);
 
-        int afterUpdate = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "groups", SQL);
-        assertEquals(1, afterUpdate);
+        int afterUpdate = countRowsInTableWhere(jdbcTemplate, "groups", SQL);
+        assertEquals(expectedRows, afterUpdate);
     }
 
     @Test
     public void givenId_whenDelete_thenDeleted() {
+        int expectedRows = countRowsInTable(jdbcTemplate, "groups") - 1;
+
         groupDao.delete(1);
 
-        assertEquals(1, JdbcTestUtils.countRowsInTable(jdbcTemplate, "groups"));
+        assertEquals(expectedRows, countRowsInTable(jdbcTemplate, "groups"));
     }
 
     @Test

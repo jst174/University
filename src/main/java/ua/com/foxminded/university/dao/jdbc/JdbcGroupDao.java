@@ -1,6 +1,5 @@
 package ua.com.foxminded.university.dao.jdbc;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -25,7 +24,6 @@ public class JdbcGroupDao implements GroupDao {
     private JdbcTemplate jdbcTemplate;
     private GroupMapper groupMapper;
 
-    @Autowired
     public JdbcGroupDao(JdbcTemplate jdbcTemplate, GroupMapper groupMapper) {
         this.jdbcTemplate = jdbcTemplate;
         this.groupMapper = groupMapper;

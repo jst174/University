@@ -9,7 +9,6 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
-
 import javax.sql.DataSource;
 
 @Configuration
@@ -41,9 +40,11 @@ public class DatabaseConfig {
         return new JdbcTemplate(dataSource);
     }
 
-
+    @Bean
+    public ResourceDatabasePopulator prepareDatabase(DataSource dataSource){
+        ResourceDatabasePopulator sqlScript = new ResourceDatabasePopulator();
+        sqlScript.addScript(new ClassPathResource("schema.sql"));
+        sqlScript.execute(dataSource);
+        return sqlScript;
+    }
 }
-
-
-
-

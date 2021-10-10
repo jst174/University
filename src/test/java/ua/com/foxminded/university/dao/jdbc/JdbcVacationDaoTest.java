@@ -1,6 +1,7 @@
 package ua.com.foxminded.university.dao.jdbc;
 
-import org.junit.jupiter.api.BeforeAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.test.jdbc.JdbcTestUtils.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,7 +19,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {DatabaseConfigTest.class})
@@ -56,10 +56,11 @@ public class JdbcVacationDaoTest {
             LocalDate.of(2021, 10, 15),
             LocalDate.of(2021, 10, 30),
             teacher);
+        int expectedRows = countRowsInTable(jdbcTemplate, "vacations") + 1;
 
         vacationDao.create(vacation);
 
-        assertEquals(3, JdbcTestUtils.countRowsInTable(jdbcTemplate, "vacations"));
+        assertEquals(expectedRows, countRowsInTable(jdbcTemplate, "vacations"));
     }
 
     @Test
@@ -82,17 +83,20 @@ public class JdbcVacationDaoTest {
             LocalDate.of(2021, 11, 30),
             teacher);
         updatedVacation.setId(1);
+        int expectedRows = countRowsInTableWhere(jdbcTemplate, "vacations", SQL) + 1;
 
         vacationDao.update(updatedVacation);
 
-        assertEquals(1, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "vacations", SQL));
+        assertEquals(expectedRows, countRowsInTableWhere(jdbcTemplate, "vacations", SQL));
     }
 
     @Test
     public void givenId_whenDelete_thenDeleted() {
+        int expectedRows = countRowsInTable(jdbcTemplate, "vacations") - 1;
+
         vacationDao.delete(1);
 
-        assertEquals(1, JdbcTestUtils.countRowsInTable(jdbcTemplate, "vacations"));
+        assertEquals(expectedRows, countRowsInTable(jdbcTemplate, "vacations"));
     }
 
     @Test

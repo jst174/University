@@ -1,6 +1,5 @@
 package ua.com.foxminded.university.dao.jdbc;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -25,7 +24,6 @@ public class JdbcTimeDao implements TimeDao {
     private TimeMapper timeMapper;
     private JdbcTemplate jdbcTemplate;
 
-    @Autowired
     public JdbcTimeDao(JdbcTemplate jdbcTemplate, TimeMapper timeMapper) {
         this.jdbcTemplate = jdbcTemplate;
         this.timeMapper = timeMapper;
@@ -35,8 +33,8 @@ public class JdbcTimeDao implements TimeDao {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
             PreparedStatement statement = connection.prepareStatement(SQL_INSERT_TIME, Statement.RETURN_GENERATED_KEYS);
-            statement.setTime(1, java.sql.Time.valueOf(time.getStartTime()));
-            statement.setTime(2, java.sql.Time.valueOf(time.getEndTime()));
+            statement.setObject(1, time.getStartTime());
+            statement.setObject(2, time.getEndTime());
             return statement;
         }, keyHolder);
         time.setId((int) keyHolder.getKeys().get("id"));

@@ -6,5 +6,4 @@ import ua.com.foxminded.university.model.Teacher;
 import java.util.List;
 
 public interface TeacherDao extends Dao<Teacher> {
-    void addCourse(int teacherId, int courseId);
 }

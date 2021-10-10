@@ -8,9 +8,9 @@ public class Student extends Person {
 	private int id;
 	private Group group;
 
-	public Student(String firstName, String lastName, LocalDate birthDate, Gender gender, Address adress,
+	public Student(String firstName, String lastName, LocalDate birthDate, Gender gender, Address address,
 			String phoneNumber, String email) {
-		super(firstName, lastName, birthDate, gender, adress, phoneNumber, email);
+		super(firstName, lastName, birthDate, gender, address, phoneNumber, email);
 	}
 
 	public int getId() {
@@ -31,7 +31,7 @@ public class Student extends Person {
 
 	@Override
 	public String toString() {
-		return getFirstName() + " " + getLastName() + "; " + getBirthDate() + "; " + getGender() + "; " + getAdress()
+		return getFirstName() + " " + getLastName() + "; " + getBirthDate() + "; " + getGender() + "; " + getAddress()
 				+ "; " + getPhoneNumber() + "; " + getEmail() + "; " + group;
 	}
 

@@ -1,5 +1,8 @@
 package ua.com.foxminded.university.dao.jdbc;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.test.jdbc.JdbcTestUtils.*;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +18,6 @@ import ua.com.foxminded.university.model.Course;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {DatabaseConfigTest.class})
@@ -31,10 +33,11 @@ public class JdbcCourseDaoTest {
     @Test
     public void givenNewCourse_whenCreate_thenCreated() {
         Course course = new Course("History");
+        int expectedRows = countRowsInTable(jdbcTemplate, "courses") + 1;
 
         courseDao.create(course);
 
-        assertEquals(3, JdbcTestUtils.countRowsInTable(jdbcTemplate, "courses"));
+        assertEquals(expectedRows, countRowsInTable(jdbcTemplate, "courses"));
     }
 
     @Test
@@ -51,25 +54,27 @@ public class JdbcCourseDaoTest {
         String SQL = "SELECT COUNT(0) FROM courses WHERE name = 'Math'";
         Course updatedCourse = new Course("Math");
         updatedCourse.setId(1);
+        int expectedRows = countRowsInTableWhere(jdbcTemplate, "courses", SQL) + 1;
 
         courseDao.update(updatedCourse);
 
-        assertEquals(1, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "courses", SQL));
+        assertEquals(expectedRows, countRowsInTableWhere(jdbcTemplate, "courses", SQL));
 
     }
 
     @Test
-    public void givenId_whenDelete_thenDeleted(){
+    public void givenId_whenDelete_thenDeleted() {
+        int expectedRows = countRowsInTable(jdbcTemplate, "courses") - 1;
         courseDao.delete(1);
 
-        assertEquals(1, JdbcTestUtils.countRowsInTable(jdbcTemplate, "courses"));
+        assertEquals(expectedRows, countRowsInTable(jdbcTemplate, "courses"));
     }
 
     @Test
-    public void whenGetAll_thenReturnAllCourses(){
+    public void whenGetAll_thenReturnAllCourses() {
         Course course1 = new Course("History");
         Course course2 = new Course("Music");
-        List<Course> expected= new ArrayList<>();
+        List<Course> expected = new ArrayList<>();
         expected.add(course1);
         expected.add(course2);
 
