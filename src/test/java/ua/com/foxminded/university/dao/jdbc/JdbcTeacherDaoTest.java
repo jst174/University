@@ -87,7 +87,7 @@ public class JdbcTeacherDaoTest {
 
     @Test
     public void givenUpdatedTeacherAndId_whenUpdate_thenUpdated() {
-        String SQL = "SELECT COUNT(0) FROM teachers WHERE first_name = 'Alan' and last_name = 'King' and " +
+        String sql = "SELECT COUNT(0) FROM teachers WHERE first_name = 'Alan' and last_name = 'King' and " +
             "birthday = '1945-12-16' and gender = 'MALE' and address_id = 1 and phone_number = '3622366' " +
             "and email = 'king97@yandex.ru' and academic_degree = 'DOCTORAL'";
         Address address = new Address("Russia", "Saint Petersburg", "Nevsky Prospect",
@@ -103,16 +103,19 @@ public class JdbcTeacherDaoTest {
             "king97@yandex.ru",
             AcademicDegree.DOCTORAL
         );
-        Course course1 = new Course("Art");
+        Course course1 = new Course("History");
         course1.setId(1);
+        Course course2 = new Course("Art");
+        course2.setId(4);
         updatedTeacher.getCourses().add(course1);
+        updatedTeacher.getCourses().add(course2);
         updatedTeacher.setId(1);
-        int expectedRows = countRowsInTableWhere(jdbcTemplate, "teachers", SQL) + 1;
-        int expectedCoursesRows = countRowsInTable(jdbcTemplate, "teachers_courses") + 1;
+        int expectedRows = countRowsInTableWhere(jdbcTemplate, "teachers", sql) + 1;
+        int expectedCoursesRows = countRowsInTable(jdbcTemplate, "teachers_courses") - 1;
 
         teacherDao.update(updatedTeacher);
 
-        assertEquals(expectedRows, countRowsInTableWhere(jdbcTemplate, "teachers", SQL));
+        assertEquals(expectedRows, countRowsInTableWhere(jdbcTemplate, "teachers", sql));
         assertEquals(expectedCoursesRows, countRowsInTable(jdbcTemplate, "teachers_courses"));
     }
 
@@ -144,6 +147,24 @@ public class JdbcTeacherDaoTest {
         expected.add(teacher);
 
         List<Teacher> actual = teacherDao.getAll();
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void givenTeacherId_whenGetCourses_thenReturnTeacherCourses() {
+        Course course1 = new Course("History");
+        Course course2 = new Course("Math");
+        Course course3 = new Course("Physics");
+        course1.setId(1);
+        course2.setId(2);
+        course3.setId(3);
+        List<Course> expected = new ArrayList<>();
+        expected.add(course1);
+        expected.add(course2);
+        expected.add(course3);
+
+        List<Course> actual = teacherDao.getCourses(1);
 
         assertEquals(expected, actual);
     }

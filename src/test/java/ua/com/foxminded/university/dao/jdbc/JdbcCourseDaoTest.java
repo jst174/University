@@ -51,14 +51,14 @@ public class JdbcCourseDaoTest {
 
     @Test
     public void givenUpdatedCourseAndId_whenUpdated_thenUpdated() {
-        String SQL = "SELECT COUNT(0) FROM courses WHERE name = 'Math'";
+        String sql = "SELECT COUNT(0) FROM courses WHERE name = 'Math'";
         Course updatedCourse = new Course("Math");
         updatedCourse.setId(1);
-        int expectedRows = countRowsInTableWhere(jdbcTemplate, "courses", SQL) + 1;
+        int expectedRows = countRowsInTableWhere(jdbcTemplate, "courses", sql) + 1;
 
         courseDao.update(updatedCourse);
 
-        assertEquals(expectedRows, countRowsInTableWhere(jdbcTemplate, "courses", SQL));
+        assertEquals(expectedRows, countRowsInTableWhere(jdbcTemplate, "courses", sql));
 
     }
 

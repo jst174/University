@@ -1,10 +1,13 @@
 package ua.com.foxminded.university.dao.jdbc;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+import ua.com.foxminded.university.dao.AddressDao;
 import ua.com.foxminded.university.dao.StudentDao;
 import ua.com.foxminded.university.dao.mapper.StudentMapper;
 import ua.com.foxminded.university.model.Address;
@@ -25,19 +28,20 @@ public class JdbcStudentDao implements StudentDao {
         "birthday = ?, gender = ?, address_id = ?, phone_number = ?, email = ?, group_id = ? WHERE id = ?";
     private static final String SQL_DELETE_STUDENT = "DELETE FROM students WHERE id = ?";
     private static final String SQL_FIND_ALL = "SELECT * FROM students";
-    private static final String SQL_INSERT_ADDRESS =
-        "INSERT INTO addresses(country, city, street, house_number, apartment_number, postcode) values (?,?,?,?,?,?)";
 
     private StudentMapper studentMapper;
     private JdbcTemplate jdbcTemplate;
+    @Autowired
+    private AddressDao addressDao;
 
     public JdbcStudentDao(JdbcTemplate jdbcTemplate, StudentMapper studentMapper) {
         this.jdbcTemplate = jdbcTemplate;
         this.studentMapper = studentMapper;
     }
 
+    @Transactional
     public void create(Student student) {
-        createAddress(student.getAddress());
+        addressDao.create(student.getAddress());
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
             PreparedStatement statement = connection.prepareStatement(SQL_INSERT_STUDENT, Statement.RETURN_GENERATED_KEYS);
@@ -50,7 +54,7 @@ public class JdbcStudentDao implements StudentDao {
             statement.setString(7, student.getEmail());
             return statement;
         }, keyHolder);
-        student.setId((int)keyHolder.getKeys().get("id"));
+        student.setId((int) keyHolder.getKeys().get("id"));
     }
 
     public Student getById(int id) {
@@ -79,18 +83,4 @@ public class JdbcStudentDao implements StudentDao {
         return jdbcTemplate.query(SQL_FIND_ALL, studentMapper);
     }
 
-    private void createAddress(Address address){
-        KeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbcTemplate.update(connection -> {
-            PreparedStatement statement = connection.prepareStatement(SQL_INSERT_ADDRESS, Statement.RETURN_GENERATED_KEYS);
-            statement.setString(1, address.getCountry());
-            statement.setString(2, address.getCity());
-            statement.setString(3, address.getStreet());
-            statement.setString(4, address.getHouseNumber());
-            statement.setString(5, address.getApartmentNumber());
-            statement.setString(6, address.getPostcode());
-            return statement;
-        }, keyHolder);
-        address.setId((int)keyHolder.getKeys().get("id"));
-    }
 }

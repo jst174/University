@@ -115,7 +115,7 @@ public class JdbcLessonDaoTest {
 
     @Test
     public void givenUpdatedLesson_whenUpdate_thenUpdated() {
-        String SQL = "SELECT COUNT(0) FROM lessons WHERE classroom_id = 2 and course_id = 2 and teacher_id = 2 and " +
+        String sql = "SELECT COUNT(0) FROM lessons WHERE classroom_id = 2 and course_id = 2 and teacher_id = 2 and " +
             "date = '2021-06-10' and time_id = 2";
         Address address = new Address("Russia", "Saint Petersburg", "Nevsky Prospect",
             "15", "45", "342423");
@@ -147,18 +147,18 @@ public class JdbcLessonDaoTest {
         updatedLesson.setId(1);
         Group group1 = new Group("DF-23");
         Group group2 = new Group("GF-33");
-        group1.setId(1);
-        group2.setId(2);
+        group1.setId(4);
+        group2.setId(5);
         List<Group> groups = new ArrayList<>();
         groups.add(group1);
         groups.add(group2);
         updatedLesson.setGroups(groups);
-        int expectedRows = countRowsInTableWhere(jdbcTemplate, "lessons", SQL) + 1;
-        int expectedGroupRows = countRowsInTable(jdbcTemplate, "lessons_groups") + 2;
+        int expectedRows = countRowsInTableWhere(jdbcTemplate, "lessons", sql) + 1;
+        int expectedGroupRows = countRowsInTable(jdbcTemplate, "lessons_groups") - 1;
 
         lessonDao.update(updatedLesson);
 
-        assertEquals(expectedRows, countRowsInTableWhere(jdbcTemplate, "lessons", SQL));
+        assertEquals(expectedRows, countRowsInTableWhere(jdbcTemplate, "lessons", sql));
         assertEquals(expectedGroupRows, countRowsInTable(jdbcTemplate, "lessons_groups"));
     }
 
@@ -208,4 +208,21 @@ public class JdbcLessonDaoTest {
         assertEquals(expected, actual);
     }
 
+    @Test
+    public void givenLessonId_whenGetGroups_thenReturnLessonGroups() {
+        Group group1 = new Group("MH-12");
+        Group group2 = new Group("JW-23");
+        Group group3 = new Group("MG-54");
+        group1.setId(1);
+        group2.setId(2);
+        group3.setId(3);
+        List<Group> expected = new ArrayList<>();
+        expected.add(group1);
+        expected.add(group2);
+        expected.add(group3);
+
+        List<Group> actual = lessonDao.getGroups(1);
+
+        assertEquals(expected, actual);
+    }
 }

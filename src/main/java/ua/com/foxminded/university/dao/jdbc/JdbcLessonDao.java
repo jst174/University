@@ -1,10 +1,13 @@
 package ua.com.foxminded.university.dao.jdbc;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import ua.com.foxminded.university.dao.LessonDao;
 import ua.com.foxminded.university.dao.mapper.LessonMapper;
 import ua.com.foxminded.university.model.Course;
@@ -12,10 +15,7 @@ import ua.com.foxminded.university.model.Group;
 import ua.com.foxminded.university.model.Lesson;
 import ua.com.foxminded.university.model.Teacher;
 
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.List;
 
 @Component
@@ -30,15 +30,20 @@ public class JdbcLessonDao implements LessonDao {
     private static final String SQL_DELETE_LESSON = "DELETE FROM lessons WHERE id = ?";
     private static final String SQL_FIND_ALL = "SELECT * FROM lessons";
     private static final String SQL_ADD_GROUP = "INSERT INTO lessons_groups(lesson_id, group_id) VALUES (?,?)";
+    private static final String SQL_FIND_GROUP = "SELECT * FROM lessons_groups WHERE lesson_id = ?";
+    private static final String SQL_DELETE_GROUP = "DELETE FROM lessons_groups WHERE lesson_id = ? and group_id = ?";
 
     private JdbcTemplate jdbcTemplate;
     private LessonMapper lessonMapper;
+    @Autowired
+    private JdbcGroupDao groupDao;
 
     public JdbcLessonDao(JdbcTemplate jdbcTemplate, LessonMapper lessonMapper) {
         this.jdbcTemplate = jdbcTemplate;
         this.lessonMapper = lessonMapper;
     }
 
+    @Transactional
     public void create(Lesson lesson) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
@@ -59,6 +64,7 @@ public class JdbcLessonDao implements LessonDao {
     }
 
     @Override
+    @Transactional
     public void update(Lesson lesson) {
         jdbcTemplate.update(SQL_UPDATE_LESSON,
             lesson.getClassroom().getId(),
@@ -67,7 +73,8 @@ public class JdbcLessonDao implements LessonDao {
             lesson.getDate(),
             lesson.getTime().getId(),
             lesson.getId());
-        setGroups(lesson);
+        deleteGroups(lesson);
+        setUpdatedGroups(lesson);
     }
 
     public void delete(int id) {
@@ -79,6 +86,16 @@ public class JdbcLessonDao implements LessonDao {
         return jdbcTemplate.query(SQL_FIND_ALL, lessonMapper);
     }
 
+    @Override
+    @Transactional
+    public List<Group> getGroups(int lessonId) {
+        return jdbcTemplate.query(SQL_FIND_GROUP, new RowMapper<Group>() {
+            @Override
+            public Group mapRow(ResultSet rs, int rowNum) throws SQLException {
+                return groupDao.getById(rs.getInt("group_id"));
+            }
+        }, lessonId);
+    }
 
     private void setGroups(Lesson lesson) {
         List<Group> groups = lesson.getGroups();
@@ -95,5 +112,25 @@ public class JdbcLessonDao implements LessonDao {
                 return groups.size();
             }
         });
+    }
+
+    private void setUpdatedGroups(Lesson lesson) {
+        List<Group> groups = getGroups(lesson.getId());
+        List<Group> updatedGroups = lesson.getGroups();
+        for (Group group : updatedGroups) {
+            if (!groups.contains(group)) {
+                jdbcTemplate.update(SQL_ADD_GROUP, lesson.getId(), group.getId());
+            }
+        }
+    }
+
+    private void deleteGroups(Lesson lesson) {
+        List<Group> groups = getGroups(lesson.getId());
+        List<Group> updatedGroups = lesson.getGroups();
+        for (Group group : groups) {
+            if (!updatedGroups.contains(group)) {
+                jdbcTemplate.update(SQL_DELETE_GROUP, lesson.getId(), group.getId());
+            }
+        }
     }
 }

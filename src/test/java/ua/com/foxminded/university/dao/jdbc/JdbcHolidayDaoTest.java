@@ -51,14 +51,14 @@ public class JdbcHolidayDaoTest {
 
     @Test
     public void givenUpdatedHolidayAndId_whenUpdate_thenUpdated() {
-        String SQL = "SELECT COUNT(0) FROM holidays WHERE name = 'Christmas' and date = '2022-01-07'";
+        String sql = "SELECT COUNT(0) FROM holidays WHERE name = 'Christmas' and date = '2022-01-07'";
         Holiday updatedHoliday = new Holiday("Christmas", LocalDate.of(2022, 01, 07));
         updatedHoliday.setId(1);
-        int expectedRows = countRowsInTableWhere(jdbcTemplate, "holidays", SQL) + 1;
+        int expectedRows = countRowsInTableWhere(jdbcTemplate, "holidays", sql) + 1;
 
         holidayDao.update(updatedHoliday);
 
-        assertEquals(expectedRows, countRowsInTableWhere(jdbcTemplate, "holidays", SQL));
+        assertEquals(expectedRows, countRowsInTableWhere(jdbcTemplate, "holidays", sql));
     }
 
     @Test

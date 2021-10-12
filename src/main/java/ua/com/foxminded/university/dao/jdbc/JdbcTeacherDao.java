@@ -1,20 +1,21 @@
 package ua.com.foxminded.university.dao.jdbc;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+import ua.com.foxminded.university.dao.AddressDao;
 import ua.com.foxminded.university.dao.TeacherDao;
+import ua.com.foxminded.university.dao.mapper.CourseMapper;
 import ua.com.foxminded.university.dao.mapper.TeacherMapper;
-import ua.com.foxminded.university.model.Address;
 import ua.com.foxminded.university.model.Course;
 import ua.com.foxminded.university.model.Teacher;
 
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.List;
 
 @Component
@@ -30,19 +31,24 @@ public class JdbcTeacherDao implements TeacherDao {
     private static final String SQL_DELETE_TEACHER = "DELETE FROM teachers WHERE id = ?";
     private static final String SQL_ADD_COURSE = "INSERT INTO teachers_courses(teacher_id, course_id) VALUES(?,?)";
     private static final String SQL_FIND_ALl = "SELECT * FROM teachers";
-    private static final String SQL_INSERT_ADDRESS =
-        "INSERT INTO addresses(country, city, street, house_number, apartment_number, postcode) values (?,?,?,?,?,?)";
+    private static final String SQL_FIND_COURSES = "SELECT * FROM teachers_courses WHERE teacher_id = ?";
+    private static final String SQL_DELETE_COURSE = "DELETE FROM teachers_courses WHERE teacher_id = ? and course_id = ?";
 
     private TeacherMapper teacherMapper;
     private JdbcTemplate jdbcTemplate;
+    @Autowired
+    private JdbcAddressDao addressDao;
+    @Autowired
+    private JdbcCourseDao courseDao;
 
     public JdbcTeacherDao(JdbcTemplate jdbcTemplate, TeacherMapper teacherMapper) {
         this.jdbcTemplate = jdbcTemplate;
         this.teacherMapper = teacherMapper;
     }
 
+    @Transactional
     public void create(Teacher teacher) {
-        createAddress(teacher.getAddress());
+        addressDao.create(teacher.getAddress());
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
             PreparedStatement statement = connection.prepareStatement(SQL_INSERT_TEACHER, Statement.RETURN_GENERATED_KEYS);
@@ -64,6 +70,7 @@ public class JdbcTeacherDao implements TeacherDao {
         return jdbcTemplate.queryForObject(SQL_FIND_TEACHER, teacherMapper, id);
     }
 
+    @Transactional
     public void update(Teacher teacher) {
         jdbcTemplate.update(SQL_UPDATE_TEACHER,
             teacher.getFirstName(),
@@ -75,7 +82,8 @@ public class JdbcTeacherDao implements TeacherDao {
             teacher.getEmail(),
             teacher.getAcademicDegree().toString(),
             teacher.getId());
-        setCourses(teacher);
+        deleteCourses(teacher);
+        setUpdatedCourses(teacher);
     }
 
     public void delete(int id) {
@@ -87,19 +95,15 @@ public class JdbcTeacherDao implements TeacherDao {
         return jdbcTemplate.query(SQL_FIND_ALl, teacherMapper);
     }
 
-    private void createAddress(Address address) {
-        KeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbcTemplate.update(connection -> {
-            PreparedStatement statement = connection.prepareStatement(SQL_INSERT_ADDRESS, Statement.RETURN_GENERATED_KEYS);
-            statement.setString(1, address.getCountry());
-            statement.setString(2, address.getCity());
-            statement.setString(3, address.getStreet());
-            statement.setString(4, address.getHouseNumber());
-            statement.setString(5, address.getApartmentNumber());
-            statement.setString(6, address.getPostcode());
-            return statement;
-        }, keyHolder);
-        address.setId((int) keyHolder.getKeys().get("id"));
+    @Override
+    @Transactional
+    public List<Course> getCourses(int teacherId) {
+        return jdbcTemplate.query(SQL_FIND_COURSES, new RowMapper<Course>() {
+            @Override
+            public Course mapRow(ResultSet rs, int rowNum) throws SQLException {
+                return courseDao.getById(rs.getInt("course_id"));
+            }
+        }, teacherId);
     }
 
     private void setCourses(Teacher teacher) {
@@ -117,6 +121,26 @@ public class JdbcTeacherDao implements TeacherDao {
                 return courses.size();
             }
         });
+    }
+
+    private void setUpdatedCourses(Teacher teacher) {
+        List<Course> courses = getCourses(teacher.getId());
+        List<Course> updatedCourses = teacher.getCourses();
+        for (Course course : updatedCourses) {
+            if (!courses.contains(course)) {
+                jdbcTemplate.update(SQL_ADD_COURSE, teacher.getId(), course.getId());
+            }
+        }
+    }
+
+    private void deleteCourses(Teacher teacher) {
+        List<Course> courses = getCourses(teacher.getId());
+        List<Course> updatedCourses = teacher.getCourses();
+        for (Course course : courses) {
+            if (!updatedCourses.contains(course)) {
+                jdbcTemplate.update(SQL_DELETE_COURSE, teacher.getId(), course.getId());
+            }
+        }
     }
 
 }

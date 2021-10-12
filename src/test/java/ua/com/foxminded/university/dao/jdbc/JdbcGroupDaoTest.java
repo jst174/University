@@ -49,15 +49,15 @@ public class JdbcGroupDaoTest {
 
     @Test
     public void givenUpdatedCroupAndId_thenUpdated() {
-        String SQL = "SELECT COUNT(0) FROM groups WHERE name = 'JD-32'";
+        String sql = "SELECT COUNT(0) FROM groups WHERE name = 'JD-32'";
         Group updatedGroup = new Group("JD-32");
-        int beforeUpdate = countRowsInTableWhere(jdbcTemplate, "groups", SQL);
+        int beforeUpdate = countRowsInTableWhere(jdbcTemplate, "groups", sql);
         updatedGroup.setId(1);
-        int expectedRows = countRowsInTableWhere(jdbcTemplate, "groups", SQL) + 1;
+        int expectedRows = countRowsInTableWhere(jdbcTemplate, "groups", sql) + 1;
 
         groupDao.update(updatedGroup);
 
-        int afterUpdate = countRowsInTableWhere(jdbcTemplate, "groups", SQL);
+        int afterUpdate = countRowsInTableWhere(jdbcTemplate, "groups", sql);
         assertEquals(expectedRows, afterUpdate);
     }
 

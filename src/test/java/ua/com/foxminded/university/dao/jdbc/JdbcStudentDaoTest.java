@@ -79,7 +79,7 @@ public class JdbcStudentDaoTest {
 
     @Test
     public void givenUpdatedStudentAndId_whenUpdate_thenUpdated() {
-        String SQL = "SELECT COUNT(0) FROM students WHERE first_name = 'Mike' and last_name = 'King' and " +
+        String sql = "SELECT COUNT(0) FROM students WHERE first_name = 'Mike' and last_name = 'King' and " +
             "birthday = '1997-05-13' and gender = 'MALE' and address_id = 1 and phone_number = '3622366' and email = 'king97@yandex.ru'" +
             "and group_id = 1";
         Address address = new Address("Russia", "Saint Petersburg", "Nevsky Prospect",
@@ -98,11 +98,11 @@ public class JdbcStudentDaoTest {
         );
         updatedStudent.setGroup(group);
         updatedStudent.setId(1);
-        int expectedRows = countRowsInTableWhere(jdbcTemplate, "students", SQL) + 1;
+        int expectedRows = countRowsInTableWhere(jdbcTemplate, "students", sql) + 1;
 
         studentDao.update(updatedStudent);
 
-        assertEquals(expectedRows, countRowsInTableWhere(jdbcTemplate, "students", SQL));
+        assertEquals(expectedRows, countRowsInTableWhere(jdbcTemplate, "students", sql));
 
     }
 

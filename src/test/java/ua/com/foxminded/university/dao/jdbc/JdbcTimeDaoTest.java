@@ -51,14 +51,14 @@ public class JdbcTimeDaoTest {
 
     @Test
     public void givenUpdatedTimeAndId_whenUpdate_thenUpdated() {
-        String SQL = "SELECT COUNT(*) FROM times WHERE start = '8:15' and ending = '9:45'";
+        String sql = "SELECT COUNT(*) FROM times WHERE start = '8:15' and ending = '9:45'";
         Time updatedTime = new Time(LocalTime.of(8, 15), LocalTime.of(9, 45));
         updatedTime.setId(1);
-        int expectedRows = countRowsInTableWhere(jdbcTemplate, "times", SQL) + 1;
+        int expectedRows = countRowsInTableWhere(jdbcTemplate, "times", sql) + 1;
 
         timeDao.update(updatedTime);
 
-        assertEquals(expectedRows, countRowsInTableWhere(jdbcTemplate, "times", SQL));
+        assertEquals(expectedRows, countRowsInTableWhere(jdbcTemplate, "times", sql));
     }
 
     @Test

@@ -50,14 +50,14 @@ public class JdbcClassroomDaoTest {
 
     @Test
     public void givenUpdatedClassroomAndId_whenUpdate_thenUpdated() {
-        String SQL = "SELECT COUNT(0) FROM classrooms WHERE number = 105 and capacity = 40";
+        String sql = "SELECT COUNT(0) FROM classrooms WHERE number = 105 and capacity = 40";
         Classroom updatedClassroom = new Classroom(105, 40);
         updatedClassroom.setId(1);
-        int expectedRows = countRowsInTableWhere(jdbcTemplate, "classrooms", SQL) + 1;
+        int expectedRows = countRowsInTableWhere(jdbcTemplate, "classrooms", sql) + 1;
 
         classroomDao.update(updatedClassroom);
 
-        assertEquals(expectedRows, countRowsInTableWhere(jdbcTemplate, "classrooms", SQL));
+        assertEquals(expectedRows, countRowsInTableWhere(jdbcTemplate, "classrooms", sql));
     }
 
     @Test

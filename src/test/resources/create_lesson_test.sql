@@ -22,4 +22,10 @@ VALUES (1, 1, 1, '2021-09-28', 1);
 INSERT INTO groups (name) VALUES ('MH-12');
 INSERT INTO groups (name) VALUES ('JW-23');
 INSERT INTO groups (name) VALUES ('MG-54');
+INSERT INTO groups (name) VALUES ('DF-23');
+INSERT INTO groups (name) VALUES ('GF-33');
+
+INSERT INTO lessons_groups (lesson_id, group_id) VALUES (1,1);
+INSERT INTO lessons_groups (lesson_id, group_id) VALUES (1,2);
+INSERT INTO lessons_groups (lesson_id, group_id) VALUES (1,3);
 

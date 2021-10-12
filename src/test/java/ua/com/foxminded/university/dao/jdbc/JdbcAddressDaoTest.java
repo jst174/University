@@ -52,17 +52,17 @@ public class JdbcAddressDaoTest {
 
     @Test
     public void givenUpdatedAddressAndId_whenUpdate_thenUpdated() {
-        String SQL = "SELECT COUNT(0) FROM addresses WHERE country = 'Russia' and city = 'Moscow'" +
+        String sql = "SELECT COUNT(0) FROM addresses WHERE country = 'Russia' and city = 'Moscow'" +
             "and street = 'Kutuzov Avenue' and house_number = '43' " +
             "and apartment_number = '192' and postcode = '432436'";
         Address updatedAddress = new Address("Russia", "Moscow", "Kutuzov Avenue",
             "43", "192", "432436");
         updatedAddress.setId(1);
-        int expectedRows = countRowsInTableWhere(jdbcTemplate, "addresses", SQL) + 1;
+        int expectedRows = countRowsInTableWhere(jdbcTemplate, "addresses", sql) + 1;
 
         addressDao.update(updatedAddress);
 
-        assertEquals(expectedRows, countRowsInTableWhere(jdbcTemplate, "addresses", SQL));
+        assertEquals(expectedRows, countRowsInTableWhere(jdbcTemplate, "addresses", sql));
     }
 
     @Test

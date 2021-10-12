@@ -77,17 +77,17 @@ public class JdbcVacationDaoTest {
 
     @Test
     public void givenUpdatedVacationAndId_whenUpdate_thenUpdated() {
-        String SQL = "SELECT COUNT(0) FROM vacations WHERE start = '2021-11-15' and ending = '2021-11-30' and teacher_id = 1";
+        String sql = "SELECT COUNT(0) FROM vacations WHERE start = '2021-11-15' and ending = '2021-11-30' and teacher_id = 1";
         Vacation updatedVacation = new Vacation(
             LocalDate.of(2021, 11, 15),
             LocalDate.of(2021, 11, 30),
             teacher);
         updatedVacation.setId(1);
-        int expectedRows = countRowsInTableWhere(jdbcTemplate, "vacations", SQL) + 1;
+        int expectedRows = countRowsInTableWhere(jdbcTemplate, "vacations", sql) + 1;
 
         vacationDao.update(updatedVacation);
 
-        assertEquals(expectedRows, countRowsInTableWhere(jdbcTemplate, "vacations", SQL));
+        assertEquals(expectedRows, countRowsInTableWhere(jdbcTemplate, "vacations", sql));
     }
 
     @Test
