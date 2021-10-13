@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface GroupDao extends Dao<Group> {
 
+    List<Group> getLessonGroups(int lessonId);
 }

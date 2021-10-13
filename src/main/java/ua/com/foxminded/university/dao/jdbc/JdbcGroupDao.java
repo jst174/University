@@ -1,6 +1,7 @@
 package ua.com.foxminded.university.dao.jdbc;
 
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
@@ -9,6 +10,8 @@ import ua.com.foxminded.university.dao.mapper.GroupMapper;
 import ua.com.foxminded.university.model.Group;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
@@ -20,6 +23,7 @@ public class JdbcGroupDao implements GroupDao {
     private static final String SQL_UPDATE_GROUP = "UPDATE groups SET name = ? WHERE id = ?";
     private static final String SQL_DELETE_GROUP = "DELETE FROM groups WHERE id = ?";
     private static final String SQL_FIND_ALL = "SELECT * FROM groups";
+    private static final String SQL_FIND_LESSON_GROUP = "SELECT * FROM lessons_groups WHERE lesson_id = ?";
 
     private JdbcTemplate jdbcTemplate;
     private GroupMapper groupMapper;
@@ -57,5 +61,13 @@ public class JdbcGroupDao implements GroupDao {
     }
 
 
-
+    @Override
+    public List<Group> getLessonGroups(int lessonId) {
+        return jdbcTemplate.query(SQL_FIND_LESSON_GROUP, new RowMapper<Group>() {
+            @Override
+            public Group mapRow(ResultSet rs, int rowNum) throws SQLException {
+                return getById(rs.getInt("group_id"));
+            }
+        }, lessonId);
+    }
 }

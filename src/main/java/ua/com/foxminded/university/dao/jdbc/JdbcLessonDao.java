@@ -3,17 +3,14 @@ package ua.com.foxminded.university.dao.jdbc;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import ua.com.foxminded.university.dao.LessonDao;
 import ua.com.foxminded.university.dao.mapper.LessonMapper;
-import ua.com.foxminded.university.model.Course;
 import ua.com.foxminded.university.model.Group;
 import ua.com.foxminded.university.model.Lesson;
-import ua.com.foxminded.university.model.Teacher;
 
 import java.sql.*;
 import java.util.List;
@@ -30,7 +27,6 @@ public class JdbcLessonDao implements LessonDao {
     private static final String SQL_DELETE_LESSON = "DELETE FROM lessons WHERE id = ?";
     private static final String SQL_FIND_ALL = "SELECT * FROM lessons";
     private static final String SQL_ADD_GROUP = "INSERT INTO lessons_groups(lesson_id, group_id) VALUES (?,?)";
-    private static final String SQL_FIND_GROUP = "SELECT * FROM lessons_groups WHERE lesson_id = ?";
     private static final String SQL_DELETE_GROUP = "DELETE FROM lessons_groups WHERE lesson_id = ? and group_id = ?";
 
     private JdbcTemplate jdbcTemplate;
@@ -56,7 +52,7 @@ public class JdbcLessonDao implements LessonDao {
             return statement;
         }, keyHolder);
         lesson.setId((int) keyHolder.getKeys().get("id"));
-        setGroups(lesson);
+        setGroups(lesson, getGroups(lesson));
     }
 
     public Lesson getById(int id) {
@@ -73,8 +69,9 @@ public class JdbcLessonDao implements LessonDao {
             lesson.getDate(),
             lesson.getTime().getId(),
             lesson.getId());
-        deleteGroups(lesson);
-        setUpdatedGroups(lesson);
+        List<Group> groups = getGroups(lesson);
+        deleteGroups(lesson, groups);
+        setGroups(lesson, groups);
     }
 
     public void delete(int id) {
@@ -86,51 +83,43 @@ public class JdbcLessonDao implements LessonDao {
         return jdbcTemplate.query(SQL_FIND_ALL, lessonMapper);
     }
 
-    @Override
-    @Transactional
-    public List<Group> getGroups(int lessonId) {
-        return jdbcTemplate.query(SQL_FIND_GROUP, new RowMapper<Group>() {
-            @Override
-            public Group mapRow(ResultSet rs, int rowNum) throws SQLException {
-                return groupDao.getById(rs.getInt("group_id"));
-            }
-        }, lessonId);
-    }
 
-    private void setGroups(Lesson lesson) {
-        List<Group> groups = lesson.getGroups();
-        jdbcTemplate.batchUpdate(SQL_ADD_GROUP, new BatchPreparedStatementSetter() {
-            @Override
-            public void setValues(PreparedStatement ps, int i) throws SQLException {
-                Group group = groups.get(i);
-                ps.setInt(1, lesson.getId());
-                ps.setInt(2, group.getId());
-            }
+    private void setGroups(Lesson lesson, List<Group> groups) {
+        List<Group> newGroups = lesson.getGroups();
+        if (groups.isEmpty()) {
+            jdbcTemplate.batchUpdate(SQL_ADD_GROUP, new BatchPreparedStatementSetter() {
+                @Override
+                public void setValues(PreparedStatement ps, int i) throws SQLException {
+                    Group group = newGroups.get(i);
+                    ps.setInt(1, lesson.getId());
+                    ps.setInt(2, group.getId());
+                }
 
-            @Override
-            public int getBatchSize() {
-                return groups.size();
-            }
-        });
-    }
-
-    private void setUpdatedGroups(Lesson lesson) {
-        List<Group> groups = getGroups(lesson.getId());
-        List<Group> updatedGroups = lesson.getGroups();
-        for (Group group : updatedGroups) {
-            if (!groups.contains(group)) {
-                jdbcTemplate.update(SQL_ADD_GROUP, lesson.getId(), group.getId());
-            }
+                @Override
+                public int getBatchSize() {
+                    return newGroups.size();
+                }
+            });
+        } else {
+            newGroups.stream()
+                .forEach((group) -> {
+                    if (groups.stream().noneMatch(group::equals)) {
+                        jdbcTemplate.update(SQL_ADD_GROUP, lesson.getId(), group.getId());
+                    }
+                });
         }
     }
 
-    private void deleteGroups(Lesson lesson) {
-        List<Group> groups = getGroups(lesson.getId());
-        List<Group> updatedGroups = lesson.getGroups();
-        for (Group group : groups) {
-            if (!updatedGroups.contains(group)) {
-                jdbcTemplate.update(SQL_DELETE_GROUP, lesson.getId(), group.getId());
-            }
-        }
+    private void deleteGroups(Lesson lesson, List<Group> groups) {
+        groups.stream()
+            .forEach((group) -> {
+                if (lesson.getGroups().stream().noneMatch(group::equals)) {
+                    jdbcTemplate.update(SQL_DELETE_GROUP, lesson.getId(), group.getId());
+                }
+            });
+    }
+
+    private List<Group> getGroups(Lesson lesson){
+        return groupDao.getLessonGroups(lesson.getId());
     }
 }

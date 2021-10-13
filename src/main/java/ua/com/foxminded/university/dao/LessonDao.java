@@ -8,5 +8,4 @@ import java.util.List;
 
 public interface LessonDao extends Dao<Lesson> {
 
-    List<Group> getGroups(int lessonId);
 }

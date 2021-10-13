@@ -8,5 +8,4 @@ import java.util.List;
 
 public interface TeacherDao extends Dao<Teacher> {
 
-    List<Course> getCourses(int teacherId);
 }

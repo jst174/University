@@ -151,21 +151,4 @@ public class JdbcTeacherDaoTest {
         assertEquals(expected, actual);
     }
 
-    @Test
-    public void givenTeacherId_whenGetCourses_thenReturnTeacherCourses() {
-        Course course1 = new Course("History");
-        Course course2 = new Course("Math");
-        Course course3 = new Course("Physics");
-        course1.setId(1);
-        course2.setId(2);
-        course3.setId(3);
-        List<Course> expected = new ArrayList<>();
-        expected.add(course1);
-        expected.add(course2);
-        expected.add(course3);
-
-        List<Course> actual = teacherDao.getCourses(1);
-
-        assertEquals(expected, actual);
-    }
 }

@@ -10,6 +10,7 @@ import java.time.LocalTime;
 
 @Component
 public class TimeMapper implements RowMapper<Time> {
+
     @Override
     public Time mapRow(ResultSet rs, int rowNum) throws SQLException {
         Time time = new Time(rs.getObject("start", LocalTime.class),

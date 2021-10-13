@@ -1,6 +1,7 @@
 package ua.com.foxminded.university.dao.jdbc;
 
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
@@ -9,6 +10,8 @@ import ua.com.foxminded.university.dao.mapper.CourseMapper;
 import ua.com.foxminded.university.model.Course;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
@@ -20,6 +23,7 @@ public class JdbcCourseDao implements CourseDao {
     private static final String SQL_UPDATE_COURSE = "UPDATE courses SET name = ? WHERE id = ?";
     private static final String SQL_DELETE_COURSE = "DELETE FROM courses WHERE id = ?";
     private static final String SQL_FIND_ALL = "SELECT * FROM courses";
+    private static final String SQL_FIND_TEACHER_COURSES = "SELECT * FROM teachers_courses WHERE teacher_id = ?";
 
     private CourseMapper courseMapper;
     private JdbcTemplate jdbcTemplate;
@@ -54,5 +58,15 @@ public class JdbcCourseDao implements CourseDao {
     @Override
     public List<Course> getAll() {
         return jdbcTemplate.query(SQL_FIND_ALL, courseMapper);
+    }
+
+    @Override
+    public List<Course> getTeacherCourses(int teacherId) {
+        return jdbcTemplate.query(SQL_FIND_TEACHER_COURSES, new RowMapper<Course>() {
+            @Override
+            public Course mapRow(ResultSet rs, int rowNum) throws SQLException {
+                return getById(rs.getInt("course_id"));
+            }
+        }, teacherId);
     }
 }

@@ -22,7 +22,7 @@ import java.util.List;
 public class JdbcStudentDao implements StudentDao {
 
     private static final String SQL_INSERT_STUDENT =
-        "INSERT INTO students(first_name,last_name,birthday,gender,address_id,phone_number,email) VALUES (?,?,?,?,?,?,?)";
+        "INSERT INTO students(first_name,last_name,birthday,gender,address_id,phone_number,email, group_id) VALUES (?,?,?,?,?,?,?,?)";
     private static final String SQL_FIND_STUDENT = "SELECT * FROM students WHERE id = ?";
     private static final String SQL_UPDATE_STUDENT = "UPDATE students SET first_name = ?, last_name = ?, " +
         "birthday = ?, gender = ?, address_id = ?, phone_number = ?, email = ?, group_id = ? WHERE id = ?";
@@ -52,6 +52,7 @@ public class JdbcStudentDao implements StudentDao {
             statement.setInt(5, student.getAddress().getId());
             statement.setString(6, student.getPhoneNumber());
             statement.setString(7, student.getEmail());
+            statement.setInt(8, student.getGroup().getId());
             return statement;
         }, keyHolder);
         student.setId((int) keyHolder.getKeys().get("id"));

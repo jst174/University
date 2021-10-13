@@ -42,9 +42,9 @@ public class DatabaseConfig {
 
     @Bean
     public ResourceDatabasePopulator prepareDatabase(DataSource dataSource){
-        ResourceDatabasePopulator sqlScript = new ResourceDatabasePopulator();
-        sqlScript.addScript(new ClassPathResource("schema.sql"));
-        sqlScript.execute(dataSource);
-        return sqlScript;
+        ResourceDatabasePopulator resourceDatabasePopulator = new ResourceDatabasePopulator();
+        resourceDatabasePopulator.addScript(new ClassPathResource("schema.sql"));
+        resourceDatabasePopulator.execute(dataSource);
+        return resourceDatabasePopulator;
     }
 }

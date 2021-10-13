@@ -21,7 +21,7 @@ import java.util.List;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {DatabaseConfigTest.class})
-@Sql({"/create_course_test.sql"})
+@Sql({"/create_address_test.sql","/create_teacher_test.sql","/create_course_test.sql"})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class JdbcCourseDaoTest {
 
@@ -79,6 +79,21 @@ public class JdbcCourseDaoTest {
         expected.add(course2);
 
         List<Course> actual = courseDao.getAll();
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void givenTeacherId_whenGetTeacherCourses_thenReturnTeacherCourses() {
+        Course course1 = new Course("History");
+        Course course2 = new Course("Music");
+        course1.setId(1);
+        course2.setId(2);
+        List<Course> expected = new ArrayList<>();
+        expected.add(course1);
+        expected.add(course2);
+
+        List<Course> actual = courseDao.getTeacherCourses(1);
 
         assertEquals(expected, actual);
     }

@@ -48,6 +48,9 @@ public class JdbcStudentDaoTest {
             "3622366",
             "king97@yandex.ru"
         );
+        Group group = new Group("MJ-12");
+        group.setId(1);
+        student.setGroup(group);
         student.setAddress(address);
         int expectedRows = countRowsInTable(jdbcTemplate, "students") + 1;
 
