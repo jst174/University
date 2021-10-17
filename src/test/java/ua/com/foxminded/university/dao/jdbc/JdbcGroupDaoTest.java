@@ -10,8 +10,8 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.jdbc.JdbcTestUtils;
 import ua.com.foxminded.university.config.DatabaseConfigTest;
+import ua.com.foxminded.university.dao.GroupDao;
 import ua.com.foxminded.university.model.Group;
 
 import java.util.ArrayList;
@@ -27,7 +27,7 @@ public class JdbcGroupDaoTest {
     @Autowired
     private JdbcTemplate jdbcTemplate;
     @Autowired
-    private JdbcGroupDao groupDao;
+    private GroupDao groupDao;
 
     @Test
     public void givenNewGroup_whenCreate_thenCreated() {
@@ -90,7 +90,7 @@ public class JdbcGroupDaoTest {
     }
 
     @Test
-    public void givenLessonId_whenGetLessonGroups_thenReturnLessonGroups() {
+    public void givenLessonId_whenGetByLessonId_thenReturnLessonGroups() {
         Group group1 = new Group("MH-12");
         Group group2 = new Group("JW-23");
         Group group3 = new Group("MG-54");
@@ -102,7 +102,7 @@ public class JdbcGroupDaoTest {
         expected.add(group2);
         expected.add(group3);
 
-        List<Group> actual = groupDao.getLessonGroups(1);
+        List<Group> actual = groupDao.getByLessonId(1);
 
         assertEquals(expected, actual);
     }

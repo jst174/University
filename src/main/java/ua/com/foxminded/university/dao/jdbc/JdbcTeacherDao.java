@@ -6,14 +6,19 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ua.com.foxminded.university.dao.AddressDao;
+import ua.com.foxminded.university.dao.CourseDao;
 import ua.com.foxminded.university.dao.TeacherDao;
 import ua.com.foxminded.university.dao.mapper.TeacherMapper;
 import ua.com.foxminded.university.model.Course;
 import ua.com.foxminded.university.model.Teacher;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class JdbcTeacherDao implements TeacherDao {
@@ -34,9 +39,9 @@ public class JdbcTeacherDao implements TeacherDao {
     private TeacherMapper teacherMapper;
     private JdbcTemplate jdbcTemplate;
     @Autowired
-    private JdbcAddressDao addressDao;
+    private AddressDao addressDao;
     @Autowired
-    private JdbcCourseDao courseDao;
+    private CourseDao courseDao;
 
     public JdbcTeacherDao(JdbcTemplate jdbcTemplate, TeacherMapper teacherMapper) {
         this.jdbcTemplate = jdbcTemplate;
@@ -60,7 +65,7 @@ public class JdbcTeacherDao implements TeacherDao {
             return statement;
         }, keyHolder);
         teacher.setId((int) keyHolder.getKeys().get("id"));
-        setCourses(teacher, getCourses(teacher));
+        setCourses(teacher, new ArrayList<>());
     }
 
     public Teacher getById(int id) {
@@ -79,9 +84,9 @@ public class JdbcTeacherDao implements TeacherDao {
             teacher.getEmail(),
             teacher.getAcademicDegree().toString(),
             teacher.getId());
-        List<Course> courses = getCourses(teacher);
-        deleteCourses(teacher, courses);
-        setCourses(teacher, courses);
+        List<Course> savedCourses = courseDao.getByTeacherId(teacher.getId());
+        deleteCourses(teacher, savedCourses);
+        setCourses(teacher, savedCourses);
     }
 
     public void delete(int id) {
@@ -94,44 +99,16 @@ public class JdbcTeacherDao implements TeacherDao {
     }
 
 
-    private void setCourses(Teacher teacher, List<Course> courses) {
-        List<Course> newCourses = teacher.getCourses();
-        if (courses.isEmpty()) {
-            jdbcTemplate.batchUpdate(SQL_ADD_COURSE, new BatchPreparedStatementSetter() {
-                @Override
-                public void setValues(PreparedStatement ps, int i) throws SQLException {
-                    Course course = newCourses.get(i);
-                    ps.setInt(1, teacher.getId());
-                    ps.setInt(2, course.getId());
-                }
-
-                @Override
-                public int getBatchSize() {
-                    return newCourses.size();
-                }
-            });
-        } else {
-            newCourses.stream()
-                .forEach((course) -> {
-                    if (courses.stream().noneMatch(course::equals)) {
-                        jdbcTemplate.update(SQL_ADD_COURSE, teacher.getId(), course.getId());
-                    }
-                });
-        }
-
+    private void setCourses(Teacher updatedTeacher, List<Course> courses) {
+        updatedTeacher.getCourses().stream()
+            .filter(course -> !courses.contains(course))
+            .forEach(course -> jdbcTemplate.update(SQL_ADD_COURSE, updatedTeacher.getId(), course.getId()));
     }
 
-    private void deleteCourses(Teacher teacher, List<Course> courses) {
-        courses.stream()
-            .forEach((course) -> {
-                if (teacher.getCourses().stream().noneMatch(course::equals)) {
-                    jdbcTemplate.update(SQL_DELETE_COURSE, teacher.getId(), course.getId());
-                }
-            });
-    }
 
-    private List<Course> getCourses(Teacher teacher){
-        return courseDao.getTeacherCourses(teacher.getId());
+    private void deleteCourses(Teacher teacher, List<Course> savedCourses) {
+        savedCourses.stream().
+            filter(course -> !teacher.getCourses().contains(course))
+            .forEach(course -> jdbcTemplate.update(SQL_DELETE_COURSE, teacher.getId(), course.getId()));
     }
-
 }

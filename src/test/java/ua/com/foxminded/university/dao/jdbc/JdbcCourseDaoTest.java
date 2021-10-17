@@ -11,8 +11,8 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.jdbc.JdbcTestUtils;
 import ua.com.foxminded.university.config.DatabaseConfigTest;
+import ua.com.foxminded.university.dao.CourseDao;
 import ua.com.foxminded.university.model.Course;
 
 import java.util.ArrayList;
@@ -26,7 +26,7 @@ import java.util.List;
 public class JdbcCourseDaoTest {
 
     @Autowired
-    private JdbcCourseDao courseDao;
+    private CourseDao courseDao;
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
@@ -84,7 +84,7 @@ public class JdbcCourseDaoTest {
     }
 
     @Test
-    public void givenTeacherId_whenGetTeacherCourses_thenReturnTeacherCourses() {
+    public void givenTeacherId_whenGetByTeacherId_thenReturnTeacherCourses() {
         Course course1 = new Course("History");
         Course course2 = new Course("Music");
         course1.setId(1);
@@ -93,7 +93,7 @@ public class JdbcCourseDaoTest {
         expected.add(course1);
         expected.add(course2);
 
-        List<Course> actual = courseDao.getTeacherCourses(1);
+        List<Course> actual = courseDao.getByTeacherId(1);
 
         assertEquals(expected, actual);
     }

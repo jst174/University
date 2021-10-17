@@ -3,6 +3,10 @@ package ua.com.foxminded.university.dao.mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
+import ua.com.foxminded.university.dao.ClassroomDao;
+import ua.com.foxminded.university.dao.CourseDao;
+import ua.com.foxminded.university.dao.TeacherDao;
+import ua.com.foxminded.university.dao.TimeDao;
 import ua.com.foxminded.university.dao.jdbc.JdbcClassroomDao;
 import ua.com.foxminded.university.dao.jdbc.JdbcCourseDao;
 import ua.com.foxminded.university.dao.jdbc.JdbcTeacherDao;
@@ -17,13 +21,13 @@ import java.time.LocalDate;
 public class LessonMapper implements RowMapper<Lesson> {
 
     @Autowired
-    private JdbcCourseDao courseDao;
+    private CourseDao courseDao;
     @Autowired
-    private JdbcClassroomDao classroomDao;
+    private ClassroomDao classroomDao;
     @Autowired
-    private JdbcTeacherDao teacherDao;
+    private TeacherDao teacherDao;
     @Autowired
-    private JdbcTimeDao timeDao;
+    private TimeDao timeDao;
 
     @Override
     public Lesson mapRow(ResultSet rs, int rowNum) throws SQLException {

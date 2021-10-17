@@ -23,7 +23,7 @@ public class JdbcCourseDao implements CourseDao {
     private static final String SQL_UPDATE_COURSE = "UPDATE courses SET name = ? WHERE id = ?";
     private static final String SQL_DELETE_COURSE = "DELETE FROM courses WHERE id = ?";
     private static final String SQL_FIND_ALL = "SELECT * FROM courses";
-    private static final String SQL_FIND_TEACHER_COURSES = "SELECT * FROM teachers_courses WHERE teacher_id = ?";
+    private static final String SQL_FIND_TEACHER_COURSES = "SELECT id, name, teacher_id FROM courses INNER JOIN teachers_courses ON id = course_id WHERE teacher_id = ?";
 
     private CourseMapper courseMapper;
     private JdbcTemplate jdbcTemplate;
@@ -61,12 +61,7 @@ public class JdbcCourseDao implements CourseDao {
     }
 
     @Override
-    public List<Course> getTeacherCourses(int teacherId) {
-        return jdbcTemplate.query(SQL_FIND_TEACHER_COURSES, new RowMapper<Course>() {
-            @Override
-            public Course mapRow(ResultSet rs, int rowNum) throws SQLException {
-                return getById(rs.getInt("course_id"));
-            }
-        }, teacherId);
+    public List<Course> getByTeacherId(int teacherId) {
+        return jdbcTemplate.query(SQL_FIND_TEACHER_COURSES, courseMapper, teacherId);
     }
 }

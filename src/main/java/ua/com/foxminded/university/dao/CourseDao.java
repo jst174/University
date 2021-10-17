@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface CourseDao extends Dao<Course>{
 
-    List<Course> getTeacherCourses(int teacherId);
+    List<Course> getByTeacherId(int teacherId);
 }

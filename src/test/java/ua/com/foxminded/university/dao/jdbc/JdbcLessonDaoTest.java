@@ -13,6 +13,7 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.jdbc.JdbcTestUtils;
 import ua.com.foxminded.university.config.DatabaseConfigTest;
+import ua.com.foxminded.university.dao.LessonDao;
 import ua.com.foxminded.university.model.*;
 
 import java.time.LocalDate;
@@ -28,7 +29,7 @@ import java.util.List;
 public class JdbcLessonDaoTest {
 
     @Autowired
-    private JdbcLessonDao lessonDao;
+    private LessonDao lessonDao;
     @Autowired
     private JdbcTemplate jdbcTemplate;
 

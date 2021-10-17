@@ -1,19 +1,21 @@
 package ua.com.foxminded.university.config;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.*;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
+
 import javax.sql.DataSource;
 
 @Configuration
 @ComponentScan("ua.com.foxminded.university")
 @PropertySource("classpath:db.properties")
+@EnableTransactionManagement
 public class DatabaseConfig {
 
     @Value("${db.driver}")
@@ -41,10 +43,16 @@ public class DatabaseConfig {
     }
 
     @Bean
-    public ResourceDatabasePopulator prepareDatabase(DataSource dataSource){
+    public ResourceDatabasePopulator prepareDatabase(DataSource dataSource) {
         ResourceDatabasePopulator resourceDatabasePopulator = new ResourceDatabasePopulator();
         resourceDatabasePopulator.addScript(new ClassPathResource("schema.sql"));
         resourceDatabasePopulator.execute(dataSource);
         return resourceDatabasePopulator;
     }
+
+    @Bean
+    public PlatformTransactionManager transactionManager(DataSource dataSource) {
+        return new DataSourceTransactionManager(dataSource);
+    }
+
 }

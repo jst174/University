@@ -7,12 +7,14 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import ua.com.foxminded.university.dao.GroupDao;
 import ua.com.foxminded.university.dao.LessonDao;
 import ua.com.foxminded.university.dao.mapper.LessonMapper;
 import ua.com.foxminded.university.model.Group;
 import ua.com.foxminded.university.model.Lesson;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -32,7 +34,7 @@ public class JdbcLessonDao implements LessonDao {
     private JdbcTemplate jdbcTemplate;
     private LessonMapper lessonMapper;
     @Autowired
-    private JdbcGroupDao groupDao;
+    private GroupDao groupDao;
 
     public JdbcLessonDao(JdbcTemplate jdbcTemplate, LessonMapper lessonMapper) {
         this.jdbcTemplate = jdbcTemplate;
@@ -52,7 +54,7 @@ public class JdbcLessonDao implements LessonDao {
             return statement;
         }, keyHolder);
         lesson.setId((int) keyHolder.getKeys().get("id"));
-        setGroups(lesson, getGroups(lesson));
+        setGroups(lesson, new ArrayList<>());
     }
 
     public Lesson getById(int id) {
@@ -69,9 +71,9 @@ public class JdbcLessonDao implements LessonDao {
             lesson.getDate(),
             lesson.getTime().getId(),
             lesson.getId());
-        List<Group> groups = getGroups(lesson);
-        deleteGroups(lesson, groups);
-        setGroups(lesson, groups);
+        List<Group> savedGroups = groupDao.getByLessonId(lesson.getId());
+        deleteGroups(lesson, savedGroups);
+        setGroups(lesson, savedGroups);
     }
 
     public void delete(int id) {
@@ -85,41 +87,14 @@ public class JdbcLessonDao implements LessonDao {
 
 
     private void setGroups(Lesson lesson, List<Group> groups) {
-        List<Group> newGroups = lesson.getGroups();
-        if (groups.isEmpty()) {
-            jdbcTemplate.batchUpdate(SQL_ADD_GROUP, new BatchPreparedStatementSetter() {
-                @Override
-                public void setValues(PreparedStatement ps, int i) throws SQLException {
-                    Group group = newGroups.get(i);
-                    ps.setInt(1, lesson.getId());
-                    ps.setInt(2, group.getId());
-                }
-
-                @Override
-                public int getBatchSize() {
-                    return newGroups.size();
-                }
-            });
-        } else {
-            newGroups.stream()
-                .forEach((group) -> {
-                    if (groups.stream().noneMatch(group::equals)) {
-                        jdbcTemplate.update(SQL_ADD_GROUP, lesson.getId(), group.getId());
-                    }
-                });
-        }
+        lesson.getGroups().stream()
+            .filter(group -> !groups.contains(group))
+            .forEach(group -> jdbcTemplate.update(SQL_ADD_GROUP, lesson.getId(), group.getId()));
     }
 
     private void deleteGroups(Lesson lesson, List<Group> groups) {
         groups.stream()
-            .forEach((group) -> {
-                if (lesson.getGroups().stream().noneMatch(group::equals)) {
-                    jdbcTemplate.update(SQL_DELETE_GROUP, lesson.getId(), group.getId());
-                }
-            });
-    }
-
-    private List<Group> getGroups(Lesson lesson){
-        return groupDao.getLessonGroups(lesson.getId());
+            .filter(group -> !lesson.getGroups().contains(group))
+            .forEach(group -> jdbcTemplate.update(SQL_DELETE_GROUP, lesson.getId(), group.getId()));
     }
 }
