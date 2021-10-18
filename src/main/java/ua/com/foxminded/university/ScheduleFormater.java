@@ -1,4 +1,4 @@
-package ua.com.foxminded;
+package ua.com.foxminded.university;
 
 import static java.lang.System.lineSeparator;
 

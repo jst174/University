@@ -1,6 +1,7 @@
 package ua.com.foxminded.university.model;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 public abstract class Person {
 
@@ -8,17 +9,17 @@ public abstract class Person {
 	private String lastName;
 	private LocalDate birthDate;
 	private Gender gender;
-	private Adress adress;
+	private Address address;
 	private String phoneNumber;
 	private String email;
 
-	public Person(String firstName, String lastName, LocalDate birthDate, Gender gender, Adress adress,
+	public Person(String firstName, String lastName, LocalDate birthDate, Gender gender, Address address,
 			String phoneNumber, String email) {
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.birthDate = birthDate;
 		this.gender = gender;
-		this.adress = adress;
+		this.address = address;
 		this.phoneNumber = phoneNumber;
 		this.email = email;
 	}
@@ -55,12 +56,12 @@ public abstract class Person {
 		this.gender = gender;
 	}
 
-	public Adress getAdress() {
-		return adress;
+	public Address getAddress() {
+		return address;
 	}
 
-	public void setAdress(Adress adress) {
-		this.adress = adress;
+	public void setAddress(Address address) {
+		this.address = address;
 	}
 
 	public String getPhoneNumber() {
@@ -79,4 +80,16 @@ public abstract class Person {
 		this.email = email;
 	}
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Person person = (Person) o;
+        return Objects.equals(firstName, person.firstName) && Objects.equals(lastName, person.lastName) && Objects.equals(birthDate, person.birthDate) && gender == person.gender && Objects.equals(address, person.address) && Objects.equals(phoneNumber, person.phoneNumber) && Objects.equals(email, person.email);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(firstName, lastName, birthDate, gender, address, phoneNumber, email);
+    }
 }

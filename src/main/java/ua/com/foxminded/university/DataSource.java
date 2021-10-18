@@ -1,4 +1,4 @@
-package ua.com.foxminded;
+package ua.com.foxminded.university;
 
 import java.io.File;
 import java.io.IOException;
@@ -8,11 +8,9 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
-import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -20,7 +18,7 @@ import java.util.stream.Stream;
 import com.github.javafaker.Faker;
 
 import ua.com.foxminded.university.model.AcademicDegree;
-import ua.com.foxminded.university.model.Adress;
+import ua.com.foxminded.university.model.Address;
 import ua.com.foxminded.university.model.Classroom;
 import ua.com.foxminded.university.model.Course;
 import ua.com.foxminded.university.model.Gender;
@@ -29,15 +27,14 @@ import ua.com.foxminded.university.model.Lesson;
 import ua.com.foxminded.university.model.Student;
 import ua.com.foxminded.university.model.Teacher;
 import ua.com.foxminded.university.model.Time;
-import ua.com.foxminded.university.model.University;
 
-public class DataSourse {
+public class DataSource {
 
 	private static final char HYPHEN = '-';
 
 	private Faker faker;
 
-	public DataSourse() throws IOException {
+	public DataSource() throws IOException {
 		faker = new Faker(new Locale("US"));
 	}
 
@@ -99,12 +96,14 @@ public class DataSourse {
 	public Lesson generateLesson(LocalDate date, List<Group> groups) throws IOException {
 		int random1 = faker.number().numberBetween(0, 9);
 		int random2 = faker.number().numberBetween(0, 6);
-		return new Lesson(getCourses("courses.txt").get(random1), groups, getClassrooms().get(random1),
+		Lesson lesson = new Lesson(getCourses("courses.txt").get(random1), getClassrooms().get(random1),
 				getTeachers().get(random1), date, getTime().get(random2));
+        lesson.setGroups(groups);
+        return  lesson;
 
 	}
 
-	private Teacher generateTeacher() {
+	public Teacher generateTeacher() {
 		String firstName = faker.name().firstName();
 		String lastName = faker.name().lastName();
 		return new Teacher(firstName, lastName, generateBirthDate(), generateGender(), generateAddress(),
@@ -112,7 +111,7 @@ public class DataSourse {
 
 	}
 
-	private Student generateStudent() throws IOException {
+	public Student generateStudent() throws IOException {
 		String firstName = faker.name().firstName();
 		String lastName = faker.name().lastName();
 		return new Student(firstName, lastName, generateBirthDate(), generateGender(), generateAddress(),
@@ -120,8 +119,8 @@ public class DataSourse {
 
 	}
 
-	private Adress generateAddress() {
-		return new Adress(faker.address().country(), faker.address().city(), faker.address().streetName(),
+	private Address generateAddress() {
+		return new Address(faker.address().country(), faker.address().city(), faker.address().streetName(),
 				faker.address().buildingNumber(), faker.address().buildingNumber(), faker.address().zipCode());
 	}
 

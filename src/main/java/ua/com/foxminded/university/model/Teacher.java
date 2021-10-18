@@ -3,6 +3,7 @@ package ua.com.foxminded.university.model;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Teacher extends Person {
 
@@ -11,9 +12,9 @@ public class Teacher extends Person {
 	private List<Course> courses;
 	private List<Vacation> vacations;
 
-	public Teacher(String firstName, String lastName, LocalDate birthDate, Gender gender, Adress adress,
+	public Teacher(String firstName, String lastName, LocalDate birthDate, Gender gender, Address address,
 			String phoneNumber, String email, AcademicDegree academicDegree) {
-		super(firstName, lastName, birthDate, gender, adress, phoneNumber, email);
+		super(firstName, lastName, birthDate, gender, address, phoneNumber, email);
 		this.academicDegree = academicDegree;
 		courses = new ArrayList<>();
 		vacations = new ArrayList<>();
@@ -47,14 +48,27 @@ public class Teacher extends Person {
 		return vacations;
 	}
 
-	public void setVacations(List<Vacation> vacations) {
-		this.vacations = vacations;
+	public void setVacations(Vacation vacation) {
+		this.vacations.add(vacation);
 	}
 
 	@Override
 	public String toString() {
-		return getFirstName() + " " + getLastName() + "; " + getBirthDate() + "; " + getGender() + "; " + getAdress()
+		return getFirstName() + " " + getLastName() + "; " + getBirthDate() + "; " + getGender() + "; " + getAddress()
 				+ "; " + getPhoneNumber() + "; " + getEmail() + "; " + academicDegree;
 	}
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Teacher)) return false;
+        if (!super.equals(o)) return false;
+        Teacher teacher = (Teacher) o;
+        return academicDegree == teacher.academicDegree && Objects.equals(vacations, teacher.vacations);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), academicDegree, vacations);
+    }
 }
