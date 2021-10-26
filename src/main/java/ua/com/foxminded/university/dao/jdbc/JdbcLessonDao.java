@@ -1,7 +1,6 @@
 package ua.com.foxminded.university.dao.jdbc;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -30,6 +29,8 @@ public class JdbcLessonDao implements LessonDao {
     private static final String SQL_FIND_ALL = "SELECT * FROM lessons";
     private static final String SQL_ADD_GROUP = "INSERT INTO lessons_groups(lesson_id, group_id) VALUES (?,?)";
     private static final String SQL_DELETE_GROUP = "DELETE FROM lessons_groups WHERE lesson_id = ? and group_id = ?";
+    private static final String SQL_FIND_LESSONS_BY_TEACHER = "SELECT * FROM lessons WHERE teacher_id = ?";
+    private static final String SQL_FIND_LESSONS_BY_CLASSROOM = "SELECT * FROM lessons WHERE classroom_id = ?";
 
     private JdbcTemplate jdbcTemplate;
     private LessonMapper lessonMapper;
@@ -85,6 +86,15 @@ public class JdbcLessonDao implements LessonDao {
         return jdbcTemplate.query(SQL_FIND_ALL, lessonMapper);
     }
 
+    @Override
+    public List<Lesson> getByTeacherId(int teacherId) {
+        return jdbcTemplate.query(SQL_FIND_LESSONS_BY_TEACHER, lessonMapper, teacherId);
+    }
+
+    @Override
+    public List<Lesson> getByClassroomId(int classroomId) {
+        return jdbcTemplate.query(SQL_FIND_LESSONS_BY_CLASSROOM, lessonMapper, classroomId);
+    }
 
     private void setGroups(Lesson lesson, List<Group> groups) {
         lesson.getGroups().stream()

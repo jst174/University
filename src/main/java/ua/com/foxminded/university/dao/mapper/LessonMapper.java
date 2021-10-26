@@ -32,11 +32,11 @@ public class LessonMapper implements RowMapper<Lesson> {
     @Override
     public Lesson mapRow(ResultSet rs, int rowNum) throws SQLException {
         Lesson lesson = new Lesson(
-            courseDao.getById(rs.getInt("id")),
-            classroomDao.getById(rs.getInt("id")),
-            teacherDao.getById(rs.getInt("id")),
+            courseDao.getById(rs.getInt("course_id")),
+            classroomDao.getById(rs.getInt("classroom_id")),
+            teacherDao.getById(rs.getInt("teacher_id")),
             rs.getObject("date", LocalDate.class),
-            timeDao.getById(rs.getInt("id"))
+            timeDao.getById(rs.getInt("time_id"))
         );
         lesson.setId(rs.getInt("id"));
         return lesson;

@@ -7,6 +7,7 @@ import ua.com.foxminded.university.dao.TimeDao;
 import ua.com.foxminded.university.dao.jdbc.*;
 import ua.com.foxminded.university.model.*;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -27,10 +28,6 @@ public class Application {
 
 		Menu menu = new Menu();
 		menu.getMenu(university);
-
-
-
-
     }
 
 }

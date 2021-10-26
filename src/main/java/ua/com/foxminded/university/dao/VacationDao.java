@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface VacationDao extends Dao<Vacation> {
 
+    List<Vacation> getByTeacherId(int id);
 }

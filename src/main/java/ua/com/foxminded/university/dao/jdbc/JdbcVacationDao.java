@@ -23,6 +23,7 @@ public class JdbcVacationDao implements VacationDao {
         "UPDATE vacations SET start = ?, ending = ?, teacher_id = ? WHERE id = ?";
     private static final String SQL_DELETE_VACATION = "DELETE FROM vacations WHERE id = ?";
     private static final String SQL_FIND_ALL = "SELECT * FROM vacations";
+    private static final String SQL_FIND_TEACHER_VACATIONS = "SELECT * FROM vacations WHERE teacher_id = ?";
 
     private VacationMapper vacationMapper;
     private JdbcTemplate jdbcTemplate;
@@ -41,7 +42,7 @@ public class JdbcVacationDao implements VacationDao {
             statement.setInt(3, vacation.getTeacher().getId());
             return statement;
         }, keyHolder);
-        vacation.setId((int)keyHolder.getKeys().get("id"));
+        vacation.setId((int) keyHolder.getKeys().get("id"));
     }
 
     public Vacation getById(int id) {
@@ -65,4 +66,8 @@ public class JdbcVacationDao implements VacationDao {
         return jdbcTemplate.query(SQL_FIND_ALL, vacationMapper);
     }
 
+    @Override
+    public List<Vacation> getByTeacherId(int id) {
+        return jdbcTemplate.query(SQL_FIND_TEACHER_VACATIONS, vacationMapper, id);
+    }
 }

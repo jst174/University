@@ -18,6 +18,8 @@ INSERT INTO times (start, ending)
 VALUES ('12:00', '13:30');
 INSERT INTO lessons (classroom_id, course_id, teacher_id, date, time_id)
 VALUES (1, 1, 1, '2021-09-28', 1);
+INSERT INTO lessons (classroom_id, course_id, teacher_id, date, time_id)
+VALUES (1, 1, 1, '2021-09-28', 2);
 
 INSERT INTO groups (name) VALUES ('MH-12');
 INSERT INTO groups (name) VALUES ('JW-23');

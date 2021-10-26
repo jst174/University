@@ -45,13 +45,13 @@ public class Classroom {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof Classroom)) return false;
         Classroom classroom = (Classroom) o;
-        return number == classroom.number && capacity == classroom.capacity;
+        return number == classroom.number;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(number, capacity);
+        return Objects.hash(number);
     }
 }

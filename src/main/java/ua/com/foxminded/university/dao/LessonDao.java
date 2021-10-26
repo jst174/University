@@ -8,4 +8,6 @@ import java.util.List;
 
 public interface LessonDao extends Dao<Lesson> {
 
+    List<Lesson> getByTeacherId(int teacherId);
+    List<Lesson> getByClassroomId(int classroomId);
 }

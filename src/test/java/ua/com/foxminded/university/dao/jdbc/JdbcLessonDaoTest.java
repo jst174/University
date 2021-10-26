@@ -169,7 +169,7 @@ public class JdbcLessonDaoTest {
 
         lessonDao.delete(1);
 
-        assertEquals(0, countRowsInTable(jdbcTemplate, "lessons"));
+        assertEquals(expectedRows, countRowsInTable(jdbcTemplate, "lessons"));
     }
 
     @Test
@@ -188,23 +188,133 @@ public class JdbcLessonDaoTest {
             AcademicDegree.MASTER
         );
         teacher.setId(1);
-        Time time = new Time(LocalTime.of(8, 00), LocalTime.of(9, 30));
-        time.setId(1);
+        Time time1 = new Time(LocalTime.of(8, 00), LocalTime.of(9, 30));
+        Time time2 = new Time(LocalTime.of(12, 00), LocalTime.of(13, 30));
+        time1.setId(1);
+        time2.setId(2);
         Course course = new Course("History");
         course.setId(1);
         Classroom classroom = new Classroom(102, 30);
         classroom.setId(1);
-        Lesson lesson = new Lesson(
+        Lesson lesson1 = new Lesson(
             course,
             classroom,
             teacher,
             LocalDate.of(2021, 9, 28),
-            time
+            time1
         );
+        Lesson lesson2 = new Lesson(
+            course,
+            classroom,
+            teacher,
+            LocalDate.of(2021, 9, 28),
+            time2
+        );
+        lesson1.setId(1);
+        lesson2.setId(2);
         List<Lesson> expected = new ArrayList<>();
-        expected.add(lesson);
+        expected.add(lesson1);
+        expected.add(lesson2);
 
         List<Lesson> actual = lessonDao.getAll();
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void givenTeacherId_whenGetByTeacherId_thenReturnLessons() {
+        Address address = new Address("Russia", "Saint Petersburg", "Nevsky Prospect",
+            "15", "45", "342423");
+        address.setId(1);
+        Teacher teacher = new Teacher(
+            "Mike",
+            "Miller",
+            LocalDate.of(1977, 05, 13),
+            Gender.MALE,
+            address,
+            "5435345334",
+            "miller77@gmail.com",
+            AcademicDegree.MASTER
+        );
+        teacher.setId(1);
+        Time time1 = new Time(LocalTime.of(8, 00), LocalTime.of(9, 30));
+        Time time2 = new Time(LocalTime.of(12, 00), LocalTime.of(13, 30));
+        time1.setId(1);
+        time2.setId(2);
+        Course course = new Course("History");
+        course.setId(1);
+        Classroom classroom = new Classroom(102, 30);
+        classroom.setId(1);
+        Lesson lesson1 = new Lesson(
+            course,
+            classroom,
+            teacher,
+            LocalDate.of(2021, 9, 28),
+            time1
+        );
+        Lesson lesson2 = new Lesson(
+            course,
+            classroom,
+            teacher,
+            LocalDate.of(2021, 9, 28),
+            time2
+        );
+        lesson1.setId(1);
+        lesson2.setId(2);
+        List<Lesson> expected = new ArrayList<>();
+        expected.add(lesson1);
+        expected.add(lesson2);
+
+        List<Lesson> actual = lessonDao.getByTeacherId(1);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void givenClassroomId_whenGetByClassroomId_thenReturnLessons() {
+        Address address = new Address("Russia", "Saint Petersburg", "Nevsky Prospect",
+            "15", "45", "342423");
+        address.setId(1);
+        Teacher teacher = new Teacher(
+            "Mike",
+            "Miller",
+            LocalDate.of(1977, 05, 13),
+            Gender.MALE,
+            address,
+            "5435345334",
+            "miller77@gmail.com",
+            AcademicDegree.MASTER
+        );
+        teacher.setId(1);
+        Time time1 = new Time(LocalTime.of(8, 00), LocalTime.of(9, 30));
+        Time time2 = new Time(LocalTime.of(12, 00), LocalTime.of(13, 30));
+        time1.setId(1);
+        time2.setId(2);
+        Course course = new Course("History");
+        course.setId(1);
+        Classroom classroom = new Classroom(102, 30);
+        classroom.setId(1);
+        Lesson lesson1 = new Lesson(
+            course,
+            classroom,
+            teacher,
+            LocalDate.of(2021, 9, 28),
+            time1
+        );
+        Lesson lesson2 = new Lesson(
+            course,
+            classroom,
+            teacher,
+            LocalDate.of(2021, 9, 28),
+            time2
+        );
+        lesson1.setId(1);
+        lesson2.setId(2);
+        List<Lesson> expected = new ArrayList<>();
+        expected.add(lesson1);
+        expected.add(lesson2);
+
+        List<Lesson> actual = lessonDao.getByClassroomId(1);
 
         assertEquals(expected, actual);
     }
