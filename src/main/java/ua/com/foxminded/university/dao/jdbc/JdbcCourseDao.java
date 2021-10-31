@@ -24,6 +24,7 @@ public class JdbcCourseDao implements CourseDao {
     private static final String SQL_DELETE_COURSE = "DELETE FROM courses WHERE id = ?";
     private static final String SQL_FIND_ALL = "SELECT * FROM courses";
     private static final String SQL_FIND_TEACHER_COURSES = "SELECT id, name, teacher_id FROM courses INNER JOIN teachers_courses ON id = course_id WHERE teacher_id = ?";
+    private static final String SQL_FIND_BY_NAME = "SELECT * FROM courses WHERE name = ?";
 
     private CourseMapper courseMapper;
     private JdbcTemplate jdbcTemplate;
@@ -37,10 +38,10 @@ public class JdbcCourseDao implements CourseDao {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
             PreparedStatement statement = connection.prepareStatement(SQL_INSERT_COURSE, Statement.RETURN_GENERATED_KEYS);
-            statement.setString(1,course.getName());
+            statement.setString(1, course.getName());
             return statement;
         }, keyHolder);
-        course.setId((int)keyHolder.getKeys().get("id"));
+        course.setId((int) keyHolder.getKeys().get("id"));
     }
 
     public Course getById(int id) {
@@ -63,5 +64,10 @@ public class JdbcCourseDao implements CourseDao {
     @Override
     public List<Course> getByTeacherId(int teacherId) {
         return jdbcTemplate.query(SQL_FIND_TEACHER_COURSES, courseMapper, teacherId);
+    }
+
+    @Override
+    public Course getByName(String name) {
+        return jdbcTemplate.queryForObject(SQL_FIND_BY_NAME, courseMapper, name);
     }
 }

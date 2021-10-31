@@ -56,7 +56,7 @@ public class GroupServiceTest {
     public void givenNewGroup_whenCreate_thenCreated() {
         Group group = new Group("GD-22");
 
-        when(groupDao.getAll()).thenReturn(groups);
+        when(groupDao.getByName("GD-22")).thenReturn(group);
 
         groupService.create(group);
 
@@ -64,40 +64,19 @@ public class GroupServiceTest {
     }
 
     @Test
-    public void givenExistentGroup_whenCreate_thenThrowException() {
-        Group group = groups.get(0);
-
-        when(groupDao.getAll()).thenReturn(groups);
-
-        Throwable exception = assertThrows(IllegalArgumentException.class, () -> groupService.create(group));
-
-        assertEquals("group with this name already exist", exception.getMessage());
-    }
-
-    @Test
     public void givenExistentGroupId_whenGetById_thenReturn() {
         Group group = groups.get(0);
 
-        when(groupDao.getAll()).thenReturn(groups);
         when(groupDao.getById(1)).thenReturn(group);
 
         assertEquals(group, groupService.getById(1));
     }
 
     @Test
-    public void givenNotExistentId_whenGetById_thenThrowException() {
-        when(groupDao.getAll()).thenReturn(groups);
-
-        Throwable exception = assertThrows(IllegalArgumentException.class, () -> groupService.getById(3));
-
-        assertEquals("group is not found", exception.getMessage());
-    }
-
-    @Test
     public void givenExistentGroup_whenUpdate_thenUpdated() {
         Group group = groups.get(0);
 
-        when(groupDao.getAll()).thenReturn(groups);
+        when(groupDao.getById(1)).thenReturn(group);
 
         groupService.update(group);
 
@@ -105,48 +84,17 @@ public class GroupServiceTest {
     }
 
     @Test
-    public void givenNotExistentGroup_whenUpdate_thenThrowException() {
-        Group group = new Group("ER-43");
-
-        when(groupDao.getAll()).thenReturn(groups);
-
-        Throwable exception = assertThrows(IllegalArgumentException.class, () -> groupService.update(group));
-
-        assertEquals("group is not found", exception.getMessage());
-    }
-
-    @Test
     public void givenExistentGroupId_whenDelete_thenDeleted() {
-        when(groupDao.getAll()).thenReturn(groups);
-
         groupService.delete(1);
 
         verify(groupDao).delete(1);
     }
 
     @Test
-    public void givenNotExistentGroupId_whenDelete_thenThrowException() {
-        when(groupDao.getAll()).thenReturn(groups);
-
-        Throwable exception = assertThrows(IllegalArgumentException.class, () -> groupService.delete(3));
-
-        assertEquals("group is not found", exception.getMessage());
-    }
-
-    @Test
     public void givenExistentLessonId_whenGetByLessonId_thenReturn() {
-        when(lessonDao.getAll()).thenReturn(lessons);
         when(groupDao.getByLessonId(1)).thenReturn(groups);
 
         assertEquals(groups, groupService.getByLessonId(1));
     }
 
-    @Test
-    public void givenNotExistentLessonId_whenGetByLessonId_thenThrowException() {
-        when(lessonDao.getAll()).thenReturn(lessons);
-
-        Throwable exception = assertThrows(IllegalArgumentException.class, () -> groupService.getByLessonId(3));
-
-        assertEquals("lesson is not found", exception.getMessage());
-    }
 }

@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface ClassroomDao extends Dao<Classroom>{
 
+    Classroom findByNumber(int number);
 }

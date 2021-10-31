@@ -16,50 +16,30 @@ public class HolidayService {
     }
 
     public void create(Holiday holiday) {
-        if (!holidayIsExist(holiday)) {
+        if (!isUnique(holiday)) {
             holidayDao.create(holiday);
-        } else {
-            throw new IllegalArgumentException("holiday already exist");
         }
-
     }
 
     public Holiday getById(int id) {
-        if (idIsExist(id)) {
-            return holidayDao.getById(id);
-        } else {
-            throw new IllegalArgumentException("holiday is not found");
-        }
+        return holidayDao.getById(id);
     }
 
     public void update(Holiday holiday) {
-        if (idIsExist(holiday.getId())) {
+        if (holidayDao.getById(holiday.getId()).equals(holiday)) {
             holidayDao.update(holiday);
-        } else {
-            throw new IllegalArgumentException("holiday is not found");
         }
-
     }
 
     public void delete(int id) {
-        if (idIsExist(id)) {
-            holidayDao.delete(id);
-        } else {
-            throw new IllegalArgumentException("holiday is not found");
-        }
+        holidayDao.delete(id);
     }
 
     public List<Holiday> getAll() {
         return holidayDao.getAll();
     }
 
-    private boolean holidayIsExist(Holiday holiday) {
-        List<Holiday> holidays = holidayDao.getAll();
-        return holidays.stream().anyMatch(holiday::equals);
-    }
-
-    private boolean idIsExist(int id) {
-        List<Holiday> holidays = holidayDao.getAll();
-        return holidays.stream().anyMatch(holiday -> holiday.getId() == id);
+    private boolean isUnique(Holiday holiday) {
+        return !holidayDao.getByDate(holiday.getDate()).equals(holiday);
     }
 }

@@ -37,49 +37,30 @@ public class ClassroomServiceTest {
 
     @Test
     public void givenNewClassroom_whenCreateClassroom_thenCreated() {
-        Classroom newClassroom = new Classroom(102, 30);
+        Classroom classroom = new Classroom(102, 30);
 
-        when(classroomDao.getAll()).thenReturn(classrooms);
+        when(classroomDao.findByNumber(102)).thenReturn(classroom);
 
-        classroomService.createClassroom(newClassroom);
+        classroomService.createClassroom(classroom);
 
-        verify(classroomDao).create(newClassroom);
+        verify(classroomDao).create(classroom);
     }
 
-    @Test
-    public void givenExistClassroom_whenCreateClassroom_thenThrowException() {
-        Classroom classroom = classrooms.get(0);
-        when(classroomDao.getAll()).thenReturn(classrooms);
-
-        Throwable exception = assertThrows(IllegalArgumentException.class, () -> classroomService.createClassroom(classroom));
-
-        assertEquals("classroom with this number already exists", exception.getMessage());
-    }
 
     @Test
     public void givenExistClassroomId_whenGetById_thenReturn() {
         Classroom classroom = classrooms.get(0);
 
-        when(classroomDao.getAll()).thenReturn(classrooms);
         when(classroomDao.getById(1)).thenReturn(classroom);
 
         assertEquals(classroom, classroomService.getById(1));
     }
 
     @Test
-    public void givenNotExistentClassroomId_whenGetById_thenThrowException() {
-        when(classroomDao.getAll()).thenReturn(classrooms);
-
-        Throwable exception = assertThrows(IllegalArgumentException.class, () -> classroomService.getById(3));
-
-        assertEquals("classroom is not found", exception.getMessage());
-    }
-
-    @Test
     public void givenExistentClassroom_whenUpdate_thenUpdated() {
         Classroom classroom = classrooms.get(0);
 
-        when(classroomDao.getAll()).thenReturn(classrooms);
+        when(classroomDao.getById(1)).thenReturn(classroom);
 
         classroomService.update(classroom);
 
@@ -87,33 +68,11 @@ public class ClassroomServiceTest {
     }
 
     @Test
-    public void givenNotExistentClassroom_whenUpdate_thenThrowException() {
-        Classroom classroom = new Classroom(102, 30);
-
-        when(classroomDao.getAll()).thenReturn(classrooms);
-
-        Throwable exception = assertThrows(IllegalArgumentException.class, () -> classroomService.update(classroom));
-
-        assertEquals("classroom is not found", exception.getMessage());
-    }
-
-    @Test
     public void givenExistentId_whenDelete_thenDeleted() {
         Classroom classroom = classrooms.get(0);
-
-        when(classroomDao.getAll()).thenReturn(classrooms);
 
         classroomService.delete(1);
 
         verify(classroomDao).delete(1);
-    }
-
-    @Test
-    public void givenNotExistentId_whenDelete_thenThrowException() {
-        when(classroomDao.getAll()).thenReturn(classrooms);
-
-        Throwable exception = assertThrows(IllegalArgumentException.class, () -> classroomService.delete(3));
-
-        assertEquals("classroom is not found", exception.getMessage());
     }
 }

@@ -53,40 +53,19 @@ public class TeacherServiceTest {
     }
 
     @Test
-    public void givenExistentTeacher_whenCreate_thenThrowException() {
-        Teacher teacher = teachers.get(0);
-
-        when(teacherDao.getAll()).thenReturn(teachers);
-
-        Throwable exception = assertThrows(IllegalArgumentException.class, () -> teacherService.create(teacher));
-
-        assertEquals("teacher already exist", exception.getMessage());
-    }
-
-    @Test
     public void givenExistentId_whenGetById_thenReturn() {
         Teacher teacher = teachers.get(0);
 
-        when(teacherDao.getAll()).thenReturn(teachers);
         when(teacherDao.getById(1)).thenReturn(teacher);
 
         assertEquals(teacher, teacherService.getById(1));
     }
 
     @Test
-    public void givenNotExistentId_whenGetById_thenThrowException() {
-        when(teacherDao.getAll()).thenReturn(teachers);
-
-        Throwable exception = assertThrows(IllegalArgumentException.class, () -> teacherService.getById(3));
-
-        assertEquals("teacher is not found", exception.getMessage());
-    }
-
-    @Test
     public void givenExistentTime_whenUpdate_thenUpdated() {
         Teacher teacher = teachers.get(0);
 
-        when(teacherDao.getAll()).thenReturn(teachers);
+        when(teacherDao.getById(1)).thenReturn(teacher);
 
         teacherService.update(teacher);
 
@@ -94,31 +73,9 @@ public class TeacherServiceTest {
     }
 
     @Test
-    public void givenNotExistentTeacher_whenUpdate_thenThrowException() throws IOException {
-        Teacher teacher = dataSource.generateTeacher();
-
-        when(teacherDao.getAll()).thenReturn(teachers);
-
-        Throwable exception = assertThrows(IllegalArgumentException.class, () -> teacherService.update(teacher));
-
-        assertEquals("teacher is not found", exception.getMessage());
-    }
-
-    @Test
     public void givenExistentId_whenDelete_thenDeleted() {
-        when(teacherDao.getAll()).thenReturn(teachers);
-
         teacherService.delete(1);
 
         verify(teacherDao).delete(1);
-    }
-
-    @Test
-    public void givenNotExistentId_whenDeleted_thenThrowException() {
-        when(teacherDao.getAll()).thenReturn(teachers);
-
-        Throwable exception = assertThrows(IllegalArgumentException.class, () -> teacherService.delete(3));
-
-        assertEquals("teacher is not found", exception.getMessage());
     }
 }

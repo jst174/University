@@ -16,50 +16,31 @@ public class ClassroomService {
     }
 
     public void createClassroom(Classroom classroom) {
-        if (!classroomIsExist(classroom)) {
+        if (!isUnique(classroom)) {
             classroomDao.create(classroom);
-        } else {
-            throw new IllegalArgumentException("classroom with this number already exists");
         }
     }
 
     public Classroom getById(int id) {
-        if (idIsExist(id)) {
-            return classroomDao.getById(id);
-        } else {
-            throw new IllegalArgumentException("classroom is not found");
-        }
+        return classroomDao.getById(id);
     }
 
     public void update(Classroom classroom) {
-        if (idIsExist(classroom.getId())) {
+        if (classroomDao.getById(classroom.getId()).equals(classroom)) {
             classroomDao.update(classroom);
-        } else {
-            throw new IllegalArgumentException("classroom is not found");
         }
-
     }
 
     public void delete(int id) {
-        if (idIsExist(id)) {
-            classroomDao.delete(id);
-        } else {
-            throw new IllegalArgumentException("classroom is not found");
-        }
-
+        classroomDao.delete(id);
     }
 
     public List<Classroom> getAll() {
         return classroomDao.getAll();
     }
 
-    private boolean classroomIsExist(Classroom classroom) {
-        List<Classroom> classrooms = classroomDao.getAll();
-        return classrooms.stream().anyMatch(classroom::equals);
+    private boolean isUnique(Classroom classroom) {
+        return !classroomDao.findByNumber(classroom.getNumber()).equals(classroom);
     }
 
-    private boolean idIsExist(int id) {
-        List<Classroom> classrooms = classroomDao.getAll();
-        return classrooms.stream().anyMatch(classroom -> classroom.getId() == id);
-    }
 }

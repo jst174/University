@@ -20,6 +20,7 @@ public class JdbcClassroomDao implements ClassroomDao {
     private static final String SQL_UPDATE_CLASSROOM = "UPDATE classrooms SET number = ? ,capacity = ? WHERE id = ?";
     private static final String SQL_DELETE_CLASSROOM = "DELETE FROM classrooms WHERE id = ?";
     private static final String SQL_FIND_ALL = "SELECT * FROM classrooms";
+    private static final String SQL_FIND_BY_NUMBER = "SELECT * FROM classrooms WHERE number = ?";
 
     private ClassroomMapper classroomMapper;
     private JdbcTemplate jdbcTemplate;
@@ -55,5 +56,10 @@ public class JdbcClassroomDao implements ClassroomDao {
     @Override
     public List<Classroom> getAll() {
         return jdbcTemplate.query(SQL_FIND_ALL, classroomMapper);
+    }
+
+    @Override
+    public Classroom findByNumber(int number) {
+        return jdbcTemplate.queryForObject(SQL_FIND_BY_NUMBER, classroomMapper, number);
     }
 }

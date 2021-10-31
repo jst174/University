@@ -101,6 +101,16 @@ public class JdbcLessonDaoTest {
         course.setId(1);
         Classroom classroom = new Classroom(102, 30);
         classroom.setId(1);
+        Group group1 = new Group("MH-12");
+        group1.setId(1);
+        Group group2 = new Group("JW-23");
+        group2.setId(2);
+        Group group3 = new Group("MG-54");
+        group3.setId(3);
+        List<Group> groups1 = new ArrayList<>();
+        groups1.add(group1);
+        groups1.add(group2);
+        groups1.add(group3);
         Lesson expected = new Lesson(
             course,
             classroom,
@@ -108,6 +118,7 @@ public class JdbcLessonDaoTest {
             LocalDate.of(2021, 9, 28),
             time
         );
+        expected.setGroups(groups1);
 
         Lesson actual = lessonDao.getById(1);
 
@@ -196,6 +207,16 @@ public class JdbcLessonDaoTest {
         course.setId(1);
         Classroom classroom = new Classroom(102, 30);
         classroom.setId(1);
+        Group group1 = new Group("MH-12");
+        group1.setId(1);
+        Group group2 = new Group("JW-23");
+        group2.setId(2);
+        Group group3 = new Group("MG-54");
+        group3.setId(3);
+        List<Group> groups1 = new ArrayList<>();
+        groups1.add(group1);
+        groups1.add(group2);
+        groups1.add(group3);
         Lesson lesson1 = new Lesson(
             course,
             classroom,
@@ -210,6 +231,8 @@ public class JdbcLessonDaoTest {
             LocalDate.of(2021, 9, 28),
             time2
         );
+        lesson1.setGroups(groups1);
+        lesson2.setGroups(groups1);
         lesson1.setId(1);
         lesson2.setId(2);
         List<Lesson> expected = new ArrayList<>();
@@ -245,6 +268,16 @@ public class JdbcLessonDaoTest {
         course.setId(1);
         Classroom classroom = new Classroom(102, 30);
         classroom.setId(1);
+        Group group1 = new Group("MH-12");
+        group1.setId(1);
+        Group group2 = new Group("JW-23");
+        group2.setId(2);
+        Group group3 = new Group("MG-54");
+        group3.setId(3);
+        List<Group> groups1 = new ArrayList<>();
+        groups1.add(group1);
+        groups1.add(group2);
+        groups1.add(group3);
         Lesson lesson1 = new Lesson(
             course,
             classroom,
@@ -259,6 +292,8 @@ public class JdbcLessonDaoTest {
             LocalDate.of(2021, 9, 28),
             time2
         );
+        lesson1.setGroups(groups1);
+        lesson2.setGroups(groups1);
         lesson1.setId(1);
         lesson2.setId(2);
         List<Lesson> expected = new ArrayList<>();
@@ -275,6 +310,7 @@ public class JdbcLessonDaoTest {
         Address address = new Address("Russia", "Saint Petersburg", "Nevsky Prospect",
             "15", "45", "342423");
         address.setId(1);
+
         Teacher teacher = new Teacher(
             "Mike",
             "Miller",
@@ -286,14 +322,30 @@ public class JdbcLessonDaoTest {
             AcademicDegree.MASTER
         );
         teacher.setId(1);
+
         Time time1 = new Time(LocalTime.of(8, 00), LocalTime.of(9, 30));
         Time time2 = new Time(LocalTime.of(12, 00), LocalTime.of(13, 30));
         time1.setId(1);
         time2.setId(2);
+
         Course course = new Course("History");
         course.setId(1);
+
         Classroom classroom = new Classroom(102, 30);
         classroom.setId(1);
+
+        Group group1 = new Group("MH-12");
+        group1.setId(1);
+        Group group2 = new Group("JW-23");
+        group2.setId(2);
+        Group group3 = new Group("MG-54");
+        group3.setId(3);
+        List<Group> groups1 = new ArrayList<>();
+        groups1.add(group1);
+        groups1.add(group2);
+        groups1.add(group3);
+
+
         Lesson lesson1 = new Lesson(
             course,
             classroom,
@@ -301,6 +353,9 @@ public class JdbcLessonDaoTest {
             LocalDate.of(2021, 9, 28),
             time1
         );
+        lesson1.setGroups(groups1);
+
+
         Lesson lesson2 = new Lesson(
             course,
             classroom,
@@ -308,6 +363,7 @@ public class JdbcLessonDaoTest {
             LocalDate.of(2021, 9, 28),
             time2
         );
+        lesson2.setGroups(groups1);
         lesson1.setId(1);
         lesson2.setId(2);
         List<Lesson> expected = new ArrayList<>();
@@ -315,6 +371,75 @@ public class JdbcLessonDaoTest {
         expected.add(lesson2);
 
         List<Lesson> actual = lessonDao.getByClassroomId(1);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public  void givenDateAndTime_whenGetByDateAndTime_thenReturn(){
+        Address address = new Address("Russia", "Saint Petersburg", "Nevsky Prospect",
+            "15", "45", "342423");
+        address.setId(1);
+
+        Teacher teacher = new Teacher(
+            "Mike",
+            "Miller",
+            LocalDate.of(1977, 05, 13),
+            Gender.MALE,
+            address,
+            "5435345334",
+            "miller77@gmail.com",
+            AcademicDegree.MASTER
+        );
+        teacher.setId(1);
+
+        Time time1 = new Time(LocalTime.of(8, 00), LocalTime.of(9, 30));
+        Time time2 = new Time(LocalTime.of(12, 00), LocalTime.of(13, 30));
+        time1.setId(1);
+        time2.setId(2);
+
+        Course course = new Course("History");
+        course.setId(1);
+
+        Classroom classroom = new Classroom(102, 30);
+        classroom.setId(1);
+
+        Group group1 = new Group("MH-12");
+        group1.setId(1);
+        Group group2 = new Group("JW-23");
+        group2.setId(2);
+        Group group3 = new Group("MG-54");
+        group3.setId(3);
+        List<Group> groups1 = new ArrayList<>();
+        groups1.add(group1);
+        groups1.add(group2);
+        groups1.add(group3);
+
+
+        Lesson lesson1 = new Lesson(
+            course,
+            classroom,
+            teacher,
+            LocalDate.of(2021, 9, 28),
+            time1
+        );
+        lesson1.setGroups(groups1);
+
+
+        Lesson lesson2 = new Lesson(
+            course,
+            classroom,
+            teacher,
+            LocalDate.of(2021, 9, 28),
+            time2
+        );
+        lesson2.setGroups(groups1);
+        lesson1.setId(1);
+        lesson2.setId(2);
+        List<Lesson> expected = new ArrayList<>();
+        expected.add(lesson1);
+
+        List<Lesson> actual = lessonDao.getByDateAndTime(LocalDate.of(2021, 9, 28), time1);
 
         assertEquals(expected, actual);
     }

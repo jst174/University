@@ -8,4 +8,6 @@ import java.util.List;
 public interface GroupDao extends Dao<Group> {
 
     List<Group> getByLessonId(int lessonId);
+
+    Group getByName(String name);
 }

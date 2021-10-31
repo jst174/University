@@ -4,7 +4,6 @@ import org.springframework.stereotype.Service;
 import ua.com.foxminded.university.dao.TeacherDao;
 import ua.com.foxminded.university.dao.VacationDao;
 import ua.com.foxminded.university.model.Teacher;
-import ua.com.foxminded.university.model.Vacation;
 
 import java.util.List;
 
@@ -20,36 +19,23 @@ public class TeacherService {
     }
 
     public void create(Teacher teacher) {
-        if (!teacherIsExist(teacher)) {
+        if (!isUnique(teacher)) {
             teacherDao.create(teacher);
-        } else {
-            throw new IllegalArgumentException("teacher already exist");
         }
-
     }
 
     public Teacher getById(int id) {
-        if (idIsExist(id)) {
-            return teacherDao.getById(id);
-        } else {
-            throw new IllegalArgumentException("teacher is not found");
-        }
+        return teacherDao.getById(id);
     }
 
     public void update(Teacher teacher) {
-        if (idIsExist(teacher.getId())) {
+        if (teacherDao.getById(teacher.getId()).equals(teacher)) {
             teacherDao.update(teacher);
-        } else {
-            throw new IllegalArgumentException("teacher is not found");
         }
     }
 
     public void delete(int id) {
-        if (idIsExist(id)) {
-            teacherDao.delete(id);
-        } else {
-            throw new IllegalArgumentException("teacher is not found");
-        }
+        teacherDao.delete(id);
 
     }
 
@@ -57,13 +43,8 @@ public class TeacherService {
         return teacherDao.getAll();
     }
 
-    private boolean teacherIsExist(Teacher teacher) {
+    private boolean isUnique(Teacher teacher) {
         List<Teacher> teachers = teacherDao.getAll();
-        return teachers.stream().anyMatch(teacher::equals);
-    }
-
-    private boolean idIsExist(int id) {
-        List<Teacher> teachers = teacherDao.getAll();
-        return teachers.stream().anyMatch(teacher -> teacher.getId() == id);
+        return teachers.contains(teacher);
     }
 }

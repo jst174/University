@@ -20,38 +20,23 @@ public class CourseService {
     }
 
     public void create(Course course) {
-        if (!courseIsExist(course)) {
+        if (!isUnique(course)) {
             courseDao.create(course);
-        } else {
-            throw new IllegalArgumentException("course with this name already exist");
         }
     }
 
     public Course getById(int id) {
-        if (courseIdIsExist(id)) {
-            return courseDao.getById(id);
-        } else {
-            throw new IllegalArgumentException("course is not found");
-        }
-
+        return courseDao.getById(id);
     }
 
     public void update(Course course) {
-        if (courseIdIsExist(course.getId())) {
+        if (courseDao.getById(course.getId()).equals(course)) {
             courseDao.update(course);
-        } else {
-            throw new IllegalArgumentException("course is not found");
         }
-
     }
 
     public void delete(int id) {
-        if (courseIdIsExist(id)) {
-            courseDao.delete(id);
-        } else {
-            throw new IllegalArgumentException("course is not found");
-        }
-
+        courseDao.delete(id);
     }
 
     public List<Course> getAll() {
@@ -59,26 +44,10 @@ public class CourseService {
     }
 
     public List<Course> getByTeacherId(int teacherId) {
-        if(teacherIdIsExist(teacherId)){
-            return courseDao.getByTeacherId(teacherId);
-        } else {
-            throw new IllegalArgumentException("teacher is not found");
-        }
-
+        return courseDao.getByTeacherId(teacherId);
     }
 
-    private boolean courseIsExist(Course course) {
-        List<Course> courses = courseDao.getAll();
-        return courses.stream().anyMatch(course::equals);
-    }
-
-    private boolean courseIdIsExist(int id) {
-        List<Course> courses = courseDao.getAll();
-        return courses.stream().anyMatch(course -> course.getId() == id);
-    }
-
-    private boolean teacherIdIsExist(int id){
-        List<Teacher> teachers = teacherDao.getAll();
-        return teachers.stream().anyMatch(teacher -> teacher.getId() == id);
+    private boolean isUnique(Course course) {
+        return !courseDao.getByName(course.getName()).equals(course);
     }
 }

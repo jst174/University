@@ -56,29 +56,18 @@ public class CourseServiceTest {
     public void givenNewCourse_whenCreate_thenCreated() {
         Course course = new Course("History");
 
-        when(courseDao.getAll()).thenReturn(courses);
+        when(courseDao.getByName("History")).thenReturn(course);
 
         courseService.create(course);
 
         verify(courseDao).create(course);
     }
 
-    @Test
-    public void givenExistentCourse_whenCreate_thenThrowException() {
-        Course course = courses.get(0);
-
-        when(courseDao.getAll()).thenReturn(courses);
-
-        Throwable exception = assertThrows(IllegalArgumentException.class, () -> courseService.create(course));
-
-        assertEquals("course with this name already exist", exception.getMessage());
-    }
 
     @Test
     public void givenExistentId_whenGetById_thenReturn() {
         Course course = courses.get(0);
 
-        when(courseDao.getAll()).thenReturn(courses);
         when(courseDao.getById(1)).thenReturn(course);
 
         assertEquals(course, courseService.getById(1));
@@ -86,19 +75,10 @@ public class CourseServiceTest {
     }
 
     @Test
-    public void givenNotExistentId_whenGetById_thenThrowException() {
-        when(courseDao.getAll()).thenReturn(courses);
-
-        Throwable exception = assertThrows(IllegalArgumentException.class, () -> courseService.getById(3));
-
-        assertEquals("course is not found", exception.getMessage());
-    }
-
-    @Test
     public void givenExistentCourse_whenUpdate_thenUpdated() {
         Course course = courses.get(0);
 
-        when(courseDao.getAll()).thenReturn(courses);
+        when(courseDao.getById(1)).thenReturn(course);
 
         courseService.update(course);
 
@@ -106,49 +86,16 @@ public class CourseServiceTest {
     }
 
     @Test
-    public void givenNotExistentCourse_whenUpdate_thenThrowException() {
-        Course course = new Course("Biology");
-
-        when(courseDao.getAll()).thenReturn(courses);
-
-        Throwable exception = assertThrows(IllegalArgumentException.class, () -> courseService.update(course));
-
-        assertEquals("course is not found", exception.getMessage());
-
-    }
-
-    @Test
     public void givenExistentCourse_whenDelete_thenDeleted() {
-        when(courseDao.getAll()).thenReturn(courses);
-
         courseService.delete(1);
 
         verify(courseDao).delete(1);
     }
 
     @Test
-    public void givenNotExistentCourse_whenDelete_thenThrowException() {
-        when(courseDao.getAll()).thenReturn(courses);
-
-        Throwable exception = assertThrows(IllegalArgumentException.class, () -> courseService.delete(3));
-
-        assertEquals("course is not found", exception.getMessage());
-    }
-
-    @Test
     public void givenExistentTeacherId_whenGetByTeacherId_whenReturn() {
-        when(teacherDao.getAll()).thenReturn(teachers);
         when(courseDao.getByTeacherId(1)).thenReturn(courses);
 
         assertEquals(courses, courseService.getByTeacherId(1));
-    }
-
-    @Test
-    public void givenNotExistentTeacherId_whenGetByTeacherId_thenThrowException() {
-        when(teacherDao.getAll()).thenReturn(teachers);
-
-        Throwable exception = assertThrows(IllegalArgumentException.class, () -> courseService.getByTeacherId(3));
-
-        assertEquals("teacher is not found", exception.getMessage());
     }
 }

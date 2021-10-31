@@ -7,10 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ua.com.foxminded.university.DataSource;
-import ua.com.foxminded.university.dao.CourseDao;
-import ua.com.foxminded.university.dao.LessonDao;
-import ua.com.foxminded.university.dao.TeacherDao;
-import ua.com.foxminded.university.dao.VacationDao;
+import ua.com.foxminded.university.dao.*;
 import ua.com.foxminded.university.model.*;
 
 import java.io.IOException;
@@ -33,6 +30,10 @@ public class LessonServiceTest {
     private VacationDao vacationDao;
     @Mock
     private CourseDao courseDao;
+    @Mock
+    private GroupDao groupDao;
+    @Mock
+    private HolidayDao holidayDao;
     @InjectMocks
     private LessonService lessonService;
     private List<Vacation> vacations;
@@ -41,6 +42,7 @@ public class LessonServiceTest {
     private List<Classroom> classrooms;
     private List<Teacher> teachers;
     private List<Time> times;
+    private List<Group> groups;
     private DataSource dataSource;
 
     @BeforeEach
@@ -97,13 +99,24 @@ public class LessonServiceTest {
             time1);
         lesson1.setId(1);
 
+        Group group1 = new Group("MH-12");
+        Group group2 = new Group("LF-43");
+        Group group3 = new Group("DF-32");
+        groups = new ArrayList<>();
+        groups.add(group1);
+        groups.add(group2);
+        groups.add(group3);
+
+        lesson1.setGroups(groups);
+
         Lesson lesson2 = new Lesson(
             course2,
             classroom2,
             teacher,
             LocalDate.of(2021, 10, 26),
-            time2
+            time1
         );
+        lesson2.setGroups(groups);
         lesson2.setId(2);
         lessons.add(lesson1);
         lessons.add(lesson2);
@@ -111,6 +124,5 @@ public class LessonServiceTest {
 
     @Test
     public void test() {
-
     }
 }

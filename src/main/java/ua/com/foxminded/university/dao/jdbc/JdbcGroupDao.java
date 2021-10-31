@@ -24,6 +24,7 @@ public class JdbcGroupDao implements GroupDao {
     private static final String SQL_DELETE_GROUP = "DELETE FROM groups WHERE id = ?";
     private static final String SQL_FIND_ALL = "SELECT * FROM groups";
     private static final String SQL_FIND_LESSON_GROUP = "SELECT id, name, lesson_id FROM groups INNER JOIN lessons_groups ON id = group_id  WHERE lesson_id = ?";
+    private static final String SQL_FIND_BY_NAME = "SELECT * FROM groups WHERE name = ?";
 
     private JdbcTemplate jdbcTemplate;
     private GroupMapper groupMapper;
@@ -39,8 +40,8 @@ public class JdbcGroupDao implements GroupDao {
             PreparedStatement statement = connection.prepareStatement(SQL_INSERT_GROUP, Statement.RETURN_GENERATED_KEYS);
             statement.setString(1, group.getName());
             return statement;
-        },keyHolder);
-        group.setId((int)keyHolder.getKeys().get("id"));
+        }, keyHolder);
+        group.setId((int) keyHolder.getKeys().get("id"));
     }
 
     public Group getById(int id) {
@@ -64,5 +65,10 @@ public class JdbcGroupDao implements GroupDao {
     @Override
     public List<Group> getByLessonId(int lessonId) {
         return jdbcTemplate.query(SQL_FIND_LESSON_GROUP, groupMapper, lessonId);
+    }
+
+    @Override
+    public Group getByName(String name) {
+        return jdbcTemplate.queryForObject(SQL_FIND_BY_NAME, groupMapper, name);
     }
 }

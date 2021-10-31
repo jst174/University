@@ -82,4 +82,15 @@ public class JdbcTimeDaoTest {
 
         assertEquals(expected, actual);
     }
+
+    @Test
+    public void givenStartAndEndTime_whenGetByTime_thenReturn(){
+        LocalTime start = LocalTime.of(8, 00);
+        LocalTime end = LocalTime.of(9, 30);
+        Time expected = new Time(start, end);
+
+        Time actual = timeDao.getByTime(start, end);
+
+        assertEquals(expected, actual);
+    }
 }

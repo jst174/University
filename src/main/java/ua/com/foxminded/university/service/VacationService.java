@@ -1,18 +1,31 @@
 package ua.com.foxminded.university.service;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 import ua.com.foxminded.university.dao.TeacherDao;
 import ua.com.foxminded.university.dao.VacationDao;
+import ua.com.foxminded.university.model.AcademicDegree;
 import ua.com.foxminded.university.model.Teacher;
 import ua.com.foxminded.university.model.Vacation;
 
+import java.time.Period;
 import java.util.List;
 
+@PropertySource("classpath:application.properties")
 @Service
 public class VacationService {
 
     private VacationDao vacationDao;
     private TeacherDao teacherDao;
+    @Value("${vacation.max.period.associate}")
+    private int vacationPeriodForAssociate;
+    @Value("${vacation.max.period.bachelor}")
+    private int vacationPeriodForBachelor;
+    @Value("${vacation.max.period.master}")
+    private int vacationPeriodForMaster;
+    @Value("${vacation.max.period.doctoral}")
+    private int vacationPeriodForDoctoral;
 
     public VacationService(VacationDao vacationDao, TeacherDao teacherDao) {
         this.vacationDao = vacationDao;
@@ -20,57 +33,46 @@ public class VacationService {
     }
 
     public void create(Vacation vacation) {
-        if (!vacationIsExist(vacation)) {
+        if (!isUnique(vacation) && (isPeriodAcceptable(vacation))) {
             vacationDao.create(vacation);
-        } else {
-            throw new IllegalArgumentException("vacation already exist");
         }
     }
 
     public Vacation getById(int id) {
-        if (idIsExist(id)) {
-            return vacationDao.getById(id);
-        } else {
-            throw new IllegalArgumentException("vacation is not found");
-        }
+        return vacationDao.getById(id);
     }
 
     public void update(Vacation vacation) {
-        if (idIsExist(vacation.getId())) {
+        if ((vacationDao.getById(vacation.getId()).equals(vacation)) && isPeriodAcceptable(vacation)) {
             vacationDao.update(vacation);
-        } else {
-            throw new IllegalArgumentException("vacation is not found");
         }
     }
 
     public void delete(int id) {
-        if (idIsExist(id)) {
-            vacationDao.delete(id);
-        } else {
-            throw new IllegalArgumentException("vacation is not found");
-        }
+        vacationDao.delete(id);
     }
 
     public List<Vacation> getByTeacherId(int teacherId) {
-        if (teacherIdIsExist(teacherId)) {
-            return vacationDao.getByTeacherId(teacherId);
-        } else {
-            throw new IllegalArgumentException("teacher is not found");
+        return vacationDao.getByTeacherId(teacherId);
+    }
+
+    private boolean isUnique(Vacation vacation) {
+        List<Vacation> vacations = vacationDao.getAll();
+        return vacations.contains(vacation);
+    }
+
+    private boolean isPeriodAcceptable(Vacation vacation) {
+        int maxVacationPeriod = 0;
+        AcademicDegree academicDegree = vacation.getTeacher().getAcademicDegree();
+        if (academicDegree.equals(AcademicDegree.ASSOCIATE)) {
+            maxVacationPeriod = vacationPeriodForAssociate;
+        } else if (academicDegree.equals(AcademicDegree.BACHELOR)) {
+            maxVacationPeriod = vacationPeriodForBachelor;
+        } else if (academicDegree.equals(AcademicDegree.MASTER)) {
+            maxVacationPeriod = vacationPeriodForMaster;
+        } else if (academicDegree.equals(AcademicDegree.DOCTORAL)) {
+            maxVacationPeriod = vacationPeriodForDoctoral;
         }
-    }
-
-    private boolean vacationIsExist(Vacation vacation) {
-        List<Vacation> vacations = vacationDao.getAll();
-        return vacations.stream().anyMatch(vacation::equals);
-    }
-
-    private boolean idIsExist(int id) {
-        List<Vacation> vacations = vacationDao.getAll();
-        return vacations.stream().anyMatch(vacation -> vacation.getId() == id);
-    }
-
-    private boolean teacherIdIsExist(int id) {
-        List<Teacher> teachers = teacherDao.getAll();
-        return teachers.stream().anyMatch(teacher -> teacher.getId() == id);
+        return maxVacationPeriod >= Period.between(vacation.getStart(), vacation.getEnd()).getDays();
     }
 }

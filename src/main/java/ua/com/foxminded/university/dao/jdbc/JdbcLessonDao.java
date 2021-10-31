@@ -11,8 +11,10 @@ import ua.com.foxminded.university.dao.LessonDao;
 import ua.com.foxminded.university.dao.mapper.LessonMapper;
 import ua.com.foxminded.university.model.Group;
 import ua.com.foxminded.university.model.Lesson;
+import ua.com.foxminded.university.model.Time;
 
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,6 +33,7 @@ public class JdbcLessonDao implements LessonDao {
     private static final String SQL_DELETE_GROUP = "DELETE FROM lessons_groups WHERE lesson_id = ? and group_id = ?";
     private static final String SQL_FIND_LESSONS_BY_TEACHER = "SELECT * FROM lessons WHERE teacher_id = ?";
     private static final String SQL_FIND_LESSONS_BY_CLASSROOM = "SELECT * FROM lessons WHERE classroom_id = ?";
+    private static final String SQL_FIND_BY_DATE_AND_TIME = "SELECT * FROM lessons WHERE date = ? and time_id = ?";
 
     private JdbcTemplate jdbcTemplate;
     private LessonMapper lessonMapper;
@@ -94,6 +97,11 @@ public class JdbcLessonDao implements LessonDao {
     @Override
     public List<Lesson> getByClassroomId(int classroomId) {
         return jdbcTemplate.query(SQL_FIND_LESSONS_BY_CLASSROOM, lessonMapper, classroomId);
+    }
+
+    @Override
+    public List<Lesson> getByDateAndTime(LocalDate date, Time time) {
+        return jdbcTemplate.query(SQL_FIND_BY_DATE_AND_TIME, lessonMapper, date, time.getId());
     }
 
     private void setGroups(Lesson lesson, List<Group> groups) {

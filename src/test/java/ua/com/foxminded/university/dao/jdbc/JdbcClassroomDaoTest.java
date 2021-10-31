@@ -82,4 +82,13 @@ public class JdbcClassroomDaoTest {
 
         assertEquals(expected, actual);
     }
+
+    @Test
+    public void givenClassroomNumber_whereGetByNumber_thenReturn(){
+        Classroom expected = new Classroom(102, 30);
+
+        Classroom actual = classroomDao.findByNumber(102);
+
+        assertEquals(expected, actual);
+    }
 }

@@ -39,9 +39,10 @@ public class HolidayServiceTest {
 
     @Test
     public void givenNewHoliday_whenCreate_thenCreated() {
-        Holiday holiday = new Holiday("Women's Day", LocalDate.of(2022, 3, 8));
+        LocalDate date = LocalDate.of(2022, 3, 8);
+        Holiday holiday = new Holiday("Women's Day", date);
 
-        when(holidayDao.getAll()).thenReturn(holidays);
+        when(holidayDao.getByDate(date)).thenReturn(holiday);
 
         holidayService.create(holiday);
 
@@ -49,40 +50,19 @@ public class HolidayServiceTest {
     }
 
     @Test
-    public void givenExistentHoliday_whenCreate_thenThrowException() {
-        Holiday holiday = holidays.get(0);
-
-        when(holidayDao.getAll()).thenReturn(holidays);
-
-        Throwable exception = assertThrows(IllegalArgumentException.class, () -> holidayService.create(holiday));
-
-        assertEquals("holiday already exist", exception.getMessage());
-    }
-
-    @Test
     public void givenExistentHolidayId_whenGetById_thenReturn() {
         Holiday holiday = holidays.get(0);
 
-        when(holidayDao.getAll()).thenReturn(holidays);
         when(holidayDao.getById(1)).thenReturn(holiday);
 
         assertEquals(holiday, holidayService.getById(1));
     }
 
     @Test
-    public void givenNotExistentHolidayId_whenGetById_thenThrowException() {
-        when(holidayDao.getAll()).thenReturn(holidays);
-
-        Throwable exception = assertThrows(IllegalArgumentException.class, () -> holidayService.getById(3));
-
-        assertEquals("holiday is not found", exception.getMessage());
-    }
-
-    @Test
     public void givenExistentHoliday_whenUpdate_thenUpdated() {
         Holiday holiday = holidays.get(0);
 
-        when(holidayDao.getAll()).thenReturn(holidays);
+        when(holidayDao.getById(1)).thenReturn(holiday);
 
         holidayService.update(holiday);
 
@@ -90,32 +70,10 @@ public class HolidayServiceTest {
     }
 
     @Test
-    public void givenNotExistentHolidayId_whenUpdate_thenThrowException() {
-        Holiday holiday = new Holiday("Women's Day", LocalDate.of(2022, 3, 8));
-
-        when(holidayDao.getAll()).thenReturn(holidays);
-
-        Throwable exception = assertThrows(IllegalArgumentException.class, () -> holidayService.update(holiday));
-
-        assertEquals("holiday is not found", exception.getMessage());
-    }
-
-    @Test
     public void givenExistentHolidayId_whenDelete_thenDeleted() {
-        when(holidayDao.getAll()).thenReturn(holidays);
-
         holidayService.delete(1);
 
         verify(holidayDao).delete(1);
-    }
-
-    @Test
-    public void givenNotExistentId_whenDelete_thenThrowException() {
-        when(holidayDao.getAll()).thenReturn(holidays);
-
-        Throwable exception = assertThrows(IllegalArgumentException.class, () -> holidayService.delete(3));
-
-        assertEquals("holiday is not found", exception.getMessage());
     }
 
 }

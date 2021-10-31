@@ -116,14 +116,14 @@ public class JdbcStudentDaoTest {
 
         studentDao.delete(1);
 
-        assertEquals(0, countRowsInTable(jdbcTemplate, "students"));
+        assertEquals(expectedRows, countRowsInTable(jdbcTemplate, "students"));
     }
 
     @Test
     public void whenGetAll_thenReturnAllStudents() {
         Address address = new Address("Russia", "Saint Petersburg", "Nevsky Prospect",
             "15", "45", "342423");
-        Student student = new Student(
+        Student student1 = new Student(
             "Mike",
             "Miller",
             LocalDate.of(1997, 5, 13),
@@ -132,11 +132,57 @@ public class JdbcStudentDaoTest {
             "5435345334",
             "miller97@gmail.com"
         );
-        student.setGroup(new Group("MJ-12"));
+        Student student2 = new Student(
+            "Steve",
+            "King",
+            LocalDate.of(1995, 5, 2),
+            Gender.MALE,
+            address,
+            "432423432",
+            "king95@gmail.com"
+        );
+        Group group = new Group("MJ-12");
+        student1.setGroup(group);
+        student2.setGroup(group);
         List<Student> expected = new ArrayList<>();
-        expected.add(student);
+        expected.add(student1);
+        expected.add(student2);
 
         List<Student> actual = studentDao.getAll();
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void givenGroupId_whenGetByGroupId_thenReturn(){
+        Address address = new Address("Russia", "Saint Petersburg", "Nevsky Prospect",
+            "15", "45", "342423");
+        Student student1 = new Student(
+            "Mike",
+            "Miller",
+            LocalDate.of(1997, 5, 13),
+            Gender.MALE,
+            address,
+            "5435345334",
+            "miller97@gmail.com"
+        );
+        Student student2 = new Student(
+            "Steve",
+            "King",
+            LocalDate.of(1995, 5, 2),
+            Gender.MALE,
+            address,
+            "432423432",
+            "king95@gmail.com"
+        );
+        Group group = new Group("MJ-12");
+        student1.setGroup(group);
+        student2.setGroup(group);
+        List<Student> expected = new ArrayList<>();
+        expected.add(student1);
+        expected.add(student2);
+
+        List<Student> actual = studentDao.getByGroupId(1);
 
         assertEquals(expected, actual);
     }

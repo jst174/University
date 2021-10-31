@@ -1,67 +1,58 @@
 package ua.com.foxminded.university.service;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
-import ua.com.foxminded.university.dao.AddressDao;
 import ua.com.foxminded.university.dao.StudentDao;
+import ua.com.foxminded.university.model.Group;
 import ua.com.foxminded.university.model.Student;
 
 import java.util.List;
 
+@PropertySource("classpath:application.properties")
 @Service
 public class StudentService {
 
     private StudentDao studentDao;
+    @Value("${group.capacity}")
+    private int groupCapacity;
 
     public StudentService(StudentDao studentDao) {
         this.studentDao = studentDao;
     }
 
     public void create(Student student) {
-        if (!studentIsExist(student)) {
+        if (!isUnique(student) && isGroupAvailable(student.getGroup())) {
             studentDao.create(student);
-        } else {
-            throw new IllegalArgumentException("student already exist");
         }
-
     }
 
     public Student getById(int id) {
-        if (idIsExist(id)) {
-            return studentDao.getById(id);
-        } else {
-            throw new IllegalArgumentException("student is not found");
-        }
+        return studentDao.getById(id);
     }
 
     public void update(Student student) {
-        if (idIsExist(student.getId())) {
+        if (studentDao.getById(student.getId()).equals(student) && isGroupAvailable(student.getGroup())) {
             studentDao.update(student);
-        } else {
-            throw new IllegalArgumentException("student is not found");
         }
 
     }
 
     public void delete(int id) {
-        if (idIsExist(id)) {
-            studentDao.delete(id);
-        } else {
-            throw new IllegalArgumentException("student is not found");
-        }
-
+        studentDao.delete(id);
     }
 
     public List<Student> getAll() {
         return studentDao.getAll();
     }
 
-    private boolean studentIsExist(Student student) {
+    private boolean isUnique(Student student) {
         List<Student> students = studentDao.getAll();
-        return students.stream().anyMatch(student::equals);
+        return students.contains(student);
     }
 
-    private boolean idIsExist(int id) {
-        List<Student> students = studentDao.getAll();
-        return students.stream().anyMatch(student -> student.getId() == id);
+    private boolean isGroupAvailable(Group group) {
+        return studentDao.getByGroupId(group.getId()).size() < groupCapacity;
     }
+
 }
