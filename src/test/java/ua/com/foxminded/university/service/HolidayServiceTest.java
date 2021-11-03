@@ -12,6 +12,7 @@ import ua.com.foxminded.university.model.Holiday;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -42,7 +43,7 @@ public class HolidayServiceTest {
         LocalDate date = LocalDate.of(2022, 3, 8);
         Holiday holiday = new Holiday("Women's Day", date);
 
-        when(holidayDao.getByDate(date)).thenReturn(holiday);
+        when(holidayDao.getByDate(holiday.getDate())).thenReturn(Optional.empty());
 
         holidayService.create(holiday);
 
@@ -53,7 +54,7 @@ public class HolidayServiceTest {
     public void givenExistentHolidayId_whenGetById_thenReturn() {
         Holiday holiday = holidays.get(0);
 
-        when(holidayDao.getById(1)).thenReturn(holiday);
+        when(holidayDao.getById(1)).thenReturn(Optional.of(holiday));
 
         assertEquals(holiday, holidayService.getById(1));
     }
@@ -62,7 +63,7 @@ public class HolidayServiceTest {
     public void givenExistentHoliday_whenUpdate_thenUpdated() {
         Holiday holiday = holidays.get(0);
 
-        when(holidayDao.getById(1)).thenReturn(holiday);
+        when(holidayDao.getByDate(holiday.getDate())).thenReturn(Optional.of(holiday));
 
         holidayService.update(holiday);
 

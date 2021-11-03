@@ -12,25 +12,23 @@ import java.util.List;
 public class CourseService {
 
     private CourseDao courseDao;
-    private TeacherDao teacherDao;
 
-    public CourseService(CourseDao courseDao, TeacherDao teacherDao) {
+    public CourseService(CourseDao courseDao) {
         this.courseDao = courseDao;
-        this.teacherDao = teacherDao;
     }
 
     public void create(Course course) {
-        if (!isUnique(course)) {
+        if (isUnique(course)) {
             courseDao.create(course);
         }
     }
 
     public Course getById(int id) {
-        return courseDao.getById(id);
+        return courseDao.getById(id).get();
     }
 
     public void update(Course course) {
-        if (courseDao.getById(course.getId()).equals(course)) {
+        if (!isUnique(course)) {
             courseDao.update(course);
         }
     }
@@ -48,6 +46,6 @@ public class CourseService {
     }
 
     private boolean isUnique(Course course) {
-        return !courseDao.getByName(course.getName()).equals(course);
+        return !courseDao.getByName(course.getName()).isPresent();
     }
 }

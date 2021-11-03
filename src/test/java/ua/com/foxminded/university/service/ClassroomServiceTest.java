@@ -14,6 +14,7 @@ import ua.com.foxminded.university.model.Classroom;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
 public class ClassroomServiceTest {
@@ -39,7 +40,7 @@ public class ClassroomServiceTest {
     public void givenNewClassroom_whenCreateClassroom_thenCreated() {
         Classroom classroom = new Classroom(102, 30);
 
-        when(classroomDao.findByNumber(102)).thenReturn(classroom);
+        when(classroomDao.findByNumber(classroom.getNumber())).thenReturn(Optional.empty());
 
         classroomService.createClassroom(classroom);
 
@@ -51,7 +52,7 @@ public class ClassroomServiceTest {
     public void givenExistClassroomId_whenGetById_thenReturn() {
         Classroom classroom = classrooms.get(0);
 
-        when(classroomDao.getById(1)).thenReturn(classroom);
+        when(classroomDao.getById(1)).thenReturn(Optional.of(classroom));
 
         assertEquals(classroom, classroomService.getById(1));
     }
@@ -60,7 +61,7 @@ public class ClassroomServiceTest {
     public void givenExistentClassroom_whenUpdate_thenUpdated() {
         Classroom classroom = classrooms.get(0);
 
-        when(classroomDao.getById(1)).thenReturn(classroom);
+        when(classroomDao.findByNumber(classroom.getNumber())).thenReturn(Optional.of(classroom));
 
         classroomService.update(classroom);
 

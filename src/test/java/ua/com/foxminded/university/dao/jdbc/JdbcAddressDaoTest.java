@@ -15,6 +15,7 @@ import ua.com.foxminded.university.model.Address;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.jdbc.JdbcTestUtils.*;
@@ -46,9 +47,9 @@ public class JdbcAddressDaoTest {
         Address expected = new Address("Russia", "Saint Petersburg", "Nevsky Prospect",
             "15", "45", "342423");
 
-        Address actual = addressDao.getById(1);
+        Optional<Address> actual = addressDao.getById(1);
 
-        assertEquals(expected, actual);
+        assertEquals(expected, actual.get());
     }
 
     @Test

@@ -10,40 +10,31 @@ import ua.com.foxminded.university.model.Teacher;
 import ua.com.foxminded.university.model.Vacation;
 
 import java.time.Period;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-@PropertySource("classpath:application.properties")
 @Service
 public class VacationService {
 
     private VacationDao vacationDao;
-    private TeacherDao teacherDao;
-    @Value("${vacation.max.period.associate}")
-    private int vacationPeriodForAssociate;
-    @Value("${vacation.max.period.bachelor}")
-    private int vacationPeriodForBachelor;
-    @Value("${vacation.max.period.master}")
-    private int vacationPeriodForMaster;
-    @Value("${vacation.max.period.doctoral}")
-    private int vacationPeriodForDoctoral;
 
-    public VacationService(VacationDao vacationDao, TeacherDao teacherDao) {
+    public VacationService(VacationDao vacationDao) {
         this.vacationDao = vacationDao;
-        this.teacherDao = teacherDao;
     }
 
     public void create(Vacation vacation) {
-        if (!isUnique(vacation) && (isPeriodAcceptable(vacation))) {
+        if (isUnique(vacation) && (isPeriodAcceptable(vacation))) {
             vacationDao.create(vacation);
         }
     }
 
     public Vacation getById(int id) {
-        return vacationDao.getById(id);
+        return vacationDao.getById(id).get();
     }
 
     public void update(Vacation vacation) {
-        if ((vacationDao.getById(vacation.getId()).equals(vacation)) && isPeriodAcceptable(vacation)) {
+        if ((vacationDao.getById(vacation.getId()).isPresent()) && isPeriodAcceptable(vacation)) {
             vacationDao.update(vacation);
         }
     }
@@ -58,21 +49,17 @@ public class VacationService {
 
     private boolean isUnique(Vacation vacation) {
         List<Vacation> vacations = vacationDao.getAll();
-        return vacations.contains(vacation);
+        return !vacations.contains(vacation);
     }
 
     private boolean isPeriodAcceptable(Vacation vacation) {
-        int maxVacationPeriod = 0;
-        AcademicDegree academicDegree = vacation.getTeacher().getAcademicDegree();
-        if (academicDegree.equals(AcademicDegree.ASSOCIATE)) {
-            maxVacationPeriod = vacationPeriodForAssociate;
-        } else if (academicDegree.equals(AcademicDegree.BACHELOR)) {
-            maxVacationPeriod = vacationPeriodForBachelor;
-        } else if (academicDegree.equals(AcademicDegree.MASTER)) {
-            maxVacationPeriod = vacationPeriodForMaster;
-        } else if (academicDegree.equals(AcademicDegree.DOCTORAL)) {
-            maxVacationPeriod = vacationPeriodForDoctoral;
-        }
+        Map<AcademicDegree, Integer> maxPeriodsVacation = new HashMap<>();
+        maxPeriodsVacation.put(AcademicDegree.ASSOCIATE, AcademicDegree.ASSOCIATE.getMaxVacationPeriod());
+        maxPeriodsVacation.put(AcademicDegree.BACHELOR, AcademicDegree.BACHELOR.getMaxVacationPeriod());
+        maxPeriodsVacation.put(AcademicDegree.MASTER, AcademicDegree.MASTER.getMaxVacationPeriod());
+        maxPeriodsVacation.put(AcademicDegree.DOCTORAL, AcademicDegree.DOCTORAL.getMaxVacationPeriod());
+
+        int maxVacationPeriod = maxPeriodsVacation.get(vacation.getTeacher().getAcademicDegree());
         return maxVacationPeriod >= Period.between(vacation.getStart(), vacation.getEnd()).getDays();
     }
 }

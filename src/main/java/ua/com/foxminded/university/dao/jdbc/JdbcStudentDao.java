@@ -17,6 +17,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class JdbcStudentDao implements StudentDao {
@@ -59,8 +60,8 @@ public class JdbcStudentDao implements StudentDao {
         student.setId((int) keyHolder.getKeys().get("id"));
     }
 
-    public Student getById(int id) {
-        return jdbcTemplate.queryForObject(SQL_FIND_STUDENT, studentMapper, id);
+    public Optional<Student> getById(int id) {
+        return Optional.ofNullable(jdbcTemplate.queryForObject(SQL_FIND_STUDENT, studentMapper, id));
     }
 
     public void update(Student student) {

@@ -20,6 +20,7 @@ import ua.com.foxminded.university.model.Student;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -63,7 +64,6 @@ public class StudentServiceTest {
         Student student = dataSource.generateStudent();
         student.setGroup(group);
 
-        when(studentDao.getAll()).thenReturn(students);
         when(studentDao.getByGroupId(1)).thenReturn(students);
 
         studentService.create(student);
@@ -75,7 +75,7 @@ public class StudentServiceTest {
     public void givenExistentStudentId_whenGetById_thenReturn() {
         Student student = students.get(0);
 
-        when(studentDao.getById(1)).thenReturn(student);
+        when(studentDao.getById(1)).thenReturn(Optional.of(student));
 
         assertEquals(student, studentService.getById(1));
     }
@@ -84,7 +84,8 @@ public class StudentServiceTest {
     public void givenExistentStudent_whenUpdate_thenUpdated() {
         Student student = students.get(0);
 
-        when(studentDao.getById(1)).thenReturn(student);
+        when(studentDao.getById(1)).thenReturn(Optional.of(student));
+        when(studentDao.getByGroupId(1)).thenReturn(students);
 
         studentService.update(student);
 

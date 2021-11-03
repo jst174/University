@@ -7,9 +7,10 @@ import ua.com.foxminded.university.model.Time;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface TimeDao extends Dao<Time> {
 
-    Time getByTime(LocalTime start, LocalTime end);
+    Optional<Time> getByTime(LocalTime start, LocalTime end);
 
 }

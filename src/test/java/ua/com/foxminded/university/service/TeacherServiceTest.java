@@ -14,6 +14,7 @@ import ua.com.foxminded.university.model.Teacher;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -45,8 +46,6 @@ public class TeacherServiceTest {
     public void givenNewTeacher_whenCreate_thenCreated() throws IOException {
         Teacher teacher = dataSource.generateTeacher();
 
-        when(teacherDao.getAll()).thenReturn(teachers);
-
         teacherService.create(teacher);
 
         verify(teacherDao).create(teacher);
@@ -56,7 +55,7 @@ public class TeacherServiceTest {
     public void givenExistentId_whenGetById_thenReturn() {
         Teacher teacher = teachers.get(0);
 
-        when(teacherDao.getById(1)).thenReturn(teacher);
+        when(teacherDao.getById(1)).thenReturn(Optional.of(teacher));
 
         assertEquals(teacher, teacherService.getById(1));
     }
@@ -65,7 +64,7 @@ public class TeacherServiceTest {
     public void givenExistentTime_whenUpdate_thenUpdated() {
         Teacher teacher = teachers.get(0);
 
-        when(teacherDao.getById(1)).thenReturn(teacher);
+        when(teacherDao.getById(1)).thenReturn(Optional.of(teacher));
 
         teacherService.update(teacher);
 

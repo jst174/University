@@ -1,6 +1,7 @@
 package ua.com.foxminded.university.dao.jdbc;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.jdbc.JdbcTestUtils.*;
 
 import org.junit.jupiter.api.Test;
@@ -18,6 +19,7 @@ import ua.com.foxminded.university.model.Classroom;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {DatabaseConfigTest.class})
@@ -44,9 +46,9 @@ public class JdbcClassroomDaoTest {
     public void givenId_whenGetById_thenReturn() {
         Classroom expected = new Classroom(102, 30);
 
-        Classroom actual = classroomDao.getById(1);
+        Optional<Classroom> actual = classroomDao.getById(1);
 
-        assertEquals(expected, actual);
+        assertEquals(expected, actual.get());
     }
 
     @Test
@@ -87,8 +89,8 @@ public class JdbcClassroomDaoTest {
     public void givenClassroomNumber_whereGetByNumber_thenReturn(){
         Classroom expected = new Classroom(102, 30);
 
-        Classroom actual = classroomDao.findByNumber(102);
+        Optional<Classroom> actual = classroomDao.findByNumber(102);
 
-        assertEquals(expected, actual);
+        assertEquals(expected, actual.get());
     }
 }

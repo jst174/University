@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 
 @ExtendWith(SpringExtension.class)
@@ -76,9 +77,9 @@ public class JdbcStudentDaoTest {
         );
         expected.setGroup(group);
 
-        Student actual = studentDao.getById(1);
+        Optional<Student> actual = studentDao.getById(1);
 
-        assertEquals(expected, actual);
+        assertEquals(expected, actual.get());
     }
 
     @Test

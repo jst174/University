@@ -14,6 +14,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class JdbcCourseDao implements CourseDao {
@@ -44,8 +45,8 @@ public class JdbcCourseDao implements CourseDao {
         course.setId((int) keyHolder.getKeys().get("id"));
     }
 
-    public Course getById(int id) {
-        return jdbcTemplate.queryForObject(SQL_FIND_COURSE, courseMapper, id);
+    public Optional<Course> getById(int id) {
+        return Optional.ofNullable(jdbcTemplate.queryForObject(SQL_FIND_COURSE, courseMapper, id));
     }
 
     public void update(Course course) {
@@ -67,7 +68,7 @@ public class JdbcCourseDao implements CourseDao {
     }
 
     @Override
-    public Course getByName(String name) {
-        return jdbcTemplate.queryForObject(SQL_FIND_BY_NAME, courseMapper, name);
+    public Optional<Course> getByName(String name) {
+        return Optional.ofNullable(jdbcTemplate.queryForObject(SQL_FIND_BY_NAME, courseMapper, name));
     }
 }

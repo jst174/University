@@ -1,5 +1,6 @@
 package ua.com.foxminded.university.dao.jdbc;
 
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -11,6 +12,7 @@ import ua.com.foxminded.university.model.Classroom;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class JdbcClassroomDao implements ClassroomDao {
@@ -41,8 +43,8 @@ public class JdbcClassroomDao implements ClassroomDao {
         classroom.setId((int) keyHolder.getKeys().get("id"));
     }
 
-    public Classroom getById(int id) {
-        return jdbcTemplate.queryForObject(SQL_FIND_CLASSROOM, classroomMapper, id);
+    public Optional<Classroom> getById(int id) {
+        return Optional.of(jdbcTemplate.queryForObject(SQL_FIND_CLASSROOM, classroomMapper, id));
     }
 
     public void update(Classroom classroom) {
@@ -59,7 +61,7 @@ public class JdbcClassroomDao implements ClassroomDao {
     }
 
     @Override
-    public Classroom findByNumber(int number) {
-        return jdbcTemplate.queryForObject(SQL_FIND_BY_NUMBER, classroomMapper, number);
+    public Optional<Classroom> findByNumber(int number) {
+            return Optional.ofNullable(jdbcTemplate.queryForObject(SQL_FIND_BY_NUMBER, classroomMapper, number));
     }
 }

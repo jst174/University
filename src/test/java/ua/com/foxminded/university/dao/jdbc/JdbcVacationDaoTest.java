@@ -20,6 +20,7 @@ import ua.com.foxminded.university.model.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 
 @ExtendWith(SpringExtension.class)
@@ -72,9 +73,9 @@ public class JdbcVacationDaoTest {
             LocalDate.of(2021, 10, 30),
             teacher);
 
-        Vacation actual = vacationDao.getById(1);
+        Optional<Vacation> actual = vacationDao.getById(1);
 
-        assertEquals(expected, actual);
+        assertEquals(expected, actual.get());
     }
 
     @Test
@@ -140,6 +141,26 @@ public class JdbcVacationDaoTest {
         List<Vacation> actual = vacationDao.getByTeacherId(1);
 
         assertEquals(expected, actual);
+    }
+
+    @Test
+    public void givenTeacherAndLessonDate_whenGetByTeacherAndLessonDate_thenReturn(){
+        Vacation vacation1 = new Vacation(
+            LocalDate.of(2021, 10, 15),
+            LocalDate.of(2021, 10, 30),
+            teacher);
+        vacation1.setId(1);
+        Vacation vacation2 = new Vacation(
+            LocalDate.of(2021, 5, 15),
+            LocalDate.of(2021, 5, 30),
+            teacher
+        );
+        vacation2.setId(2);
+
+        Optional<Vacation> actual = vacationDao.getByTeacherAndLessonDate(teacher,
+            LocalDate.of(2021, 10, 20));
+
+        assertEquals(vacation1, actual.get());
     }
 
 

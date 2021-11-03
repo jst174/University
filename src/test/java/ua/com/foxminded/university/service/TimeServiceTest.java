@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -58,7 +59,7 @@ public class TimeServiceTest {
         LocalTime end = LocalTime.of(13, 30);
         Time time = new Time(start, end);
 
-        when(timeDao.getByTime(start, end)).thenReturn(time);
+        when(timeDao.getByTime(start, end)).thenReturn(Optional.empty());
 
         timeService.create(time);
 
@@ -69,7 +70,7 @@ public class TimeServiceTest {
     public void givenExistentId_whenGetById_thenReturn() {
         Time time = times.get(0);
 
-        when(timeDao.getById(1)).thenReturn(time);
+        when(timeDao.getById(1)).thenReturn(Optional.of(time));
 
         assertEquals(time, timeService.getById(1));
     }
@@ -78,7 +79,7 @@ public class TimeServiceTest {
     public void givenExistentTime_whenUpdate_thenUpdated() {
         Time time = times.get(0);
 
-        when(timeDao.getById(1)).thenReturn(time);
+        when(timeDao.getById(1)).thenReturn(Optional.of(time));
 
         timeService.update(time);
 

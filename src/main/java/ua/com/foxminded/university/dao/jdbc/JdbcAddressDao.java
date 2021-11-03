@@ -11,6 +11,7 @@ import ua.com.foxminded.university.model.Address;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class JdbcAddressDao implements AddressDao {
@@ -47,8 +48,8 @@ public class JdbcAddressDao implements AddressDao {
 
     }
 
-    public Address getById(int id) {
-        return jdbcTemplate.queryForObject(SQL_FIND_ADDRESS, addressMapper, id);
+    public Optional<Address> getById(int id) {
+        return Optional.ofNullable(jdbcTemplate.queryForObject(SQL_FIND_ADDRESS, addressMapper, id));
     }
 
     public void update(Address address) {

@@ -18,6 +18,7 @@ import ua.com.foxminded.university.model.Teacher;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
@@ -68,8 +69,8 @@ public class JdbcTeacherDao implements TeacherDao {
         setCourses(teacher, new ArrayList<>());
     }
 
-    public Teacher getById(int id) {
-        return jdbcTemplate.queryForObject(SQL_FIND_TEACHER, teacherMapper, id);
+    public Optional<Teacher> getById(int id) {
+        return Optional.ofNullable(jdbcTemplate.queryForObject(SQL_FIND_TEACHER, teacherMapper, id));
     }
 
     @Transactional

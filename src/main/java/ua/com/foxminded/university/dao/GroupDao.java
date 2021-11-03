@@ -4,10 +4,11 @@ import ua.com.foxminded.university.model.Course;
 import ua.com.foxminded.university.model.Group;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface GroupDao extends Dao<Group> {
 
     List<Group> getByLessonId(int lessonId);
 
-    Group getByName(String name);
+    Optional<Group> getByName(String name);
 }

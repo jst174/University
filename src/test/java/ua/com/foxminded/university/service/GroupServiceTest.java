@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
 public class GroupServiceTest {
@@ -56,7 +57,7 @@ public class GroupServiceTest {
     public void givenNewGroup_whenCreate_thenCreated() {
         Group group = new Group("GD-22");
 
-        when(groupDao.getByName("GD-22")).thenReturn(group);
+        when(groupDao.getByName(group.getName())).thenReturn(Optional.empty());
 
         groupService.create(group);
 
@@ -67,7 +68,7 @@ public class GroupServiceTest {
     public void givenExistentGroupId_whenGetById_thenReturn() {
         Group group = groups.get(0);
 
-        when(groupDao.getById(1)).thenReturn(group);
+        when(groupDao.getById(1)).thenReturn(Optional.of(group));
 
         assertEquals(group, groupService.getById(1));
     }
@@ -76,7 +77,7 @@ public class GroupServiceTest {
     public void givenExistentGroup_whenUpdate_thenUpdated() {
         Group group = groups.get(0);
 
-        when(groupDao.getById(1)).thenReturn(group);
+        when(groupDao.getByName(group.getName())).thenReturn(Optional.of(group));
 
         groupService.update(group);
 

@@ -13,6 +13,7 @@ import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class JdbcHolidayDao implements HolidayDao {
@@ -44,8 +45,8 @@ public class JdbcHolidayDao implements HolidayDao {
         holiday.setId((int) keyHolder.getKeys().get("id"));
     }
 
-    public Holiday getById(int id) {
-        return jdbcTemplate.queryForObject(SQL_FIND_HOLIDAY, holidayMapper, id);
+    public Optional<Holiday> getById(int id) {
+        return Optional.ofNullable(jdbcTemplate.queryForObject(SQL_FIND_HOLIDAY, holidayMapper, id));
     }
 
     public void update(Holiday holiday) {
@@ -62,8 +63,8 @@ public class JdbcHolidayDao implements HolidayDao {
     }
 
     @Override
-    public Holiday getByDate(LocalDate date) {
-        return jdbcTemplate.queryForObject(SQL_FIND_BY_DATE, holidayMapper, date);
+    public Optional<Holiday> getByDate(LocalDate date) {
+        return Optional.ofNullable(jdbcTemplate.queryForObject(SQL_FIND_BY_DATE, holidayMapper, date));
     }
 
 }

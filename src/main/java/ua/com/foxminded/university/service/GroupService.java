@@ -20,17 +20,17 @@ public class GroupService {
     }
 
     public void create(Group group) {
-        if (!isUnique(group)) {
+        if (isUnique(group)) {
             groupDao.create(group);
         }
     }
 
     public Group getById(int id) {
-        return groupDao.getById(id);
+        return groupDao.getById(id).get();
     }
 
     public void update(Group group) {
-        if (groupDao.getById(group.getId()).equals(group)) {
+        if (!isUnique(group)) {
             groupDao.update(group);
         }
     }
@@ -48,6 +48,6 @@ public class GroupService {
     }
 
     private boolean isUnique(Group group) {
-        return !groupDao.getByName(group.getName()).equals(group);
+        return !groupDao.getByName(group.getName()).isPresent();
     }
 }

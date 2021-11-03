@@ -16,17 +16,17 @@ public class HolidayService {
     }
 
     public void create(Holiday holiday) {
-        if (!isUnique(holiday)) {
+        if (isUnique(holiday)) {
             holidayDao.create(holiday);
         }
     }
 
     public Holiday getById(int id) {
-        return holidayDao.getById(id);
+        return holidayDao.getById(id).get();
     }
 
     public void update(Holiday holiday) {
-        if (holidayDao.getById(holiday.getId()).equals(holiday)) {
+        if (!isUnique(holiday)) {
             holidayDao.update(holiday);
         }
     }
@@ -40,6 +40,6 @@ public class HolidayService {
     }
 
     private boolean isUnique(Holiday holiday) {
-        return !holidayDao.getByDate(holiday.getDate()).equals(holiday);
+        return !holidayDao.getByDate(holiday.getDate()).isPresent();
     }
 }

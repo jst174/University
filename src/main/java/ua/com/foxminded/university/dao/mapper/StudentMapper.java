@@ -28,10 +28,10 @@ public class StudentMapper implements RowMapper<Student> {
             rs.getString("last_name"),
             rs.getObject("birthday", LocalDate.class),
             Gender.valueOf(rs.getString("gender")),
-            addressDao.getById(rs.getInt("address_id")),
+            addressDao.getById(rs.getInt("address_id")).get(),
             rs.getString("phone_number"),
             rs.getString("email"));
-        student.setGroup(groupDao.getById(rs.getInt("group_id")));
+        groupDao.getById(rs.getInt("group_id")).ifPresent(student::setGroup);
         student.setId(rs.getInt("id"));
         return student;
     }

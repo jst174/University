@@ -46,7 +46,7 @@ public class JdbcGroupDaoTest {
     public void givenId_whenGetById_thenReturn() {
         Group group = new Group("MH-12");
 
-        assertEquals(group, groupDao.getById(1));
+        assertEquals(group, groupDao.getById(1).get());
     }
 
     @Test
@@ -113,7 +113,7 @@ public class JdbcGroupDaoTest {
     public void givenGroupName_whenGetByName_thenReturn() {
         Group group = new Group("MH-12");
 
-        assertEquals(group, groupDao.getByName("MH-12"));
+        assertEquals(group, groupDao.getByName("MH-12").get());
     }
 
 

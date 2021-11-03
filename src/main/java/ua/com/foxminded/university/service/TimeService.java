@@ -22,17 +22,18 @@ public class TimeService {
     }
 
     public void create(Time time) {
-        if ((!isUnique(time)) && (isNotLess30Minutes(time)) && (isTimeNotCrosses(time))) {
+        if ((isUnique(time)) && (isNotLess30Minutes(time)) && (isTimeNotCrosses(time))) {
             timeDao.create(time);
         }
     }
 
     public Time getById(int id) {
-        return timeDao.getById(id);
+        return timeDao.getById(id).get();
     }
 
     public void update(Time time) {
-        if ((timeDao.getById(time.getId()).equals(time)) && (isNotLess30Minutes(time)) && (isTimeNotCrosses(time))) {
+        if ((timeDao.getById(time.getId()).isPresent()) && (isNotLess30Minutes(time))
+            && (isTimeNotCrosses(time))) {
             timeDao.update(time);
         }
     }
@@ -46,7 +47,7 @@ public class TimeService {
     }
 
     private boolean isUnique(Time time) {
-        return !timeDao.getByTime(time.getStartTime(), time.getEndTime()).equals(time);
+        return !timeDao.getByTime(time.getStartTime(), time.getEndTime()).isPresent();
     }
 
     private boolean isNotLess30Minutes(Time time) {

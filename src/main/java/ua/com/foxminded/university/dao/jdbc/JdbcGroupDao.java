@@ -14,6 +14,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class JdbcGroupDao implements GroupDao {
@@ -44,8 +45,8 @@ public class JdbcGroupDao implements GroupDao {
         group.setId((int) keyHolder.getKeys().get("id"));
     }
 
-    public Group getById(int id) {
-        return jdbcTemplate.queryForObject(SQL_FIND_GROUP, groupMapper, id);
+    public Optional<Group> getById(int id) {
+        return Optional.ofNullable(jdbcTemplate.queryForObject(SQL_FIND_GROUP, groupMapper, id));
     }
 
     public void update(Group group) {
@@ -68,7 +69,7 @@ public class JdbcGroupDao implements GroupDao {
     }
 
     @Override
-    public Group getByName(String name) {
-        return jdbcTemplate.queryForObject(SQL_FIND_BY_NAME, groupMapper, name);
+    public Optional<Group> getByName(String name) {
+        return Optional.ofNullable(jdbcTemplate.queryForObject(SQL_FIND_BY_NAME, groupMapper, name));
     }
 }

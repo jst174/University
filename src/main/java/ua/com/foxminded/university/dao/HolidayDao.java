@@ -5,9 +5,10 @@ import ua.com.foxminded.university.model.Holiday;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface HolidayDao extends Dao<Holiday> {
 
-    Holiday getByDate(LocalDate date);
+    Optional<Holiday> getByDate(LocalDate date);
 
 }

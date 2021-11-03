@@ -22,17 +22,17 @@ public class StudentService {
     }
 
     public void create(Student student) {
-        if (!isUnique(student) && isGroupAvailable(student.getGroup())) {
+        if (isGroupAvailable(student.getGroup())) {
             studentDao.create(student);
         }
     }
 
     public Student getById(int id) {
-        return studentDao.getById(id);
+        return studentDao.getById(id).get();
     }
 
     public void update(Student student) {
-        if (studentDao.getById(student.getId()).equals(student) && isGroupAvailable(student.getGroup())) {
+        if (studentDao.getById(student.getId()).isPresent() && isGroupAvailable(student.getGroup())) {
             studentDao.update(student);
         }
 
@@ -46,10 +46,6 @@ public class StudentService {
         return studentDao.getAll();
     }
 
-    private boolean isUnique(Student student) {
-        List<Student> students = studentDao.getAll();
-        return students.contains(student);
-    }
 
     private boolean isGroupAvailable(Group group) {
         return studentDao.getByGroupId(group.getId()).size() < groupCapacity;

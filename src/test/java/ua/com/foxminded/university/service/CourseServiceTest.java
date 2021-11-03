@@ -15,6 +15,7 @@ import ua.com.foxminded.university.model.Teacher;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -24,8 +25,6 @@ public class CourseServiceTest {
 
     @Mock
     private CourseDao courseDao;
-    @Mock
-    private TeacherDao teacherDao;
     @InjectMocks
     private CourseService courseService;
     private List<Course> courses;
@@ -56,7 +55,7 @@ public class CourseServiceTest {
     public void givenNewCourse_whenCreate_thenCreated() {
         Course course = new Course("History");
 
-        when(courseDao.getByName("History")).thenReturn(course);
+        when(courseDao.getByName(course.getName())).thenReturn(Optional.empty());
 
         courseService.create(course);
 
@@ -68,7 +67,7 @@ public class CourseServiceTest {
     public void givenExistentId_whenGetById_thenReturn() {
         Course course = courses.get(0);
 
-        when(courseDao.getById(1)).thenReturn(course);
+        when(courseDao.getById(1)).thenReturn(Optional.of(course));
 
         assertEquals(course, courseService.getById(1));
 
@@ -78,7 +77,7 @@ public class CourseServiceTest {
     public void givenExistentCourse_whenUpdate_thenUpdated() {
         Course course = courses.get(0);
 
-        when(courseDao.getById(1)).thenReturn(course);
+        when(courseDao.getByName(course.getName())).thenReturn(Optional.of(course));
 
         courseService.update(course);
 

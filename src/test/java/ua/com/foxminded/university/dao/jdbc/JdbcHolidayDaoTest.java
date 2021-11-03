@@ -19,6 +19,7 @@ import ua.com.foxminded.university.model.Holiday;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 
 @ExtendWith(SpringExtension.class)
@@ -46,9 +47,9 @@ public class JdbcHolidayDaoTest {
     public void givenId_whenGetById_thenReturn() {
         Holiday expected = new Holiday("New Year", LocalDate.of(2021, 12, 31));
 
-        Holiday actual = holidayDao.getById(1);
+        Optional<Holiday> actual = holidayDao.getById(1);
 
-        assertEquals(expected, actual);
+        assertEquals(expected, actual.get());
     }
 
     @Test
@@ -90,8 +91,8 @@ public class JdbcHolidayDaoTest {
         LocalDate date = LocalDate.of(2021, 12, 31);
         Holiday expected = new Holiday("New Year", date);
 
-        Holiday actual = holidayDao.getByDate(LocalDate.of(2021, 12, 31));
+        Optional<Holiday> actual = holidayDao.getByDate(LocalDate.of(2021, 12, 31));
 
-        assertEquals(expected, actual);
+        assertEquals(expected, actual.get());
     }
 }

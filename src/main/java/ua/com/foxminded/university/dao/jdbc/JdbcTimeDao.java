@@ -12,6 +12,7 @@ import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class JdbcTimeDao implements TimeDao {
@@ -42,8 +43,8 @@ public class JdbcTimeDao implements TimeDao {
         time.setId((int) keyHolder.getKeys().get("id"));
     }
 
-    public Time getById(int id) {
-        return jdbcTemplate.queryForObject(SQL_FIND_TIME, timeMapper, id);
+    public Optional<Time> getById(int id) {
+        return Optional.ofNullable(jdbcTemplate.queryForObject(SQL_FIND_TIME, timeMapper, id));
     }
 
     public void update(Time time) {
@@ -63,7 +64,7 @@ public class JdbcTimeDao implements TimeDao {
 
 
     @Override
-    public Time getByTime(LocalTime start, LocalTime end) {
-        return jdbcTemplate.queryForObject(SQL_FIND_BY_TIME, timeMapper, start, end);
+    public Optional<Time> getByTime(LocalTime start, LocalTime end) {
+        return Optional.ofNullable(jdbcTemplate.queryForObject(SQL_FIND_BY_TIME, timeMapper, start, end));
     }
 }

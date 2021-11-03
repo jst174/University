@@ -17,6 +17,7 @@ import ua.com.foxminded.university.model.Course;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 
 @ExtendWith(SpringExtension.class)
@@ -44,9 +45,9 @@ public class JdbcCourseDaoTest {
     public void givenId_whenGetById_thenReturn() {
         Course courseExpected = new Course("History");
 
-        Course courseActual = courseDao.getById(1);
+        Optional<Course> courseActual = courseDao.getById(1);
 
-        assertEquals(courseExpected, courseActual);
+        assertEquals(courseExpected, courseActual.get());
     }
 
     @Test
@@ -102,8 +103,8 @@ public class JdbcCourseDaoTest {
     public void givenCourseName_whereGetByName_thenReturn() {
         Course courseExpected = new Course("History");
 
-        Course courseActual = courseDao.getByName("History");
+        Optional<Course> courseActual = courseDao.getByName("History");
 
-        assertEquals(courseExpected, courseActual);
+        assertEquals(courseExpected, courseActual.get());
     }
 }

@@ -25,7 +25,7 @@ public class TeacherMapper implements RowMapper<Teacher> {
             rs.getString("last_name"),
             rs.getObject("birthday", LocalDate.class),
             Gender.valueOf(rs.getString("gender")),
-            addressDao.getById(rs.getInt("address_id")),
+            addressDao.getById(rs.getInt("address_id")).get(),
             rs.getString("phone_number"),
             rs.getString("email"),
             AcademicDegree.valueOf(rs.getString("academic_degree")));

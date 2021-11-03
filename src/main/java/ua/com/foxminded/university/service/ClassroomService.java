@@ -16,17 +16,17 @@ public class ClassroomService {
     }
 
     public void createClassroom(Classroom classroom) {
-        if (!isUnique(classroom)) {
+        if (isUnique(classroom)) {
             classroomDao.create(classroom);
         }
     }
 
     public Classroom getById(int id) {
-        return classroomDao.getById(id);
+        return classroomDao.getById(id).get();
     }
 
     public void update(Classroom classroom) {
-        if (classroomDao.getById(classroom.getId()).equals(classroom)) {
+        if (!isUnique(classroom)) {
             classroomDao.update(classroom);
         }
     }
@@ -40,7 +40,7 @@ public class ClassroomService {
     }
 
     private boolean isUnique(Classroom classroom) {
-        return !classroomDao.findByNumber(classroom.getNumber()).equals(classroom);
+        return !classroomDao.findByNumber(classroom.getNumber()).isPresent();
     }
 
 }

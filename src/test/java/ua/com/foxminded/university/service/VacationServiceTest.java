@@ -23,14 +23,12 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@ExtendWith(SpringExtension.class)
-@PropertySource("classpath:application.properties")
-@ContextConfiguration(classes = {AppConfig.class})
 public class VacationServiceTest {
 
     @Mock
@@ -43,21 +41,10 @@ public class VacationServiceTest {
     private List<Teacher> teachers;
     private DataSource dataSource;
     private Teacher teacher;
-    @Value("${vacation.max.period.associate}")
-    private int vacationPeriodForAssociate;
-    @Value("${vacation.max.period.bachelor}")
-    private int vacationPeriodForBachelor;
-    @Value("${vacation.max.period.master}")
-    private int vacationPeriodForMaster;
-    @Value("${vacation.max.period.doctoral}")
-    private int vacationPeriodForDoctoral;
+
 
     @BeforeEach
     public void setUp() throws IOException {
-        ReflectionTestUtils.setField(vacationService, "vacationPeriodForAssociate", vacationPeriodForAssociate);
-        ReflectionTestUtils.setField(vacationService, "vacationPeriodForBachelor", vacationPeriodForBachelor);
-        ReflectionTestUtils.setField(vacationService, "vacationPeriodForMaster", vacationPeriodForMaster);
-        ReflectionTestUtils.setField(vacationService, "vacationPeriodForDoctoral", vacationPeriodForDoctoral);
         dataSource = new DataSource();
         vacations = new ArrayList<>();
         teacher = dataSource.generateTeacher();
@@ -103,7 +90,7 @@ public class VacationServiceTest {
     public void givenExistentId_whenGetById_thenReturn() {
         Vacation vacation = vacations.get(0);
 
-        when(vacationDao.getById(1)).thenReturn(vacation);
+        when(vacationDao.getById(1)).thenReturn(Optional.of(vacation));
 
         assertEquals(vacation, vacationService.getById(1));
     }
@@ -112,7 +99,7 @@ public class VacationServiceTest {
     public void givenExistentVacation_whenUpdate_thenUpdated() {
         Vacation vacation = vacations.get(0);
 
-        when(vacationDao.getById(1)).thenReturn(vacation);
+        when(vacationDao.getById(vacation.getId())).thenReturn(Optional.of(vacation));
 
         vacationService.update(vacation);
 
