@@ -16,9 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class TeacherServiceTest {
@@ -46,9 +45,22 @@ public class TeacherServiceTest {
     public void givenNewTeacher_whenCreate_thenCreated() throws IOException {
         Teacher teacher = dataSource.generateTeacher();
 
+        when(teacherDao.getByName(teacher.getFirstName(), teacher.getLastName())).thenReturn(Optional.empty());
+
         teacherService.create(teacher);
 
         verify(teacherDao).create(teacher);
+    }
+
+    @Test
+    public void givenExistentTeacher_whenCreate_thenNotCreated() {
+        Teacher teacher = teachers.get(0);
+
+        when(teacherDao.getByName(teacher.getFirstName(), teacher.getLastName())).thenReturn(Optional.of(teacher));
+
+        teacherService.create(teacher);
+
+        verify(teacherDao, never()).create(teacher);
     }
 
     @Test
@@ -64,11 +76,27 @@ public class TeacherServiceTest {
     public void givenExistentTime_whenUpdate_thenUpdated() {
         Teacher teacher = teachers.get(0);
 
-        when(teacherDao.getById(1)).thenReturn(Optional.of(teacher));
+        when(teacherDao.getByName(teacher.getFirstName(), teacher.getLastName()))
+            .thenReturn(Optional.of(teacher));
 
         teacherService.update(teacher);
 
         verify(teacherDao).update(teacher);
+    }
+
+    @Test
+    public void givenTeacherWithOtherTeacherName_whenUpdate_thenNotUpdated() {
+        Teacher teacher1 = teachers.get(0);
+        Teacher teacher2 = teachers.get(1);
+        teacher1.setFirstName(teacher2.getFirstName());
+        teacher1.setLastName(teacher2.getLastName());
+
+        when(teacherDao.getByName(teacher1.getFirstName(), teacher1.getLastName()))
+            .thenReturn(Optional.of(teacher2));
+
+        teacherService.update(teacher1);
+
+        verify(teacherDao, never()).update(teacher1);
     }
 
     @Test

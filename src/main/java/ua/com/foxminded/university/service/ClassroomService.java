@@ -26,7 +26,7 @@ public class ClassroomService {
     }
 
     public void update(Classroom classroom) {
-        if (!isUnique(classroom)) {
+        if (isCurrent(classroom)) {
             classroomDao.update(classroom);
         }
     }
@@ -40,7 +40,11 @@ public class ClassroomService {
     }
 
     private boolean isUnique(Classroom classroom) {
-        return !classroomDao.findByNumber(classroom.getNumber()).isPresent();
+        return classroomDao.findByNumber(classroom.getNumber()).isEmpty();
+    }
+
+    private boolean isCurrent(Classroom classroom) {
+        return classroomDao.findByNumber(classroom.getNumber()).get().getId() == classroom.getId();
     }
 
 }

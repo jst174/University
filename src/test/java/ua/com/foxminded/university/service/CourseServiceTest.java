@@ -15,6 +15,7 @@ import ua.com.foxminded.university.model.Teacher;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -62,6 +63,17 @@ public class CourseServiceTest {
         verify(courseDao).create(course);
     }
 
+    @Test
+    public void givenExistentCourse_whenCreate_thenNotCreated() {
+        Course course = courses.get(0);
+
+        when(courseDao.getByName(course.getName())).thenReturn(Optional.of(course));
+
+        courseService.create(course);
+
+        verify(courseDao, never()).create(course);
+    }
+
 
     @Test
     public void givenExistentId_whenGetById_thenReturn() {
@@ -82,6 +94,19 @@ public class CourseServiceTest {
         courseService.update(course);
 
         verify(courseDao).update(course);
+    }
+
+    @Test
+    public void givenCourseWithOtherCourseName_whenUpdate_thenNotUpdated(){
+        Course course1 = courses.get(0);
+        Course course2 = courses.get(1);
+        course1.setName(course2.getName());
+
+        when(courseDao.getByName(course1.getName())).thenReturn(Optional.of(course2));
+
+        courseService.update(course1);
+
+        verify(courseDao, never()).update(course1);
     }
 
     @Test

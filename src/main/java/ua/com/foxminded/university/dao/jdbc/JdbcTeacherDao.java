@@ -36,6 +36,7 @@ public class JdbcTeacherDao implements TeacherDao {
     private static final String SQL_FIND_ALl = "SELECT * FROM teachers";
     private static final String SQL_FIND_COURSES = "SELECT * FROM teachers_courses WHERE teacher_id = ?";
     private static final String SQL_DELETE_COURSE = "DELETE FROM teachers_courses WHERE teacher_id = ? and course_id = ?";
+    private static final String SQL_GET_BY_FULL_NAME = "SELECT * FROM teachers WHERE first_name = ? and last_name = ?";
 
     private TeacherMapper teacherMapper;
     private JdbcTemplate jdbcTemplate;
@@ -111,5 +112,11 @@ public class JdbcTeacherDao implements TeacherDao {
         savedCourses.stream().
             filter(course -> !teacher.getCourses().contains(course))
             .forEach(course -> jdbcTemplate.update(SQL_DELETE_COURSE, teacher.getId(), course.getId()));
+    }
+
+    @Override
+    public Optional<Teacher> getByName(String firstName, String lastName) {
+        return Optional.ofNullable(jdbcTemplate.queryForObject(SQL_GET_BY_FULL_NAME, teacherMapper,
+            firstName, lastName));
     }
 }

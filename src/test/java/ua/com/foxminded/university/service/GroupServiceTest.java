@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
@@ -65,6 +66,17 @@ public class GroupServiceTest {
     }
 
     @Test
+    public void givenExistentGroup_whenCreate_thenNotCreated() {
+        Group group = groups.get(0);
+
+        when(groupDao.getByName(group.getName())).thenReturn(Optional.of(group));
+
+        groupService.create(group);
+
+        verify(groupDao, never()).create(group);
+    }
+
+    @Test
     public void givenExistentGroupId_whenGetById_thenReturn() {
         Group group = groups.get(0);
 
@@ -82,6 +94,19 @@ public class GroupServiceTest {
         groupService.update(group);
 
         verify(groupDao).update(group);
+    }
+
+    @Test
+    public void givenGroupWithOtherGroupName_whenUpdate_thenUpdated() {
+        Group group1 = groups.get(0);
+        Group group2 = groups.get(1);
+        group1.setName(group2.getName());
+
+        when(groupDao.getByName(group1.getName())).thenReturn(Optional.of(group2));
+
+        groupService.update(group1);
+
+        verify(groupDao, never()).update(group1);
     }
 
     @Test

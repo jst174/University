@@ -49,7 +49,7 @@ public class LessonService {
     }
 
     public void update(Lesson lesson) {
-        if ((lessonDao.getById(lesson.getId()).isPresent()) && (checkConditions(lesson))) {
+        if ((isCurrent(lesson)) && (checkConditions(lesson))) {
             lessonDao.update(lesson);
         }
     }
@@ -77,16 +77,14 @@ public class LessonService {
         return courses.contains(lesson.getCourse());
     }
 
-    private boolean isTeacherBusy(Lesson newLesson) {
-        List<Lesson> lessons = lessonDao.getByDateAndTimeAndTeacher(newLesson.getDate(), newLesson.getTime(),
-            newLesson.getTeacher());
-        return lessons.stream().anyMatch(lesson -> lesson.getTeacher().equals(newLesson.getTeacher()));
+    private boolean isTeacherBusy(Lesson lesson) {
+        return lessonDao.getByDateAndTimeAndTeacher(lesson.getDate(), lesson.getTime(),
+            lesson.getTeacher()).isPresent();
     }
 
-    private boolean isClassroomsBusy(Lesson newLesson) {
-        List<Lesson> lessons = lessonDao.getByDateAndTimeAndClassroom(newLesson.getDate(), newLesson.getTime(),
-            newLesson.getClassroom());
-        return lessons.stream().anyMatch(lesson -> lesson.getClassroom().equals(newLesson.getClassroom()));
+    private boolean isClassroomsBusy(Lesson lesson) {
+        return lessonDao.getByDateAndTimeAndClassroom(lesson.getDate(), lesson.getTime(),
+            lesson.getClassroom()).isPresent();
     }
 
     private boolean isHoliday(Lesson lesson) {
@@ -109,5 +107,11 @@ public class LessonService {
         List<Group> groups = new ArrayList<>();
         lessons.forEach(lesson -> groups.addAll(lesson.getGroups()));
         return groups.stream().anyMatch(group -> newLesson.getGroups().contains(group));
+    }
+
+    private boolean isCurrent(Lesson lesson) {
+        return lessonDao.getByDateAndTimeAndClassroom(lesson.getDate(), lesson.getTime(), lesson.getClassroom())
+            .get()
+            .getId() == lesson.getId();
     }
 }

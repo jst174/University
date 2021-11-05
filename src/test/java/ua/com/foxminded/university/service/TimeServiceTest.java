@@ -23,9 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(SpringExtension.class)
@@ -60,10 +59,49 @@ public class TimeServiceTest {
         Time time = new Time(start, end);
 
         when(timeDao.getByTime(start, end)).thenReturn(Optional.empty());
+        when(timeDao.getAll()).thenReturn(times);
 
         timeService.create(time);
 
         verify(timeDao).create(time);
+    }
+
+    @Test
+    public void givenExistentTime_whenCreate_thenNotCreated() {
+        Time time = times.get(0);
+
+        when(timeDao.getByTime(time.getStartTime(), time.getEndTime())).thenReturn(Optional.of(time));
+
+        timeService.create(time);
+
+        verify(timeDao, never()).create(time);
+    }
+
+    @Test
+    public void givenTimeWithDurationLessThanMinLessDuration_whenCreate_thenNotCreated() {
+        LocalTime start = LocalTime.of(12, 0);
+        LocalTime end = LocalTime.of(12, 20);
+        Time time = new Time(start, end);
+
+        when(timeDao.getByTime(start, end)).thenReturn(Optional.empty());
+
+        timeService.create(time);
+
+        verify(timeDao, never()).create(time);
+    }
+
+    @Test
+    public void givenTimeThatCrossWithOtherTime_whenCreate_thenNotCreated() {
+        LocalTime start = LocalTime.of(8, 20);
+        LocalTime end = LocalTime.of(9, 20);
+        Time time = new Time(start, end);
+
+        when(timeDao.getByTime(start, end)).thenReturn(Optional.empty());
+        when(timeDao.getAll()).thenReturn(times);
+
+        timeService.create(time);
+
+        verify(timeDao, never()).create(time);
     }
 
     @Test
@@ -79,11 +117,40 @@ public class TimeServiceTest {
     public void givenExistentTime_whenUpdate_thenUpdated() {
         Time time = times.get(0);
 
-        when(timeDao.getById(1)).thenReturn(Optional.of(time));
+        when(timeDao.getByTime(time.getStartTime(), time.getEndTime())).thenReturn(Optional.of(time));
 
         timeService.update(time);
 
         verify(timeDao).update(time);
+    }
+
+    @Test
+    public void givenTimeWithDurationLessThanMinLessDuration_whenUpdate_thenNotUpdated() {
+        Time time = times.get(0);
+        time.setStartTime(LocalTime.of(8, 0));
+        time.setEndTime(LocalTime.of(8, 20));
+
+        when(timeDao.getByTime(time.getStartTime(), time.getEndTime())).thenReturn(Optional.of(time));
+
+        timeService.update(time);
+
+        verify(timeDao, never()).update(time);
+    }
+
+    @Test
+    public void givenTimeThatCrossWithOtherTime_whenUpdate_thenNotUpdated() {
+        LocalTime start = LocalTime.of(8, 20);
+        LocalTime end = LocalTime.of(9, 20);
+        Time time = times.get(0);
+        time.setStartTime(start);
+        time.setEndTime(end);
+
+        when(timeDao.getByTime(time.getStartTime(), time.getEndTime())).thenReturn(Optional.of(time));
+        when(timeDao.getAll()).thenReturn(times);
+
+        timeService.update(time);
+
+        verify(timeDao, never()).update(time);
     }
 
     @Test

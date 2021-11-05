@@ -153,4 +153,24 @@ public class JdbcTeacherDaoTest {
         assertEquals(expected, actual);
     }
 
+    @Test
+    public void givenFirstNameAndLastName_whenGetByName_thenReturn() {
+        Address address = new Address("Russia", "Saint Petersburg", "Nevsky Prospect",
+            "15", "45", "342423");
+        Teacher expected = new Teacher(
+            "Mike",
+            "Miller",
+            LocalDate.of(1977, 5, 13),
+            Gender.MALE,
+            address,
+            "5435345334",
+            "miller97@gmail.com",
+            AcademicDegree.MASTER
+        );
+
+        Optional<Teacher> actual = teacherDao.getByName(expected.getFirstName(), expected.getLastName());
+
+        assertEquals(expected, actual.get());
+    }
+
 }

@@ -163,5 +163,24 @@ public class JdbcVacationDaoTest {
         assertEquals(vacation1, actual.get());
     }
 
+    @Test
+    public void givenVacation_whenGetByTeacherAndVacationDates_thenReturn(){
+        Vacation vacation1 = new Vacation(
+            LocalDate.of(2021, 10, 15),
+            LocalDate.of(2021, 10, 30),
+            teacher);
+        vacation1.setId(1);
+        Vacation vacation2 = new Vacation(
+            LocalDate.of(2021, 5, 15),
+            LocalDate.of(2021, 5, 30),
+            teacher
+        );
+        vacation2.setId(2);
+
+        Optional<Vacation> actual = vacationDao.getByTeacherAndVacationDates(vacation1);
+
+        assertEquals(vacation1, actual.get());
+    }
+
 
 }

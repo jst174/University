@@ -12,4 +12,5 @@ public interface VacationDao extends Dao<Vacation> {
 
     List<Vacation> getByTeacherId(int id);
     Optional<Vacation> getByTeacherAndLessonDate(Teacher teacher, LocalDate lessonDate);
+    Optional<Vacation> getByTeacherAndVacationDates(Vacation vacation);
 }

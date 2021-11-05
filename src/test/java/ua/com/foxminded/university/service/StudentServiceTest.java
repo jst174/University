@@ -22,13 +22,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(SpringExtension.class)
-@PropertySource("classpath:application.properties")
 @ContextConfiguration(classes = {AppConfig.class})
 public class StudentServiceTest {
 
@@ -39,12 +37,12 @@ public class StudentServiceTest {
     private List<Student> students;
     private DataSource dataSource;
     private Group group;
-    @Value("${group.capacity}")
-    private int groupCapacity;
+    @Value("${max.group.size}")
+    private int maxGroupSize;
 
     @BeforeEach
     public void setUp() throws IOException {
-        ReflectionTestUtils.setField(studentService, "groupCapacity", groupCapacity);
+        ReflectionTestUtils.setField(studentService, "maxGroupSize", maxGroupSize);
         students = new ArrayList<>();
         dataSource = new DataSource();
         group = new Group("NG-12");
@@ -65,10 +63,35 @@ public class StudentServiceTest {
         student.setGroup(group);
 
         when(studentDao.getByGroupId(1)).thenReturn(students);
+        when(studentDao.getByName(student.getFirstName(), student.getLastName())).thenReturn(Optional.empty());
 
         studentService.create(student);
 
         verify(studentDao).create(student);
+    }
+
+    @Test
+    public void givenExistentStudent_whenCreate_thenNotCreated() {
+        Student student = students.get(0);
+
+        when(studentDao.getByName(student.getFirstName(), student.getLastName())).thenReturn(Optional.of(student));
+
+        studentService.create(student);
+
+        verify(studentDao, never()).create(student);
+    }
+
+    @Test
+    public void givenNotAvailableGroup_whenCreate_thenNotCreated() throws IOException {
+        Student student = dataSource.generateStudent();
+        student.setGroup(group);
+
+        when(studentDao.getByGroupId(1)).thenReturn(generateStudents());
+        when(studentDao.getByName(student.getFirstName(), student.getLastName())).thenReturn(Optional.empty());
+
+        studentService.create(student);
+
+        verify(studentDao, never()).create(student);
     }
 
     @Test
@@ -84,7 +107,7 @@ public class StudentServiceTest {
     public void givenExistentStudent_whenUpdate_thenUpdated() {
         Student student = students.get(0);
 
-        when(studentDao.getById(1)).thenReturn(Optional.of(student));
+        when(studentDao.getByName(student.getFirstName(), student.getLastName())).thenReturn(Optional.of(student));
         when(studentDao.getByGroupId(1)).thenReturn(students);
 
         studentService.update(student);
@@ -93,9 +116,43 @@ public class StudentServiceTest {
     }
 
     @Test
+    public void givenStudentWithOtherStudentName_whenUpdate_thenNotUpdated() {
+        Student student1 = students.get(0);
+        Student student2 = students.get(1);
+        student1.setFirstName(student2.getFirstName());
+        student1.setLastName(student2.getLastName());
+
+        when(studentDao.getByName(student1.getFirstName(), student1.getLastName())).thenReturn(Optional.of(student2));
+
+        studentService.update(student1);
+
+        verify(studentDao, never()).update(student1);
+    }
+
+    @Test
+    public void givenNotAvailableGroup_whenUpdate_thenNotUpdated() throws IOException {
+        Student student = students.get(0);
+
+        when(studentDao.getByName(student.getFirstName(), student.getLastName())).thenReturn(Optional.of(student));
+        when(studentDao.getByGroupId(1)).thenReturn(generateStudents());
+
+        studentService.update(student);
+
+        verify(studentDao, never()).update(student);
+    }
+
+    @Test
     public void givenExistentId_whenDelete_thenDeleted() {
         studentService.delete(1);
 
         verify(studentDao).delete(1);
+    }
+
+    private List<Student> generateStudents() throws IOException {
+        List<Student> students = new ArrayList<>();
+        for (int i = 0; i < maxGroupSize; i++) {
+            students.add(dataSource.generateStudent());
+        }
+        return students;
     }
 }

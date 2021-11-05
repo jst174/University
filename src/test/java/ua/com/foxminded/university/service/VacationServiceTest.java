@@ -23,12 +23,15 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = {AppConfig.class})
 public class VacationServiceTest {
 
     @Mock
@@ -41,10 +44,13 @@ public class VacationServiceTest {
     private List<Teacher> teachers;
     private DataSource dataSource;
     private Teacher teacher;
+    @Value("#{${maxPeriodsVacation}}")
+    private Map<AcademicDegree, Integer> maxPeriodsVacation;
 
 
     @BeforeEach
     public void setUp() throws IOException {
+        ReflectionTestUtils.setField(vacationService, "maxPeriodsVacation", maxPeriodsVacation);
         dataSource = new DataSource();
         vacations = new ArrayList<>();
         teacher = dataSource.generateTeacher();
@@ -60,7 +66,7 @@ public class VacationServiceTest {
             LocalDate.of(2021, 5, 30),
             teacher
         );
-        vacation2.setId(1);
+        vacation2.setId(2);
         vacations.add(vacation1);
         vacations.add(vacation2);
 
@@ -76,14 +82,39 @@ public class VacationServiceTest {
     public void givenNewVacation_whenCreate_thenCreated() throws IOException {
         Vacation vacation = new Vacation(
             LocalDate.of(2021, 3, 10),
-            LocalDate.of(2021, 3, 20),
+            LocalDate.of(2021, 3, 30),
             teacher);
 
-        when(vacationDao.getAll()).thenReturn(vacations);
+        when(vacationDao.getByTeacherAndVacationDates(vacation)).thenReturn(Optional.empty());
 
         vacationService.create(vacation);
 
         verify(vacationDao).create(vacation);
+    }
+
+    @Test
+    public void givenNewVacationWithNotAcceptablePeriod_whenCreate_thenNotCreated(){
+        Vacation vacation = new Vacation(
+            LocalDate.of(2021, 3, 10),
+            LocalDate.of(2021, 4, 12),
+            teacher);
+
+        when(vacationDao.getByTeacherAndVacationDates(vacation)).thenReturn(Optional.empty());
+
+        vacationService.create(vacation);
+
+        verify(vacationDao, never()).create(vacation);
+    }
+
+    @Test
+    public void givenExistentVacation_whenCreate_thenNotCreated(){
+        Vacation vacation = vacations.get(0);
+
+        when(vacationDao.getByTeacherAndVacationDates(vacation)).thenReturn(Optional.of(vacation));
+
+        vacationService.create(vacation);
+
+        verify(vacationDao, never()).create(vacation);
     }
 
     @Test
@@ -99,11 +130,38 @@ public class VacationServiceTest {
     public void givenExistentVacation_whenUpdate_thenUpdated() {
         Vacation vacation = vacations.get(0);
 
-        when(vacationDao.getById(vacation.getId())).thenReturn(Optional.of(vacation));
+        when(vacationDao.getByTeacherAndVacationDates(vacation)).thenReturn(Optional.of(vacation));
 
         vacationService.update(vacation);
 
         verify(vacationDao).update(vacation);
+    }
+
+    @Test
+    public void givenVacationWithOtherVacationTeacherAndVacationDates_whenUpdate_thenNotUpdated(){
+        Vacation vacation1 = vacations.get(0);
+        Vacation vacation2 = vacations.get(1);
+        vacation1.setTeacher(vacation2.getTeacher());
+        vacation1.setStart(vacation2.getStart());
+        vacation1.setEnd(vacation2.getEnd());
+
+        when(vacationDao.getByTeacherAndVacationDates(vacation1)).thenReturn(Optional.of(vacation2));
+
+        vacationService.update(vacation1);
+
+        verify(vacationDao, never()).update(vacation1);
+    }
+
+    @Test
+    public void givenVacationWithNotAcceptablePeriod_whenUpdate_thenNotUpdated(){
+        Vacation vacation = vacations.get(0);
+        vacation.setEnd(LocalDate.of(2021,12,12));
+
+        when(vacationDao.getByTeacherAndVacationDates(vacation)).thenReturn(Optional.of(vacation));
+
+        vacationService.update(vacation);
+
+        verify(vacationDao, never()).update(vacation);
     }
 
     @Test

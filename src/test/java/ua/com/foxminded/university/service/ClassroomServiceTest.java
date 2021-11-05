@@ -14,6 +14,7 @@ import ua.com.foxminded.university.model.Classroom;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
@@ -47,6 +48,17 @@ public class ClassroomServiceTest {
         verify(classroomDao).create(classroom);
     }
 
+    @Test
+    public void givenExistentClassroom_whenCreateClassroom_thenNotCreated(){
+        Classroom classroom = classrooms.get(0);
+
+        when(classroomDao.findByNumber(classroom.getNumber())).thenReturn(Optional.of(classroom));
+
+        classroomService.createClassroom(classroom);
+
+        verify(classroomDao, never()).create(classroom);
+    }
+
 
     @Test
     public void givenExistClassroomId_whenGetById_thenReturn() {
@@ -69,6 +81,19 @@ public class ClassroomServiceTest {
     }
 
     @Test
+    public void givenClassroomWithOtherClassroomNumber_whenUpdate_thenNotUpdated(){
+        Classroom classroom1 = classrooms.get(0);
+        classroom1.setNumber(202);
+        Classroom classroom2 = classrooms.get(1);
+
+        when(classroomDao.findByNumber(classroom1.getNumber())).thenReturn(Optional.of(classroom2));
+
+        classroomService.update(classroom1);
+
+        verify(classroomDao, never()).update(classroom1);
+    }
+
+    @Test
     public void givenExistentId_whenDelete_thenDeleted() {
         Classroom classroom = classrooms.get(0);
 
@@ -76,4 +101,5 @@ public class ClassroomServiceTest {
 
         verify(classroomDao).delete(1);
     }
+
 }

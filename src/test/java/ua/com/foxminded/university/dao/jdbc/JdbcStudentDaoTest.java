@@ -187,4 +187,25 @@ public class JdbcStudentDaoTest {
 
         assertEquals(expected, actual);
     }
+
+    @Test
+    public void givenFirstNameAndLastName_whenGetByName_thenReturn() {
+        Address address = new Address("Russia", "Saint Petersburg", "Nevsky Prospect",
+            "15", "45", "342423");
+        Group group = new Group("MJ-12");
+        Student expected = new Student(
+            "Mike",
+            "Miller",
+            LocalDate.of(1997, 5, 13),
+            Gender.MALE,
+            address,
+            "5435345334",
+            "miller97@gmail.com"
+        );
+        expected.setGroup(group);
+
+        Optional<Student> actual = studentDao.getByName(expected.getFirstName(), expected.getLastName());
+
+        assertEquals(expected, actual.get());
+    }
 }

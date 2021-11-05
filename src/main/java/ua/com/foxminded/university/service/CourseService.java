@@ -3,6 +3,7 @@ package ua.com.foxminded.university.service;
 import org.springframework.stereotype.Service;
 import ua.com.foxminded.university.dao.CourseDao;
 import ua.com.foxminded.university.dao.TeacherDao;
+import ua.com.foxminded.university.model.Classroom;
 import ua.com.foxminded.university.model.Course;
 import ua.com.foxminded.university.model.Teacher;
 
@@ -28,7 +29,7 @@ public class CourseService {
     }
 
     public void update(Course course) {
-        if (!isUnique(course)) {
+        if (isCurrent(course)) {
             courseDao.update(course);
         }
     }
@@ -46,6 +47,10 @@ public class CourseService {
     }
 
     private boolean isUnique(Course course) {
-        return !courseDao.getByName(course.getName()).isPresent();
+        return courseDao.getByName(course.getName()).isEmpty();
+    }
+
+    private boolean isCurrent(Course course) {
+        return courseDao.getByName(course.getName()).get().getId() == course.getId();
     }
 }

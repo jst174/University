@@ -14,9 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class HolidayServiceTest {
@@ -51,6 +50,17 @@ public class HolidayServiceTest {
     }
 
     @Test
+    public void givenExistentHoliday_whenCreate_thenNotCreated() {
+        Holiday holiday = holidays.get(0);
+
+        when(holidayDao.getByDate(holiday.getDate())).thenReturn(Optional.of(holiday));
+
+        holidayService.create(holiday);
+
+        verify(holidayDao, never()).create(holiday);
+    }
+
+    @Test
     public void givenExistentHolidayId_whenGetById_thenReturn() {
         Holiday holiday = holidays.get(0);
 
@@ -68,6 +78,19 @@ public class HolidayServiceTest {
         holidayService.update(holiday);
 
         verify(holidayDao).update(holiday);
+    }
+
+    @Test
+    public void givenHolidayWithOtherHolidayDate_whenUpdate_thenNotUpdated() {
+        Holiday holiday1 = holidays.get(0);
+        Holiday holiday2 = holidays.get(1);
+        holiday1.setDate(holiday2.getDate());
+
+        when(holidayDao.getByDate(holiday1.getDate())).thenReturn(Optional.of(holiday2));
+
+        holidayService.update(holiday1);
+
+        verify(holidayDao, never()).update(holiday1);
     }
 
     @Test

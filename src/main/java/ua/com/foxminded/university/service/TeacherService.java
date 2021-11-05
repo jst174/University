@@ -19,7 +19,10 @@ public class TeacherService {
     }
 
     public void create(Teacher teacher) {
+        if (isUnique(teacher)) {
             teacherDao.create(teacher);
+        }
+
     }
 
     public Teacher getById(int id) {
@@ -27,7 +30,7 @@ public class TeacherService {
     }
 
     public void update(Teacher teacher) {
-        if (teacherDao.getById(teacher.getId()).isPresent()) {
+        if (isCurrent(teacher)) {
             teacherDao.update(teacher);
         }
     }
@@ -39,6 +42,16 @@ public class TeacherService {
 
     public List<Teacher> getAll() {
         return teacherDao.getAll();
+    }
+
+    private boolean isUnique(Teacher teacher) {
+        return teacherDao.getByName(teacher.getFirstName(), teacher.getLastName()).isEmpty();
+    }
+
+    public boolean isCurrent(Teacher teacher) {
+        return teacherDao.getByName(teacher.getFirstName(), teacher.getLastName())
+            .get()
+            .getId() == teacher.getId();
     }
 
 }

@@ -17,9 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class LessonServiceTest {
@@ -64,7 +63,7 @@ public class LessonServiceTest {
             LocalDate.of(2021, 10, 26),
             getTimes().get(0));
         lesson1.setId(1);
-        lesson1.setGroups(getGroups());
+        lesson1.setGroups(groups);
         Lesson lesson2 = new Lesson(
             getCourses().get(1),
             getClassrooms().get(1),
@@ -80,24 +79,176 @@ public class LessonServiceTest {
 
     @Test
     public void givenNewLesson_whenCreate_thenCreated() throws IOException {
-        Lesson lesson = new Lesson(courses.get(0), getClassrooms().get(0), teachers.get(0),
+        Lesson lesson = new Lesson(courses.get(0), new Classroom(432, 50), teachers.get(0),
             LocalDate.of(2021, 12, 15), getTimes().get(0));
+        Group group1 = new Group("GD-32");
+        Group group2 = new Group("GF-65");
+        Group group3 = new Group("BF-36");
+        List<Group> groups = new ArrayList<>();
+        groups.add(group1);
+        groups.add(group2);
+        groups.add(group3);
         lesson.setGroups(groups);
         addStudentToGroup(groups.get(0), 10);
         addStudentToGroup(groups.get(1), 10);
         addStudentToGroup(groups.get(2), 10);
 
-        when(vacationDao.getByTeacherId(lesson.getTeacher().getId())).thenReturn(vacations);
-        when(courseDao.getByTeacherId(lesson.getTeacher().getId())).thenReturn(courses);
-        when(lessonDao.getByDateAndTimeAndTeacher(lesson.getDate(), lesson.getTime(), lesson.getTeacher())).thenReturn(new ArrayList<>());
-        when(lessonDao.getByDateAndTimeAndClassroom(lesson.getDate(), lesson.getTime(), lesson.getClassroom())).thenReturn(new ArrayList<>());
-        when(lessonDao.getByDateAndTime(lesson.getDate(), lesson.getTime())).thenReturn(new ArrayList<>());
         when(holidayDao.getByDate(lesson.getDate())).thenReturn(Optional.empty());
+        when(lessonDao.getByDateAndTimeAndClassroom(lesson.getDate(), lesson.getTime(), lesson.getClassroom())).thenReturn(Optional.empty());
+        when(vacationDao.getByTeacherAndLessonDate(lesson.getTeacher(), lesson.getDate())).thenReturn(Optional.empty());
+        when(lessonDao.getByDateAndTimeAndTeacher(lesson.getDate(), lesson.getTime(), lesson.getTeacher())).thenReturn(Optional.empty());
+        when(lessonDao.getByDateAndTime(lesson.getDate(), lesson.getTime())).thenReturn(lessons);
 
         lessonService.create(lesson);
 
         verify(lessonDao).create(lesson);
     }
+
+    @Test
+    public void givenLessonWhereDateIsHoliday_whenCreate_thenNotCreated() {
+        Lesson lesson = new Lesson(courses.get(0), new Classroom(432, 50), teachers.get(0),
+            LocalDate.of(2021, 12, 15), getTimes().get(0));
+        Holiday holiday = new Holiday("holiday", LocalDate.of(2021, 12, 15));
+
+        when(holidayDao.getByDate(lesson.getDate())).thenReturn(Optional.of(holiday));
+
+        lessonService.create(lesson);
+
+        verify(lessonDao, never()).create(lesson);
+    }
+
+    @Test
+    public void givenLessonWhereDateIsWeekend_whenCreate_thenNotCreated() {
+        Lesson lesson = new Lesson(courses.get(0), new Classroom(432, 50), teachers.get(0),
+            LocalDate.of(2021, 11, 6), getTimes().get(0));
+
+        when(holidayDao.getByDate(lesson.getDate())).thenReturn(Optional.empty());
+
+        lessonService.create(lesson);
+
+        verify(lessonDao, never()).create(lesson);
+    }
+
+    @Test
+    public void givenLessonWithBusyClassroom_whenCreate_thenNotCreated() {
+        Lesson lesson = new Lesson(courses.get(0), getClassrooms().get(0), teachers.get(0),
+            LocalDate.of(2021, 11, 9), getTimes().get(0));
+
+
+        when(holidayDao.getByDate(lesson.getDate())).thenReturn(Optional.empty());
+        when(lessonDao.getByDateAndTimeAndClassroom(lesson.getDate(), lesson.getTime(), lesson.getClassroom()))
+            .thenReturn(Optional.of(lessons.get(0)));
+
+        lessonService.create(lesson);
+
+        verify(lessonDao, never()).create(lesson);
+    }
+
+    @Test
+    public void givenLessonWithTeacherNotMatchedCourse_whenCreate_thenNotCreated() {
+        Lesson lesson = new Lesson(courses.get(0), getClassrooms().get(0), teachers.get(0),
+            LocalDate.of(2021, 11, 9), getTimes().get(0));
+        List<Course> courses = new ArrayList<>();
+        Course course = new Course("History");
+        courses.add(course);
+        teachers.get(0).setCourses(courses);
+
+        when(holidayDao.getByDate(lesson.getDate())).thenReturn(Optional.empty());
+        when(lessonDao.getByDateAndTimeAndClassroom(lesson.getDate(), lesson.getTime(), lesson.getClassroom()))
+            .thenReturn(Optional.empty());
+
+        lessonService.create(lesson);
+
+        verify(lessonDao, never()).create(lesson);
+    }
+
+    @Test
+    public void givenLessonWithTeacherOnVacation_whenCreate_thenNotCreated() {
+        Lesson lesson = new Lesson(courses.get(0), getClassrooms().get(0), teachers.get(0),
+            LocalDate.of(2021, 11, 9), getTimes().get(0));
+
+        when(holidayDao.getByDate(lesson.getDate())).thenReturn(Optional.empty());
+        when(lessonDao.getByDateAndTimeAndClassroom(lesson.getDate(), lesson.getTime(), lesson.getClassroom()))
+            .thenReturn(Optional.empty());
+        when(vacationDao.getByTeacherAndLessonDate(lesson.getTeacher(), lesson.getDate()))
+            .thenReturn(Optional.of(vacations.get(0)));
+
+        lessonService.create(lesson);
+
+        verify(lessonDao, never()).create(lesson);
+    }
+
+    @Test
+    public void givenLessonWithBusyTeacher_whenCreate_thenNotCreated() {
+        Lesson lesson = new Lesson(courses.get(0), getClassrooms().get(0), teachers.get(0),
+            LocalDate.of(2021, 11, 9), getTimes().get(0));
+
+        when(holidayDao.getByDate(lesson.getDate())).thenReturn(Optional.empty());
+        when(lessonDao.getByDateAndTimeAndClassroom(lesson.getDate(), lesson.getTime(), lesson.getClassroom()))
+            .thenReturn(Optional.empty());
+        when(vacationDao.getByTeacherAndLessonDate(lesson.getTeacher(), lesson.getDate()))
+            .thenReturn(Optional.empty());
+        when(lessonDao.getByDateAndTimeAndTeacher(lesson.getDate(), lesson.getTime(), lesson.getTeacher()))
+            .thenReturn(Optional.of(lessons.get(1)));
+
+        lessonService.create(lesson);
+
+        verify(lessonDao, never()).create(lesson);
+    }
+
+    @Test
+    public void givenLessonWithClassroomWherePlacesIsNotEnough_whenCreate_thenNotCreated() throws IOException {
+        Lesson lesson = new Lesson(courses.get(0), getClassrooms().get(0), teachers.get(0),
+            LocalDate.of(2021, 11, 9), getTimes().get(0));
+        Group group1 = new Group("GD-32");
+        Group group2 = new Group("GF-65");
+        Group group3 = new Group("BF-36");
+        List<Group> groups = new ArrayList<>();
+        groups.add(group1);
+        groups.add(group2);
+        groups.add(group3);
+        lesson.setGroups(groups);
+        addStudentToGroup(groups.get(0), 11);
+        addStudentToGroup(groups.get(1), 10);
+        addStudentToGroup(groups.get(2), 10);
+
+        when(holidayDao.getByDate(lesson.getDate())).thenReturn(Optional.empty());
+        when(lessonDao.getByDateAndTimeAndClassroom(lesson.getDate(), lesson.getTime(), lesson.getClassroom()))
+            .thenReturn(Optional.empty());
+        when(vacationDao.getByTeacherAndLessonDate(lesson.getTeacher(), lesson.getDate()))
+            .thenReturn(Optional.empty());
+        when(lessonDao.getByDateAndTimeAndTeacher(lesson.getDate(), lesson.getTime(), lesson.getTeacher()))
+            .thenReturn(Optional.empty());
+
+        lessonService.create(lesson);
+
+        verify(lessonDao, never()).create(lesson);
+    }
+
+    @Test
+    public void givenLessonWithBusyGroup_whenCreate_thenNotCreated() throws IOException {
+        Lesson lesson = new Lesson(courses.get(0), getClassrooms().get(0), teachers.get(0),
+            LocalDate.of(2021, 10, 26), getTimes().get(0));
+        lesson.setGroups(groups);
+        addStudentToGroup(groups.get(0), 10);
+        addStudentToGroup(groups.get(1), 10);
+        addStudentToGroup(groups.get(2), 10);
+
+        when(holidayDao.getByDate(lesson.getDate())).thenReturn(Optional.empty());
+        when(lessonDao.getByDateAndTimeAndClassroom(lesson.getDate(), lesson.getTime(), lesson.getClassroom()))
+            .thenReturn(Optional.empty());
+        when(vacationDao.getByTeacherAndLessonDate(lesson.getTeacher(), lesson.getDate()))
+            .thenReturn(Optional.empty());
+        when(lessonDao.getByDateAndTimeAndTeacher(lesson.getDate(), lesson.getTime(), lesson.getTeacher()))
+            .thenReturn(Optional.empty());
+        when(lessonDao.getByDateAndTime(lesson.getDate(), lesson.getTime()))
+            .thenReturn(lessons);
+
+        lessonService.create(lesson);
+
+        verify(lessonDao, never()).create(lesson);
+    }
+
 
     @Test
     public void givenLessonId_whenGetById_thenReturn() {
@@ -110,22 +261,197 @@ public class LessonServiceTest {
 
     @Test
     public void givenUpdatedLesson_whenUpdate_thenUpdated() throws IOException {
-        Lesson lesson = lessons.get(0);
+        Lesson lesson = new Lesson(courses.get(0), new Classroom(432, 50), teachers.get(0),
+            LocalDate.of(2021, 12, 15), getTimes().get(0));
+        Group group1 = new Group("GD-32");
+        Group group2 = new Group("GF-65");
+        Group group3 = new Group("BF-36");
+        List<Group> groups = new ArrayList<>();
+        groups.add(group1);
+        groups.add(group2);
+        groups.add(group3);
         lesson.setGroups(groups);
         addStudentToGroup(groups.get(0), 10);
         addStudentToGroup(groups.get(1), 10);
         addStudentToGroup(groups.get(2), 10);
 
-        when(vacationDao.getByTeacherId(lesson.getTeacher().getId())).thenReturn(vacations);
-        when(courseDao.getByTeacherId(lesson.getTeacher().getId())).thenReturn(courses);
-        when(lessonDao.getByDateAndTimeAndTeacher(lesson.getDate(), lesson.getTime(), lesson.getTeacher())).thenReturn(new ArrayList<>());
-        when(lessonDao.getByDateAndTimeAndClassroom(lesson.getDate(), lesson.getTime(), lesson.getClassroom())).thenReturn(new ArrayList<>());
-        when(lessonDao.getByDateAndTime(lesson.getDate(), lesson.getTime())).thenReturn(new ArrayList<>());
         when(holidayDao.getByDate(lesson.getDate())).thenReturn(Optional.empty());
+        when(lessonDao.getByDateAndTimeAndClassroom(lesson.getDate(), lesson.getTime(), lesson.getClassroom()))
+            .thenReturn(Optional.of(lesson), Optional.empty());
+        when(vacationDao.getByTeacherAndLessonDate(lesson.getTeacher(), lesson.getDate()))
+            .thenReturn(Optional.empty());
+        when(lessonDao.getByDateAndTimeAndTeacher(lesson.getDate(), lesson.getTime(), lesson.getTeacher()))
+            .thenReturn(Optional.empty());
+        when(lessonDao.getByDateAndTime(lesson.getDate(), lesson.getTime())).thenReturn(lessons);
 
         lessonService.update(lesson);
 
         verify(lessonDao).update(lesson);
+    }
+
+    @Test
+    public void givenLessonWhereDateIsHoliday_whenUpdate_thenNotUpdated() {
+        Lesson lesson = new Lesson(courses.get(0), new Classroom(432, 50), teachers.get(0),
+            LocalDate.of(2021, 12, 15), getTimes().get(0));
+        Holiday holiday = new Holiday("holiday", LocalDate.of(2021, 12, 15));
+
+        when(holidayDao.getByDate(lesson.getDate())).thenReturn(Optional.of(holiday));
+        when(lessonDao.getByDateAndTimeAndClassroom(lesson.getDate(), lesson.getTime(), lesson.getClassroom()))
+            .thenReturn(Optional.of(lesson));
+
+        lessonService.update(lesson);
+
+        verify(lessonDao, never()).update(lesson);
+    }
+
+    @Test
+    public void givenLessonWhereDateIsWeekend_whenUpdate_thenNotUpdated() {
+        Lesson lesson = new Lesson(courses.get(0), new Classroom(432, 50), teachers.get(0),
+            LocalDate.of(2021, 11, 6), getTimes().get(0));
+
+        when(holidayDao.getByDate(lesson.getDate())).thenReturn(Optional.empty());
+        when(lessonDao.getByDateAndTimeAndClassroom(lesson.getDate(), lesson.getTime(), lesson.getClassroom()))
+            .thenReturn(Optional.of(lesson));
+
+        lessonService.update(lesson);
+
+        verify(lessonDao, never()).update(lesson);
+    }
+
+    @Test
+    public void givenLessonWithBusyClassroom_whenUpdate_thenNotUpdated() {
+        Lesson lesson = new Lesson(courses.get(0), getClassrooms().get(0), teachers.get(0),
+            LocalDate.of(2021, 11, 9), getTimes().get(0));
+
+
+        when(holidayDao.getByDate(lesson.getDate())).thenReturn(Optional.empty());
+        when(lessonDao.getByDateAndTimeAndClassroom(lesson.getDate(), lesson.getTime(), lesson.getClassroom()))
+            .thenReturn(Optional.of(lesson), Optional.of(lessons.get(0)));
+
+        lessonService.update(lesson);
+
+        verify(lessonDao, never()).update(lesson);
+    }
+
+    @Test
+    public void givenLessonWithTeacherNotMatchedCourse_whenUpdate_thenNotUpdated() {
+        Lesson lesson = new Lesson(courses.get(0), getClassrooms().get(0), teachers.get(0),
+            LocalDate.of(2021, 11, 9), getTimes().get(0));
+        List<Course> courses = new ArrayList<>();
+        Course course = new Course("History");
+        courses.add(course);
+        teachers.get(0).setCourses(courses);
+
+        when(holidayDao.getByDate(lesson.getDate())).thenReturn(Optional.empty());
+        when(lessonDao.getByDateAndTimeAndClassroom(lesson.getDate(), lesson.getTime(), lesson.getClassroom()))
+            .thenReturn(Optional.of(lesson), Optional.empty());
+
+        lessonService.update(lesson);
+
+        verify(lessonDao, never()).update(lesson);
+    }
+
+    @Test
+    public void givenLessonWithTeacherOnVacation_whenUpdate_thenNotUpdated() {
+        Lesson lesson = new Lesson(courses.get(0), getClassrooms().get(0), teachers.get(0),
+            LocalDate.of(2021, 11, 9), getTimes().get(0));
+
+        when(holidayDao.getByDate(lesson.getDate())).thenReturn(Optional.empty());
+        when(lessonDao.getByDateAndTimeAndClassroom(lesson.getDate(), lesson.getTime(), lesson.getClassroom()))
+            .thenReturn(Optional.of(lesson), Optional.empty());
+        when(vacationDao.getByTeacherAndLessonDate(lesson.getTeacher(), lesson.getDate()))
+            .thenReturn(Optional.of(vacations.get(0)));
+
+        lessonService.update(lesson);
+
+        verify(lessonDao, never()).update(lesson);
+    }
+
+    @Test
+    public void givenLessonWithBusyTeacher_whenUpdate_thenNotUpdated() {
+        Lesson lesson = new Lesson(courses.get(0), getClassrooms().get(0), teachers.get(0),
+            LocalDate.of(2021, 11, 9), getTimes().get(0));
+
+        when(holidayDao.getByDate(lesson.getDate())).thenReturn(Optional.empty());
+        when(lessonDao.getByDateAndTimeAndClassroom(lesson.getDate(), lesson.getTime(), lesson.getClassroom()))
+            .thenReturn(Optional.of(lesson), Optional.empty());
+        when(vacationDao.getByTeacherAndLessonDate(lesson.getTeacher(), lesson.getDate()))
+            .thenReturn(Optional.empty());
+        when(lessonDao.getByDateAndTimeAndTeacher(lesson.getDate(), lesson.getTime(), lesson.getTeacher()))
+            .thenReturn(Optional.of(lessons.get(1)));
+
+        lessonService.update(lesson);
+
+        verify(lessonDao, never()).update(lesson);
+    }
+
+    @Test
+    public void givenLessonWithClassroomWherePlacesIsNotEnough_whenUpdate_thenNotUpdated() throws IOException {
+        Lesson lesson = new Lesson(courses.get(0), getClassrooms().get(0), teachers.get(0),
+            LocalDate.of(2021, 11, 9), getTimes().get(0));
+        Group group1 = new Group("GD-32");
+        Group group2 = new Group("GF-65");
+        Group group3 = new Group("BF-36");
+        List<Group> groups = new ArrayList<>();
+        groups.add(group1);
+        groups.add(group2);
+        groups.add(group3);
+        lesson.setGroups(groups);
+        addStudentToGroup(groups.get(0), 11);
+        addStudentToGroup(groups.get(1), 10);
+        addStudentToGroup(groups.get(2), 10);
+
+        when(holidayDao.getByDate(lesson.getDate())).thenReturn(Optional.empty());
+        when(lessonDao.getByDateAndTimeAndClassroom(lesson.getDate(), lesson.getTime(), lesson.getClassroom()))
+            .thenReturn(Optional.of(lesson), Optional.empty());
+        when(vacationDao.getByTeacherAndLessonDate(lesson.getTeacher(), lesson.getDate()))
+            .thenReturn(Optional.empty());
+        when(lessonDao.getByDateAndTimeAndTeacher(lesson.getDate(), lesson.getTime(), lesson.getTeacher()))
+            .thenReturn(Optional.empty());
+
+        lessonService.update(lesson);
+
+        verify(lessonDao, never()).update(lesson);
+    }
+
+    @Test
+    public void givenLessonWithBusyGroup_whenUpdate_thenNotUpdated() throws IOException {
+        Lesson lesson = new Lesson(courses.get(0), getClassrooms().get(0), teachers.get(0),
+            LocalDate.of(2021, 10, 26), getTimes().get(0));
+        lesson.setGroups(groups);
+        addStudentToGroup(groups.get(0), 10);
+        addStudentToGroup(groups.get(1), 10);
+        addStudentToGroup(groups.get(2), 10);
+
+        when(holidayDao.getByDate(lesson.getDate())).thenReturn(Optional.empty());
+        when(lessonDao.getByDateAndTimeAndClassroom(lesson.getDate(), lesson.getTime(), lesson.getClassroom()))
+            .thenReturn(Optional.of(lesson), Optional.empty());
+        when(vacationDao.getByTeacherAndLessonDate(lesson.getTeacher(), lesson.getDate()))
+            .thenReturn(Optional.empty());
+        when(lessonDao.getByDateAndTimeAndTeacher(lesson.getDate(), lesson.getTime(), lesson.getTeacher()))
+            .thenReturn(Optional.empty());
+        when(lessonDao.getByDateAndTime(lesson.getDate(), lesson.getTime()))
+            .thenReturn(lessons);
+
+        lessonService.update(lesson);
+
+        verify(lessonDao, never()).update(lesson);
+    }
+
+    @Test
+    public void givenLessonWithOtherLessonDateAndTimeAndClassroom_whenUpdate_thenNotUpdated() {
+        Lesson lesson = lessons.get(0);
+        Lesson otherLesson = lessons.get(1);
+        lesson.setDate(otherLesson.getDate());
+        lesson.setTime(otherLesson.getTime());
+        lesson.setClassroom(otherLesson.getClassroom());
+        
+        when(lessonDao.getByDateAndTimeAndClassroom(lesson.getDate(), lesson.getTime(), lesson.getClassroom()))
+            .thenReturn(Optional.of(otherLesson));
+
+        lessonService.update(lesson);
+
+        verify(lessonDao, never()).update(lesson);
     }
 
     @Test

@@ -26,7 +26,7 @@ public class HolidayService {
     }
 
     public void update(Holiday holiday) {
-        if (!isUnique(holiday)) {
+        if (isCurrent(holiday)) {
             holidayDao.update(holiday);
         }
     }
@@ -40,6 +40,10 @@ public class HolidayService {
     }
 
     private boolean isUnique(Holiday holiday) {
-        return !holidayDao.getByDate(holiday.getDate()).isPresent();
+        return holidayDao.getByDate(holiday.getDate()).isEmpty();
+    }
+
+    private boolean isCurrent(Holiday holiday){
+        return holidayDao.getByDate(holiday.getDate()).get().getId() == holiday.getId();
     }
 }

@@ -485,32 +485,20 @@ public class JdbcLessonDaoTest {
         groups1.add(group3);
 
 
-        Lesson lesson1 = new Lesson(
+        Lesson expected = new Lesson(
             course,
             classroom,
             teacher,
             LocalDate.of(2021, 9, 28),
             time1
         );
-        lesson1.setGroups(groups1);
+        expected.setGroups(groups1);
 
+        expected.setId(1);
 
-        Lesson lesson2 = new Lesson(
-            course,
-            classroom,
-            teacher,
-            LocalDate.of(2021, 9, 28),
-            time2
-        );
-        lesson2.setGroups(groups1);
-        lesson1.setId(1);
-        lesson2.setId(2);
-        List<Lesson> expected = new ArrayList<>();
-        expected.add(lesson1);
+        Optional<Lesson> actual = lessonDao.getByDateAndTimeAndTeacher(LocalDate.of(2021, 9, 28), time1, teacher);
 
-        List<Lesson> actual = lessonDao.getByDateAndTimeAndTeacher(LocalDate.of(2021, 9, 28), time1, teacher);
-
-        assertEquals(expected, actual);
+        assertEquals(expected, actual.get());
     }
 
     @Test
@@ -554,32 +542,19 @@ public class JdbcLessonDaoTest {
         groups1.add(group3);
 
 
-        Lesson lesson1 = new Lesson(
+        Lesson expected = new Lesson(
             course,
             classroom,
             teacher,
             LocalDate.of(2021, 9, 28),
             time1
         );
-        lesson1.setGroups(groups1);
+        expected.setGroups(groups1);
+        expected.setId(1);
 
+        Optional<Lesson> actual = lessonDao.getByDateAndTimeAndClassroom(LocalDate.of(2021, 9, 28), time1, classroom);
 
-        Lesson lesson2 = new Lesson(
-            course,
-            classroom,
-            teacher,
-            LocalDate.of(2021, 9, 28),
-            time2
-        );
-        lesson2.setGroups(groups1);
-        lesson1.setId(1);
-        lesson2.setId(2);
-        List<Lesson> expected = new ArrayList<>();
-        expected.add(lesson1);
-
-        List<Lesson> actual = lessonDao.getByDateAndTimeAndClassroom(LocalDate.of(2021, 9, 28), time1, classroom);
-
-        assertEquals(expected, actual);
+        assertEquals(expected, actual.get());
     }
 
 }

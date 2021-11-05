@@ -22,7 +22,7 @@ public class TimeService {
     }
 
     public void create(Time time) {
-        if ((isUnique(time)) && (isNotLess30Minutes(time)) && (isTimeNotCrosses(time))) {
+        if ((isUnique(time)) && (isNotLessMinLessonDuration(time)) && (isTimeNotCrosses(time))) {
             timeDao.create(time);
         }
     }
@@ -32,7 +32,7 @@ public class TimeService {
     }
 
     public void update(Time time) {
-        if ((timeDao.getById(time.getId()).isPresent()) && (isNotLess30Minutes(time))
+        if ((isCurrent(time)) && (isNotLessMinLessonDuration(time))
             && (isTimeNotCrosses(time))) {
             timeDao.update(time);
         }
@@ -47,10 +47,10 @@ public class TimeService {
     }
 
     private boolean isUnique(Time time) {
-        return !timeDao.getByTime(time.getStartTime(), time.getEndTime()).isPresent();
+        return timeDao.getByTime(time.getStartTime(), time.getEndTime()).isEmpty();
     }
 
-    private boolean isNotLess30Minutes(Time time) {
+    private boolean isNotLessMinLessonDuration(Time time) {
         return Duration.between(time.getStartTime(), time.getEndTime()).getSeconds()
             >= Duration.ofMinutes(minLessonDuration).getSeconds();
     }
@@ -60,5 +60,10 @@ public class TimeService {
         return times.stream().allMatch(time -> (((newTime.getStartTime().isBefore(time.getStartTime()))
             && (newTime.getEndTime().isBefore(time.getStartTime())))
             || ((newTime.getStartTime().isAfter(time.getEndTime())))));
+    }
+
+    private boolean isCurrent(Time time) {
+        return timeDao.getByTime(time.getStartTime(), time.getEndTime()).get()
+            .getId() == time.getId();
     }
 }

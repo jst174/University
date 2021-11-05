@@ -30,7 +30,7 @@ public class GroupService {
     }
 
     public void update(Group group) {
-        if (!isUnique(group)) {
+        if (isCurrent(group)) {
             groupDao.update(group);
         }
     }
@@ -48,6 +48,10 @@ public class GroupService {
     }
 
     private boolean isUnique(Group group) {
-        return !groupDao.getByName(group.getName()).isPresent();
+        return groupDao.getByName(group.getName()).isEmpty();
+    }
+
+    private boolean isCurrent(Group group) {
+        return groupDao.getByName(group.getName()).get().getId() == group.getId();
     }
 }

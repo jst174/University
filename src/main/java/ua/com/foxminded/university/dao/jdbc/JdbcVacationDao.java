@@ -27,7 +27,10 @@ public class JdbcVacationDao implements VacationDao {
     private static final String SQL_DELETE_VACATION = "DELETE FROM vacations WHERE id = ?";
     private static final String SQL_FIND_ALL = "SELECT * FROM vacations";
     private static final String SQL_FIND_TEACHER_VACATIONS = "SELECT * FROM vacations WHERE teacher_id = ?";
-    private static final String SQL_FIND_TEACHER_VACATIONS_BY_LESSON_DATE = "SELECT * FROM vacations WHERE teacher_id = ? and start <= ? and ending >= ?";
+    private static final String SQL_FIND_TEACHER_VACATIONS_BY_LESSON_DATE = "SELECT * FROM vacations WHERE " +
+        "teacher_id = ? and start <= ? and ending >= ?";
+    private static final String SQL_GET_BY_TEACHER_AND_VACATION_DATES = "SELECT * FROM vacations WHERE " +
+        "teacher_id = ? and start = ? and ending = ?";
 
     private VacationMapper vacationMapper;
     private JdbcTemplate jdbcTemplate;
@@ -79,5 +82,11 @@ public class JdbcVacationDao implements VacationDao {
     public Optional<Vacation> getByTeacherAndLessonDate(Teacher teacher, LocalDate lessonDate) {
         return Optional.ofNullable(jdbcTemplate.queryForObject(SQL_FIND_TEACHER_VACATIONS_BY_LESSON_DATE,
             vacationMapper, teacher.getId(), lessonDate, lessonDate));
+    }
+
+    @Override
+    public Optional<Vacation> getByTeacherAndVacationDates(Vacation vacation) {
+        return Optional.ofNullable(jdbcTemplate.queryForObject(SQL_GET_BY_TEACHER_AND_VACATION_DATES, vacationMapper,
+            vacation.getTeacher().getId(), vacation.getStart(), vacation.getEnd()));
     }
 }

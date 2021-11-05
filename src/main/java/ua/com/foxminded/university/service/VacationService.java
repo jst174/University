@@ -14,10 +14,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static java.time.temporal.ChronoUnit.DAYS;
+
+//@PropertySource("classpath:application.properties")
 @Service
 public class VacationService {
 
     private VacationDao vacationDao;
+    @Value("#{${maxPeriodsVacation}}")
+    private Map<AcademicDegree, Integer> maxPeriodsVacation;
 
     public VacationService(VacationDao vacationDao) {
         this.vacationDao = vacationDao;
@@ -34,7 +39,7 @@ public class VacationService {
     }
 
     public void update(Vacation vacation) {
-        if ((vacationDao.getById(vacation.getId()).isPresent()) && isPeriodAcceptable(vacation)) {
+        if ((isCurrent(vacation)) && isPeriodAcceptable(vacation)) {
             vacationDao.update(vacation);
         }
     }
@@ -48,18 +53,16 @@ public class VacationService {
     }
 
     private boolean isUnique(Vacation vacation) {
-        List<Vacation> vacations = vacationDao.getAll();
-        return !vacations.contains(vacation);
+        return vacationDao.getByTeacherAndVacationDates(vacation).isEmpty();
     }
 
     private boolean isPeriodAcceptable(Vacation vacation) {
-        Map<AcademicDegree, Integer> maxPeriodsVacation = new HashMap<>();
-        maxPeriodsVacation.put(AcademicDegree.ASSOCIATE, AcademicDegree.ASSOCIATE.getMaxVacationPeriod());
-        maxPeriodsVacation.put(AcademicDegree.BACHELOR, AcademicDegree.BACHELOR.getMaxVacationPeriod());
-        maxPeriodsVacation.put(AcademicDegree.MASTER, AcademicDegree.MASTER.getMaxVacationPeriod());
-        maxPeriodsVacation.put(AcademicDegree.DOCTORAL, AcademicDegree.DOCTORAL.getMaxVacationPeriod());
-
         int maxVacationPeriod = maxPeriodsVacation.get(vacation.getTeacher().getAcademicDegree());
-        return maxVacationPeriod >= Period.between(vacation.getStart(), vacation.getEnd()).getDays();
+        return maxVacationPeriod >= DAYS.between(vacation.getStart(), vacation.getEnd());
+    }
+
+    private boolean isCurrent(Vacation vacation){
+        return vacationDao.getByTeacherAndVacationDates(vacation).get()
+            .getId() == vacation.getId();
     }
 }

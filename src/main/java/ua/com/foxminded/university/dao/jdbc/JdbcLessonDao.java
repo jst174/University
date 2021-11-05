@@ -102,15 +102,15 @@ public class JdbcLessonDao implements LessonDao {
     }
 
     @Override
-    public List<Lesson> getByDateAndTimeAndTeacher(LocalDate date, Time time, Teacher teacher) {
-        return jdbcTemplate.query(SQL_FIND_BY_DATE_AND_TIME_AND_TEACHER, lessonMapper, date,
-            time.getId(), teacher.getId());
+    public Optional<Lesson> getByDateAndTimeAndTeacher(LocalDate date, Time time, Teacher teacher) {
+        return Optional.ofNullable(jdbcTemplate.queryForObject(SQL_FIND_BY_DATE_AND_TIME_AND_TEACHER, lessonMapper, date,
+            time.getId(), teacher.getId()));
     }
 
     @Override
-    public List<Lesson> getByDateAndTimeAndClassroom(LocalDate date, Time time, Classroom classroom) {
-        return jdbcTemplate.query(SQL_FIND_BY_DATE_AND_TIME_AND_CLASSROOM, lessonMapper, date,
-            time.getId(), classroom.getId());
+    public Optional<Lesson> getByDateAndTimeAndClassroom(LocalDate date, Time time, Classroom classroom) {
+        return Optional.ofNullable(jdbcTemplate.queryForObject(SQL_FIND_BY_DATE_AND_TIME_AND_CLASSROOM, lessonMapper, date,
+            time.getId(), classroom.getId()));
     }
 
     @Override

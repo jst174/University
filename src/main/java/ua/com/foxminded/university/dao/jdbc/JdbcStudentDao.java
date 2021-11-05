@@ -30,6 +30,7 @@ public class JdbcStudentDao implements StudentDao {
     private static final String SQL_DELETE_STUDENT = "DELETE FROM students WHERE id = ?";
     private static final String SQL_FIND_ALL = "SELECT * FROM students";
     private static final String SQL_GET_BY_GROUP = "SELECT * FROM students WHERE group_id = ?";
+    private static final String SQL_GET_BY_FULL_NAME = "SELECT * FROM students WHERE first_name = ? and last_name = ?";
 
     private StudentMapper studentMapper;
     private JdbcTemplate jdbcTemplate;
@@ -89,5 +90,11 @@ public class JdbcStudentDao implements StudentDao {
     @Override
     public List<Student> getByGroupId(int groupId) {
         return jdbcTemplate.query(SQL_GET_BY_GROUP, studentMapper, groupId);
+    }
+
+    @Override
+    public Optional<Student> getByName(String firstName, String lastName) {
+        return Optional.ofNullable(jdbcTemplate.queryForObject(SQL_GET_BY_FULL_NAME, studentMapper,
+            firstName, lastName));
     }
 }
