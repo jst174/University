@@ -1,5 +1,6 @@
 package ua.com.foxminded.university.dao.jdbc;
 
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -46,7 +47,11 @@ public class JdbcGroupDao implements GroupDao {
     }
 
     public Optional<Group> getById(int id) {
-        return Optional.ofNullable(jdbcTemplate.queryForObject(SQL_FIND_GROUP, groupMapper, id));
+        try {
+            return Optional.of(jdbcTemplate.queryForObject(SQL_FIND_GROUP, groupMapper, id));
+        } catch (DataAccessException e) {
+            return Optional.empty();
+        }
     }
 
     public void update(Group group) {
@@ -70,6 +75,10 @@ public class JdbcGroupDao implements GroupDao {
 
     @Override
     public Optional<Group> getByName(String name) {
-        return Optional.ofNullable(jdbcTemplate.queryForObject(SQL_FIND_BY_NAME, groupMapper, name));
+        try {
+            return Optional.of(jdbcTemplate.queryForObject(SQL_FIND_BY_NAME, groupMapper, name));
+        } catch (DataAccessException e) {
+            return Optional.empty();
+        }
     }
 }

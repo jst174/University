@@ -1,6 +1,7 @@
 package ua.com.foxminded.university.dao.jdbc;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -64,7 +65,11 @@ public class JdbcLessonDao implements LessonDao {
     }
 
     public Optional<Lesson> getById(int id) {
-        return Optional.ofNullable(jdbcTemplate.queryForObject(SQL_FIND_LESSON, lessonMapper, id));
+        try {
+            return Optional.of(jdbcTemplate.queryForObject(SQL_FIND_LESSON, lessonMapper, id));
+        } catch (DataAccessException e) {
+            return Optional.empty();
+        }
     }
 
     @Override
@@ -109,8 +114,12 @@ public class JdbcLessonDao implements LessonDao {
 
     @Override
     public Optional<Lesson> getByDateAndTimeAndClassroom(LocalDate date, Time time, Classroom classroom) {
-        return Optional.ofNullable(jdbcTemplate.queryForObject(SQL_FIND_BY_DATE_AND_TIME_AND_CLASSROOM, lessonMapper, date,
-            time.getId(), classroom.getId()));
+        try {
+            return Optional.of(jdbcTemplate.queryForObject(SQL_FIND_BY_DATE_AND_TIME_AND_CLASSROOM, lessonMapper, date,
+                time.getId(), classroom.getId()));
+        } catch (DataAccessException e) {
+            return Optional.empty();
+        }
     }
 
     @Override

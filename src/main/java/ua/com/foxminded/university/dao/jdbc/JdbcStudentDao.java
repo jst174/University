@@ -2,6 +2,7 @@ package ua.com.foxminded.university.dao.jdbc;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -62,7 +63,11 @@ public class JdbcStudentDao implements StudentDao {
     }
 
     public Optional<Student> getById(int id) {
-        return Optional.ofNullable(jdbcTemplate.queryForObject(SQL_FIND_STUDENT, studentMapper, id));
+        try {
+            return Optional.of(jdbcTemplate.queryForObject(SQL_FIND_STUDENT, studentMapper, id));
+        } catch (DataAccessException e) {
+            return Optional.empty();
+        }
     }
 
     public void update(Student student) {
@@ -94,7 +99,11 @@ public class JdbcStudentDao implements StudentDao {
 
     @Override
     public Optional<Student> getByName(String firstName, String lastName) {
-        return Optional.ofNullable(jdbcTemplate.queryForObject(SQL_GET_BY_FULL_NAME, studentMapper,
-            firstName, lastName));
+        try {
+            return Optional.ofNullable(jdbcTemplate.queryForObject(SQL_GET_BY_FULL_NAME, studentMapper,
+                firstName, lastName));
+        } catch (DataAccessException e) {
+            return Optional.empty();
+        }
     }
 }

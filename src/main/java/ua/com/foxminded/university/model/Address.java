@@ -12,6 +12,10 @@ public class Address {
     private String apartmentNumber;
     private String postcode;
 
+    public Address() {
+
+    }
+
     public Address(String country, String city, String street, String houseNumber, String apartmentNumber,
                    String postcode) {
         this.country = country;
@@ -94,5 +98,53 @@ public class Address {
     @Override
     public int hashCode() {
         return Objects.hash(country, city, street, houseNumber, apartmentNumber, postcode);
+    }
+
+    public static class Builder {
+
+        private Address address;
+
+        public Builder() {
+            address = new Address();
+        }
+
+        public Builder setId(int id) {
+            address.setId(id);
+            return this;
+        }
+
+        public Builder setCountry(String country) {
+            address.setCountry(country);
+            return this;
+        }
+
+        public Builder setCity(String city) {
+            address.setCity(city);
+            return this;
+        }
+
+        public Builder setStreet(String street){
+           address.setStreet(street);
+            return this;
+        }
+
+        public Builder setHouseNumber(String houseNumber){
+            address.setHouseNumber(houseNumber);
+            return this;
+        }
+
+        public Builder setApartmentNumber(String apartmentNumber){
+            address.setApartmentNumber(apartmentNumber);
+            return this;
+        }
+
+        public Builder setPostcode(String postcode){
+            address.setPostcode(postcode);
+            return this;
+        }
+
+        public Address build(){
+            return address;
+        }
     }
 }

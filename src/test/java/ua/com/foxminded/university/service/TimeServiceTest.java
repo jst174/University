@@ -58,6 +58,7 @@ public class TimeServiceTest {
         LocalTime end = LocalTime.of(13, 30);
         Time time = new Time(start, end);
 
+        when(timeDao.getById(time.getId())).thenReturn(Optional.empty());
         when(timeDao.getByTime(start, end)).thenReturn(Optional.empty());
         when(timeDao.getAll()).thenReturn(times);
 
@@ -70,6 +71,7 @@ public class TimeServiceTest {
     public void givenExistentTime_whenCreate_thenNotCreated() {
         Time time = times.get(0);
 
+        when(timeDao.getById(time.getId())).thenReturn(Optional.empty());
         when(timeDao.getByTime(time.getStartTime(), time.getEndTime())).thenReturn(Optional.of(time));
 
         timeService.create(time);
@@ -83,6 +85,7 @@ public class TimeServiceTest {
         LocalTime end = LocalTime.of(12, 20);
         Time time = new Time(start, end);
 
+        when(timeDao.getById(time.getId())).thenReturn(Optional.empty());
         when(timeDao.getByTime(start, end)).thenReturn(Optional.empty());
 
         timeService.create(time);
@@ -96,6 +99,7 @@ public class TimeServiceTest {
         LocalTime end = LocalTime.of(9, 20);
         Time time = new Time(start, end);
 
+        when(timeDao.getById(time.getId())).thenReturn(Optional.empty());
         when(timeDao.getByTime(start, end)).thenReturn(Optional.empty());
         when(timeDao.getAll()).thenReturn(times);
 
@@ -117,6 +121,7 @@ public class TimeServiceTest {
     public void givenExistentTime_whenUpdate_thenUpdated() {
         Time time = times.get(0);
 
+        when(timeDao.getById(time.getId())).thenReturn(Optional.of(time));
         when(timeDao.getByTime(time.getStartTime(), time.getEndTime())).thenReturn(Optional.of(time));
 
         timeService.update(time);
@@ -130,6 +135,7 @@ public class TimeServiceTest {
         time.setStartTime(LocalTime.of(8, 0));
         time.setEndTime(LocalTime.of(8, 20));
 
+        when(timeDao.getById(time.getId())).thenReturn(Optional.of(time));
         when(timeDao.getByTime(time.getStartTime(), time.getEndTime())).thenReturn(Optional.of(time));
 
         timeService.update(time);
@@ -145,6 +151,7 @@ public class TimeServiceTest {
         time.setStartTime(start);
         time.setEndTime(end);
 
+        when(timeDao.getById(time.getId())).thenReturn(Optional.of(time));
         when(timeDao.getByTime(time.getStartTime(), time.getEndTime())).thenReturn(Optional.of(time));
         when(timeDao.getAll()).thenReturn(times);
 

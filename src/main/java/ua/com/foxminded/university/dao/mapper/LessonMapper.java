@@ -30,13 +30,12 @@ public class LessonMapper implements RowMapper<Lesson> {
 
     @Override
     public Lesson mapRow(ResultSet rs, int rowNum) throws SQLException {
-        Lesson lesson = new Lesson(
-            courseDao.getById(rs.getInt("course_id")).get(),
-            classroomDao.getById(rs.getInt("classroom_id")).get(),
-            teacherDao.getById(rs.getInt("teacher_id")).get(),
-            rs.getObject("date", LocalDate.class),
-            timeDao.getById(rs.getInt("time_id")).get()
-        );
+        Lesson lesson = new Lesson();
+        courseDao.getById(rs.getInt("course_id")).ifPresent(lesson::setCourse);
+        classroomDao.getById(rs.getInt("classroom_id")).ifPresent(lesson::setClassroom);
+        teacherDao.getById(rs.getInt("teacher_id")).ifPresent(lesson::setTeacher);
+        lesson.setDate(rs.getObject("date", LocalDate.class));
+        timeDao.getById(rs.getInt("time_id")).ifPresent(lesson::setTime);
         lesson.setGroups(groupDao.getByLessonId(rs.getInt("id")));
         lesson.setId(rs.getInt("id"));
         return lesson;

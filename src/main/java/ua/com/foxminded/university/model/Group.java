@@ -9,6 +9,10 @@ public class Group {
     private String name;
     private List<Student> students;
 
+    public Group() {
+
+    }
+
     public Group(String name) {
         this.name = name;
     }
@@ -54,6 +58,34 @@ public class Group {
     @Override
     public String toString() {
         return name;
+    }
+
+    public static class Builder {
+
+        private Group group;
+
+        public Builder() {
+            group = new Group();
+        }
+
+        public Builder setId(int id) {
+            group.setId(id);
+            return this;
+        }
+
+        public Builder setName(String name) {
+            group.setName(name);
+            return this;
+        }
+
+        public Builder setStudents(List<Student> students) {
+            group.setStudents(students);
+            return this;
+        }
+
+        public Group build() {
+            return group;
+        }
     }
 
 }

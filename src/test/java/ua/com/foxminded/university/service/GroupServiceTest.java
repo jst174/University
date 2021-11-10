@@ -58,6 +58,7 @@ public class GroupServiceTest {
     public void givenNewGroup_whenCreate_thenCreated() {
         Group group = new Group("GD-22");
 
+        when(groupDao.getById(group.getId())).thenReturn(Optional.empty());
         when(groupDao.getByName(group.getName())).thenReturn(Optional.empty());
 
         groupService.create(group);
@@ -66,9 +67,10 @@ public class GroupServiceTest {
     }
 
     @Test
-    public void givenExistentGroup_whenCreate_thenNotCreated() {
-        Group group = groups.get(0);
+    public void givenGroupWithExistentName_whenCreate_thenNotCreated() {
+        Group group = new Group(groups.get(0).getName());
 
+        when(groupDao.getById(group.getId())).thenReturn(Optional.empty());
         when(groupDao.getByName(group.getName())).thenReturn(Optional.of(group));
 
         groupService.create(group);
@@ -89,6 +91,7 @@ public class GroupServiceTest {
     public void givenExistentGroup_whenUpdate_thenUpdated() {
         Group group = groups.get(0);
 
+        when(groupDao.getById(group.getId())).thenReturn(Optional.of(group));
         when(groupDao.getByName(group.getName())).thenReturn(Optional.of(group));
 
         groupService.update(group);
@@ -102,6 +105,7 @@ public class GroupServiceTest {
         Group group2 = groups.get(1);
         group1.setName(group2.getName());
 
+        when(groupDao.getById(group1.getId())).thenReturn(Optional.of(group1));
         when(groupDao.getByName(group1.getName())).thenReturn(Optional.of(group2));
 
         groupService.update(group1);

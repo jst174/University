@@ -4,43 +4,47 @@ import java.util.Objects;
 
 public class Classroom {
 
-	private int id;
-	private int number;
-	private int capacity;
+    private int id;
+    private int number;
+    private int capacity;
 
-	public Classroom(int number, int capacity) {
-		this.number = number;
-		this.capacity = capacity;
-	}
+    public Classroom() {
 
-	public int getId() {
-		return id;
-	}
+    }
 
-	public void setId(int id) {
-		this.id = id;
-	}
+    public Classroom(int number, int capacity) {
+        this.number = number;
+        this.capacity = capacity;
+    }
 
-	public int getNumber() {
-		return number;
-	}
+    public int getId() {
+        return id;
+    }
 
-	public void setNumber(int number) {
-		this.number = number;
-	}
+    public void setId(int id) {
+        this.id = id;
+    }
 
-	public int getCapacity() {
-		return capacity;
-	}
+    public int getNumber() {
+        return number;
+    }
 
-	public void setCapacity(int capacity) {
-		this.capacity = capacity;
-	}
+    public void setNumber(int number) {
+        this.number = number;
+    }
 
-	@Override
-	public String toString() {
-		return "number: " + number + "; capacity: " + capacity;
-	}
+    public int getCapacity() {
+        return capacity;
+    }
+
+    public void setCapacity(int capacity) {
+        this.capacity = capacity;
+    }
+
+    @Override
+    public String toString() {
+        return "number: " + number + "; capacity: " + capacity;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -53,5 +57,33 @@ public class Classroom {
     @Override
     public int hashCode() {
         return Objects.hash(number);
+    }
+
+    public static class Builder {
+
+        private Classroom classroom;
+
+        public Builder() {
+            classroom = new Classroom();
+        }
+
+        public Builder setId(int id) {
+            classroom.setId(id);
+            return this;
+        }
+
+        public Builder setNumber(int number) {
+            classroom.setNumber(number);
+            return this;
+        }
+
+        public Builder setCapacity(int capacity) {
+            classroom.setCapacity(capacity);
+            return this;
+        }
+
+        public Classroom build(){
+            return classroom;
+        }
     }
 }

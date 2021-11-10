@@ -42,6 +42,7 @@ public class HolidayServiceTest {
         LocalDate date = LocalDate.of(2022, 3, 8);
         Holiday holiday = new Holiday("Women's Day", date);
 
+        when(holidayDao.getById(holiday.getId())).thenReturn(Optional.empty());
         when(holidayDao.getByDate(holiday.getDate())).thenReturn(Optional.empty());
 
         holidayService.create(holiday);
@@ -50,9 +51,10 @@ public class HolidayServiceTest {
     }
 
     @Test
-    public void givenExistentHoliday_whenCreate_thenNotCreated() {
-        Holiday holiday = holidays.get(0);
+    public void givenHolidayWithOtherHolidayDate_whenCreate_thenNotCreated() {
+        Holiday holiday = new Holiday("holiday", holidays.get(0).getDate());
 
+        when(holidayDao.getById(holiday.getId())).thenReturn(Optional.empty());
         when(holidayDao.getByDate(holiday.getDate())).thenReturn(Optional.of(holiday));
 
         holidayService.create(holiday);
@@ -73,6 +75,7 @@ public class HolidayServiceTest {
     public void givenExistentHoliday_whenUpdate_thenUpdated() {
         Holiday holiday = holidays.get(0);
 
+        when(holidayDao.getById(holiday.getId())).thenReturn(Optional.of(holiday));
         when(holidayDao.getByDate(holiday.getDate())).thenReturn(Optional.of(holiday));
 
         holidayService.update(holiday);
@@ -86,6 +89,7 @@ public class HolidayServiceTest {
         Holiday holiday2 = holidays.get(1);
         holiday1.setDate(holiday2.getDate());
 
+        when(holidayDao.getById(holiday1.getId())).thenReturn(Optional.of(holiday1));
         when(holidayDao.getByDate(holiday1.getDate())).thenReturn(Optional.of(holiday2));
 
         holidayService.update(holiday1);

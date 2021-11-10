@@ -16,7 +16,6 @@ import java.util.Map;
 
 import static java.time.temporal.ChronoUnit.DAYS;
 
-//@PropertySource("classpath:application.properties")
 @Service
 public class VacationService {
 
@@ -35,11 +34,11 @@ public class VacationService {
     }
 
     public Vacation getById(int id) {
-        return vacationDao.getById(id).get();
+        return vacationDao.getById(id).orElseThrow();
     }
 
     public void update(Vacation vacation) {
-        if ((isCurrent(vacation)) && isPeriodAcceptable(vacation)) {
+        if ((isUnique(vacation)) && isPeriodAcceptable(vacation)) {
             vacationDao.update(vacation);
         }
     }
@@ -53,16 +52,20 @@ public class VacationService {
     }
 
     private boolean isUnique(Vacation vacation) {
-        return vacationDao.getByTeacherAndVacationDates(vacation).isEmpty();
+        if (vacationDao.getById(vacation.getId()).isEmpty()) {
+            return vacationDao.getByTeacherAndVacationDates(vacation).isEmpty();
+        } else {
+            return vacationDao.getByTeacherAndVacationDates(vacation).get()
+                .getId() == vacation.getId();
+        }
     }
 
     private boolean isPeriodAcceptable(Vacation vacation) {
+        List<Vacation> vacations = vacationDao.getByTeacherId(vacation.getTeacher().getId());
+        vacations.add(vacation);
         int maxVacationPeriod = maxPeriodsVacation.get(vacation.getTeacher().getAcademicDegree());
-        return maxVacationPeriod >= DAYS.between(vacation.getStart(), vacation.getEnd());
-    }
-
-    private boolean isCurrent(Vacation vacation){
-        return vacationDao.getByTeacherAndVacationDates(vacation).get()
-            .getId() == vacation.getId();
+        return (maxVacationPeriod) >= (vacations.stream()
+            .mapToLong(v -> DAYS.between(v.getStart(), v.getEnd()))
+            .sum());
     }
 }

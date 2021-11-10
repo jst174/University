@@ -2,10 +2,8 @@ package ua.com.foxminded.university.service;
 
 import org.springframework.stereotype.Service;
 import ua.com.foxminded.university.dao.*;
-import ua.com.foxminded.university.model.Course;
 import ua.com.foxminded.university.model.Group;
 import ua.com.foxminded.university.model.Lesson;
-import ua.com.foxminded.university.model.Vacation;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -45,11 +43,11 @@ public class LessonService {
     }
 
     public Lesson getById(int id) {
-        return lessonDao.getById(id).get();
+        return lessonDao.getById(id).orElseThrow();
     }
 
     public void update(Lesson lesson) {
-        if ((isCurrent(lesson)) && (checkConditions(lesson))) {
+        if (checkConditions(lesson)) {
             lessonDao.update(lesson);
         }
     }
@@ -63,9 +61,9 @@ public class LessonService {
     }
 
     private boolean checkConditions(Lesson lesson) {
-        return !isHoliday(lesson) && !isWeekend(lesson) && !isClassroomsBusy(lesson)
+        return !isHoliday(lesson) && !isWeekend(lesson) && !isClassroomBusy(lesson)
             && isTeacherMatchedCourse(lesson) && !isTeacherOnVacation(lesson) && !isTeacherBusy(lesson)
-            && isPlacesEnough(lesson) && !isGroupBusy(lesson);
+            && isEnoughClassroomCapacity(lesson) && !isGroupBusy(lesson);
     }
 
     private boolean isTeacherOnVacation(Lesson lesson) {
@@ -73,18 +71,27 @@ public class LessonService {
     }
 
     private boolean isTeacherMatchedCourse(Lesson lesson) {
-        List<Course> courses = lesson.getTeacher().getCourses();
-        return courses.contains(lesson.getCourse());
+        return lesson.getTeacher().getCourses().contains(lesson.getCourse());
     }
 
     private boolean isTeacherBusy(Lesson lesson) {
-        return lessonDao.getByDateAndTimeAndTeacher(lesson.getDate(), lesson.getTime(),
-            lesson.getTeacher()).isPresent();
+        if (lessonDao.getById(lesson.getId()).isEmpty()) {
+            return lessonDao.getByDateAndTimeAndTeacher(lesson.getDate(), lesson.getTime(),
+                lesson.getTeacher()).isPresent();
+        } else {
+            return !(lessonDao.getByDateAndTimeAndTeacher(lesson.getDate(), lesson.getTime(),
+                lesson.getTeacher()).get().getId() == lesson.getId());
+        }
     }
 
-    private boolean isClassroomsBusy(Lesson lesson) {
-        return lessonDao.getByDateAndTimeAndClassroom(lesson.getDate(), lesson.getTime(),
-            lesson.getClassroom()).isPresent();
+    private boolean isClassroomBusy(Lesson lesson) {
+        if (lessonDao.getById(lesson.getId()).isEmpty()) {
+            return lessonDao.getByDateAndTimeAndClassroom(lesson.getDate(), lesson.getTime(),
+                lesson.getClassroom()).isPresent();
+        } else {
+            return !(lessonDao.getByDateAndTimeAndClassroom(lesson.getDate(), lesson.getTime(),
+                lesson.getClassroom()).get().getId() == lesson.getId());
+        }
     }
 
     private boolean isHoliday(Lesson lesson) {
@@ -96,22 +103,22 @@ public class LessonService {
         return (lessonDate.getDayOfWeek() == DayOfWeek.SATURDAY) || (lessonDate.getDayOfWeek() == DayOfWeek.SUNDAY);
     }
 
-    private boolean isPlacesEnough(Lesson lesson) {
+    private boolean isEnoughClassroomCapacity(Lesson lesson) {
         List<Group> groups = lesson.getGroups();
         int numberOfStudents = groups.stream().mapToInt(group -> group.getStudents().size()).reduce(Integer::sum).orElse(0);
         return numberOfStudents <= lesson.getClassroom().getCapacity();
     }
 
     private boolean isGroupBusy(Lesson newLesson) {
-        List<Lesson> lessons = lessonDao.getByDateAndTime(newLesson.getDate(), newLesson.getTime());
-        List<Group> groups = new ArrayList<>();
-        lessons.forEach(lesson -> groups.addAll(lesson.getGroups()));
-        return groups.stream().anyMatch(group -> newLesson.getGroups().contains(group));
-    }
-
-    private boolean isCurrent(Lesson lesson) {
-        return lessonDao.getByDateAndTimeAndClassroom(lesson.getDate(), lesson.getTime(), lesson.getClassroom())
-            .get()
-            .getId() == lesson.getId();
+        if (lessonDao.getById(newLesson.getId()).isEmpty()) {
+            List<Lesson> lessons = lessonDao.getByDateAndTime(newLesson.getDate(), newLesson.getTime());
+            List<Group> groups = new ArrayList<>();
+            lessons.forEach(lesson -> groups.addAll(lesson.getGroups()));
+            return groups.stream().anyMatch(group -> newLesson.getGroups().contains(group));
+        } else {
+            return lessonDao.getByDateAndTime(newLesson.getDate(), newLesson.getTime())
+                .stream()
+                .noneMatch(lesson -> lesson.getId() == newLesson.getId());
+        }
     }
 }

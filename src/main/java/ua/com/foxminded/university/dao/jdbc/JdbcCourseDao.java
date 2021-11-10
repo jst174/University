@@ -1,5 +1,6 @@
 package ua.com.foxminded.university.dao.jdbc;
 
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -46,7 +47,11 @@ public class JdbcCourseDao implements CourseDao {
     }
 
     public Optional<Course> getById(int id) {
-        return Optional.ofNullable(jdbcTemplate.queryForObject(SQL_FIND_COURSE, courseMapper, id));
+        try {
+            return Optional.of(jdbcTemplate.queryForObject(SQL_FIND_COURSE, courseMapper, id));
+        } catch (DataAccessException e) {
+            return Optional.empty();
+        }
     }
 
     public void update(Course course) {
@@ -69,6 +74,10 @@ public class JdbcCourseDao implements CourseDao {
 
     @Override
     public Optional<Course> getByName(String name) {
-        return Optional.ofNullable(jdbcTemplate.queryForObject(SQL_FIND_BY_NAME, courseMapper, name));
+        try {
+            return Optional.of(jdbcTemplate.queryForObject(SQL_FIND_BY_NAME, courseMapper, name));
+        } catch (DataAccessException e) {
+            return Optional.empty();
+        }
     }
 }

@@ -27,14 +27,13 @@ public class StudentService {
     }
 
     public Student getById(int id) {
-        return studentDao.getById(id).get();
+        return studentDao.getById(id).orElseThrow();
     }
 
     public void update(Student student) {
-        if ((isCurrent(student)) && (isGroupAvailable(student.getGroup()))) {
+        if ((isUnique(student)) && (isGroupAvailable(student.getGroup()))) {
             studentDao.update(student);
         }
-
     }
 
     public void delete(int id) {
@@ -46,17 +45,16 @@ public class StudentService {
     }
 
     public boolean isUnique(Student student) {
-        return studentDao.getByName(student.getFirstName(), student.getLastName()).isEmpty();
+        if (studentDao.getById(student.getId()).isEmpty()) {
+            return studentDao.getByName(student.getFirstName(), student.getLastName()).isEmpty();
+        } else {
+            return studentDao.getByName(student.getFirstName(), student.getLastName())
+                .get()
+                .getId() == student.getId();
+        }
     }
 
     private boolean isGroupAvailable(Group group) {
         return studentDao.getByGroupId(group.getId()).size() < maxGroupSize;
     }
-
-    public boolean isCurrent(Student student){
-        return studentDao.getByName(student.getFirstName(), student.getLastName())
-            .get()
-            .getId() == student.getId();
-    }
-
 }

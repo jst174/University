@@ -274,14 +274,17 @@ public class LessonServiceTest {
         addStudentToGroup(groups.get(0), 10);
         addStudentToGroup(groups.get(1), 10);
         addStudentToGroup(groups.get(2), 10);
+        lesson.setId(3);
+        lessons.add(lesson);
 
+        when(lessonDao.getById(lesson.getId())).thenReturn(Optional.of(lesson));
         when(holidayDao.getByDate(lesson.getDate())).thenReturn(Optional.empty());
         when(lessonDao.getByDateAndTimeAndClassroom(lesson.getDate(), lesson.getTime(), lesson.getClassroom()))
-            .thenReturn(Optional.of(lesson), Optional.empty());
+            .thenReturn(Optional.of(lesson));
         when(vacationDao.getByTeacherAndLessonDate(lesson.getTeacher(), lesson.getDate()))
             .thenReturn(Optional.empty());
         when(lessonDao.getByDateAndTimeAndTeacher(lesson.getDate(), lesson.getTime(), lesson.getTeacher()))
-            .thenReturn(Optional.empty());
+            .thenReturn(Optional.of(lesson));
         when(lessonDao.getByDateAndTime(lesson.getDate(), lesson.getTime())).thenReturn(lessons);
 
         lessonService.update(lesson);
@@ -296,8 +299,6 @@ public class LessonServiceTest {
         Holiday holiday = new Holiday("holiday", LocalDate.of(2021, 12, 15));
 
         when(holidayDao.getByDate(lesson.getDate())).thenReturn(Optional.of(holiday));
-        when(lessonDao.getByDateAndTimeAndClassroom(lesson.getDate(), lesson.getTime(), lesson.getClassroom()))
-            .thenReturn(Optional.of(lesson));
 
         lessonService.update(lesson);
 
@@ -310,8 +311,6 @@ public class LessonServiceTest {
             LocalDate.of(2021, 11, 6), getTimes().get(0));
 
         when(holidayDao.getByDate(lesson.getDate())).thenReturn(Optional.empty());
-        when(lessonDao.getByDateAndTimeAndClassroom(lesson.getDate(), lesson.getTime(), lesson.getClassroom()))
-            .thenReturn(Optional.of(lesson));
 
         lessonService.update(lesson);
 
@@ -324,9 +323,10 @@ public class LessonServiceTest {
             LocalDate.of(2021, 11, 9), getTimes().get(0));
 
 
+        when(lessonDao.getById(lesson.getId())).thenReturn(Optional.of(lesson));
         when(holidayDao.getByDate(lesson.getDate())).thenReturn(Optional.empty());
         when(lessonDao.getByDateAndTimeAndClassroom(lesson.getDate(), lesson.getTime(), lesson.getClassroom()))
-            .thenReturn(Optional.of(lesson), Optional.of(lessons.get(0)));
+            .thenReturn(Optional.of(lessons.get(0)));
 
         lessonService.update(lesson);
 
@@ -342,9 +342,10 @@ public class LessonServiceTest {
         courses.add(course);
         teachers.get(0).setCourses(courses);
 
+        when(lessonDao.getById(lesson.getId())).thenReturn(Optional.of(lesson));
         when(holidayDao.getByDate(lesson.getDate())).thenReturn(Optional.empty());
         when(lessonDao.getByDateAndTimeAndClassroom(lesson.getDate(), lesson.getTime(), lesson.getClassroom()))
-            .thenReturn(Optional.of(lesson), Optional.empty());
+            .thenReturn(Optional.of(lesson));
 
         lessonService.update(lesson);
 
@@ -356,9 +357,10 @@ public class LessonServiceTest {
         Lesson lesson = new Lesson(courses.get(0), getClassrooms().get(0), teachers.get(0),
             LocalDate.of(2021, 11, 9), getTimes().get(0));
 
+        when(lessonDao.getById(lesson.getId())).thenReturn(Optional.of(lesson));
         when(holidayDao.getByDate(lesson.getDate())).thenReturn(Optional.empty());
         when(lessonDao.getByDateAndTimeAndClassroom(lesson.getDate(), lesson.getTime(), lesson.getClassroom()))
-            .thenReturn(Optional.of(lesson), Optional.empty());
+            .thenReturn(Optional.of(lesson));
         when(vacationDao.getByTeacherAndLessonDate(lesson.getTeacher(), lesson.getDate()))
             .thenReturn(Optional.of(vacations.get(0)));
 
@@ -372,9 +374,10 @@ public class LessonServiceTest {
         Lesson lesson = new Lesson(courses.get(0), getClassrooms().get(0), teachers.get(0),
             LocalDate.of(2021, 11, 9), getTimes().get(0));
 
+        when(lessonDao.getById(lesson.getId())).thenReturn(Optional.of(lesson));
         when(holidayDao.getByDate(lesson.getDate())).thenReturn(Optional.empty());
         when(lessonDao.getByDateAndTimeAndClassroom(lesson.getDate(), lesson.getTime(), lesson.getClassroom()))
-            .thenReturn(Optional.of(lesson), Optional.empty());
+            .thenReturn(Optional.of(lesson));
         when(vacationDao.getByTeacherAndLessonDate(lesson.getTeacher(), lesson.getDate()))
             .thenReturn(Optional.empty());
         when(lessonDao.getByDateAndTimeAndTeacher(lesson.getDate(), lesson.getTime(), lesson.getTeacher()))
@@ -401,13 +404,14 @@ public class LessonServiceTest {
         addStudentToGroup(groups.get(1), 10);
         addStudentToGroup(groups.get(2), 10);
 
+        when(lessonDao.getById(lesson.getId())).thenReturn(Optional.of(lesson));
         when(holidayDao.getByDate(lesson.getDate())).thenReturn(Optional.empty());
         when(lessonDao.getByDateAndTimeAndClassroom(lesson.getDate(), lesson.getTime(), lesson.getClassroom()))
-            .thenReturn(Optional.of(lesson), Optional.empty());
+            .thenReturn(Optional.of(lesson));
         when(vacationDao.getByTeacherAndLessonDate(lesson.getTeacher(), lesson.getDate()))
             .thenReturn(Optional.empty());
         when(lessonDao.getByDateAndTimeAndTeacher(lesson.getDate(), lesson.getTime(), lesson.getTeacher()))
-            .thenReturn(Optional.empty());
+            .thenReturn(Optional.of(lesson));
 
         lessonService.update(lesson);
 
@@ -423,13 +427,15 @@ public class LessonServiceTest {
         addStudentToGroup(groups.get(1), 10);
         addStudentToGroup(groups.get(2), 10);
 
+
+        when(lessonDao.getById(lesson.getId())).thenReturn(Optional.of(lesson));
         when(holidayDao.getByDate(lesson.getDate())).thenReturn(Optional.empty());
         when(lessonDao.getByDateAndTimeAndClassroom(lesson.getDate(), lesson.getTime(), lesson.getClassroom()))
-            .thenReturn(Optional.of(lesson), Optional.empty());
+            .thenReturn(Optional.of(lesson));
         when(vacationDao.getByTeacherAndLessonDate(lesson.getTeacher(), lesson.getDate()))
             .thenReturn(Optional.empty());
         when(lessonDao.getByDateAndTimeAndTeacher(lesson.getDate(), lesson.getTime(), lesson.getTeacher()))
-            .thenReturn(Optional.empty());
+            .thenReturn(Optional.of(lesson));
         when(lessonDao.getByDateAndTime(lesson.getDate(), lesson.getTime()))
             .thenReturn(lessons);
 
@@ -445,7 +451,7 @@ public class LessonServiceTest {
         lesson.setDate(otherLesson.getDate());
         lesson.setTime(otherLesson.getTime());
         lesson.setClassroom(otherLesson.getClassroom());
-        
+
         when(lessonDao.getByDateAndTimeAndClassroom(lesson.getDate(), lesson.getTime(), lesson.getClassroom()))
             .thenReturn(Optional.of(otherLesson));
 

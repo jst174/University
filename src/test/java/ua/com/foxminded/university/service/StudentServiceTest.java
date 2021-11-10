@@ -26,9 +26,9 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {AppConfig.class})
 public class StudentServiceTest {
+
+    private static final int maxGroupSize = 30;
 
     @Mock
     private StudentDao studentDao;
@@ -37,8 +37,7 @@ public class StudentServiceTest {
     private List<Student> students;
     private DataSource dataSource;
     private Group group;
-    @Value("${max.group.size}")
-    private int maxGroupSize;
+
 
     @BeforeEach
     public void setUp() throws IOException {
@@ -62,6 +61,7 @@ public class StudentServiceTest {
         Student student = dataSource.generateStudent();
         student.setGroup(group);
 
+        when(studentDao.getById(student.getId())).thenReturn(Optional.empty());
         when(studentDao.getByGroupId(1)).thenReturn(students);
         when(studentDao.getByName(student.getFirstName(), student.getLastName())).thenReturn(Optional.empty());
 
@@ -74,6 +74,7 @@ public class StudentServiceTest {
     public void givenExistentStudent_whenCreate_thenNotCreated() {
         Student student = students.get(0);
 
+        when(studentDao.getById(student.getId())).thenReturn(Optional.empty());
         when(studentDao.getByName(student.getFirstName(), student.getLastName())).thenReturn(Optional.of(student));
 
         studentService.create(student);
@@ -86,6 +87,7 @@ public class StudentServiceTest {
         Student student = dataSource.generateStudent();
         student.setGroup(group);
 
+        when(studentDao.getById(student.getId())).thenReturn(Optional.empty());
         when(studentDao.getByGroupId(1)).thenReturn(generateStudents());
         when(studentDao.getByName(student.getFirstName(), student.getLastName())).thenReturn(Optional.empty());
 
@@ -107,6 +109,7 @@ public class StudentServiceTest {
     public void givenExistentStudent_whenUpdate_thenUpdated() {
         Student student = students.get(0);
 
+        when(studentDao.getById(student.getId())).thenReturn(Optional.of(student));
         when(studentDao.getByName(student.getFirstName(), student.getLastName())).thenReturn(Optional.of(student));
         when(studentDao.getByGroupId(1)).thenReturn(students);
 
@@ -122,6 +125,7 @@ public class StudentServiceTest {
         student1.setFirstName(student2.getFirstName());
         student1.setLastName(student2.getLastName());
 
+        when(studentDao.getById(student1.getId())).thenReturn(Optional.of(student1));
         when(studentDao.getByName(student1.getFirstName(), student1.getLastName())).thenReturn(Optional.of(student2));
 
         studentService.update(student1);
@@ -133,6 +137,7 @@ public class StudentServiceTest {
     public void givenNotAvailableGroup_whenUpdate_thenNotUpdated() throws IOException {
         Student student = students.get(0);
 
+        when(studentDao.getById(student.getId())).thenReturn(Optional.of(student));
         when(studentDao.getByName(student.getFirstName(), student.getLastName())).thenReturn(Optional.of(student));
         when(studentDao.getByGroupId(1)).thenReturn(generateStudents());
 

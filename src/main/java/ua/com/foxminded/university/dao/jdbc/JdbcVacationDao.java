@@ -1,5 +1,6 @@
 package ua.com.foxminded.university.dao.jdbc;
 
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -53,7 +54,11 @@ public class JdbcVacationDao implements VacationDao {
     }
 
     public Optional<Vacation> getById(int id) {
-        return Optional.ofNullable(jdbcTemplate.queryForObject(SQL_FIND_VACATION, vacationMapper, id));
+        try {
+            return Optional.of(jdbcTemplate.queryForObject(SQL_FIND_VACATION, vacationMapper, id));
+        } catch (DataAccessException e) {
+            return Optional.empty();
+        }
     }
 
     public void update(Vacation vacation) {
@@ -80,13 +85,21 @@ public class JdbcVacationDao implements VacationDao {
 
     @Override
     public Optional<Vacation> getByTeacherAndLessonDate(Teacher teacher, LocalDate lessonDate) {
-        return Optional.ofNullable(jdbcTemplate.queryForObject(SQL_FIND_TEACHER_VACATIONS_BY_LESSON_DATE,
-            vacationMapper, teacher.getId(), lessonDate, lessonDate));
+        try {
+            return Optional.of(jdbcTemplate.queryForObject(SQL_FIND_TEACHER_VACATIONS_BY_LESSON_DATE,
+                vacationMapper, teacher.getId(), lessonDate, lessonDate));
+        } catch (DataAccessException e) {
+            return Optional.empty();
+        }
     }
 
     @Override
     public Optional<Vacation> getByTeacherAndVacationDates(Vacation vacation) {
-        return Optional.ofNullable(jdbcTemplate.queryForObject(SQL_GET_BY_TEACHER_AND_VACATION_DATES, vacationMapper,
-            vacation.getTeacher().getId(), vacation.getStart(), vacation.getEnd()));
+        try {
+            return Optional.of(jdbcTemplate.queryForObject(SQL_GET_BY_TEACHER_AND_VACATION_DATES, vacationMapper,
+                vacation.getTeacher().getId(), vacation.getStart(), vacation.getEnd()));
+        } catch (DataAccessException e) {
+            return Optional.empty();
+        }
     }
 }

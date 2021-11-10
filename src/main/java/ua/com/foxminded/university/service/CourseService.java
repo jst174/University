@@ -25,11 +25,11 @@ public class CourseService {
     }
 
     public Course getById(int id) {
-        return courseDao.getById(id).get();
+        return courseDao.getById(id).orElseThrow();
     }
 
     public void update(Course course) {
-        if (isCurrent(course)) {
+        if (isUnique(course)) {
             courseDao.update(course);
         }
     }
@@ -47,10 +47,10 @@ public class CourseService {
     }
 
     private boolean isUnique(Course course) {
-        return courseDao.getByName(course.getName()).isEmpty();
-    }
-
-    private boolean isCurrent(Course course) {
-        return courseDao.getByName(course.getName()).get().getId() == course.getId();
+        if (courseDao.getById(course.getId()).isEmpty()) {
+            return courseDao.getByName(course.getName()).isEmpty();
+        } else {
+            return courseDao.getByName(course.getName()).get().getId() == course.getId();
+        }
     }
 }

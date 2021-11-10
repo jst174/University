@@ -5,6 +5,7 @@ import ua.com.foxminded.university.dao.ClassroomDao;
 import ua.com.foxminded.university.model.Classroom;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ClassroomService {
@@ -22,11 +23,11 @@ public class ClassroomService {
     }
 
     public Classroom getById(int id) {
-        return classroomDao.getById(id).get();
+        return classroomDao.getById(id).orElseThrow();
     }
 
     public void update(Classroom classroom) {
-        if (isCurrent(classroom)) {
+        if (isUnique(classroom)) {
             classroomDao.update(classroom);
         }
     }
@@ -40,11 +41,10 @@ public class ClassroomService {
     }
 
     private boolean isUnique(Classroom classroom) {
-        return classroomDao.findByNumber(classroom.getNumber()).isEmpty();
+        if (classroomDao.getById(classroom.getId()).isEmpty()) {
+            return classroomDao.findByNumber(classroom.getNumber()).isEmpty();
+        } else {
+            return classroomDao.findByNumber(classroom.getNumber()).get().getId() == classroom.getId();
+        }
     }
-
-    private boolean isCurrent(Classroom classroom) {
-        return classroomDao.findByNumber(classroom.getNumber()).get().getId() == classroom.getId();
-    }
-
 }

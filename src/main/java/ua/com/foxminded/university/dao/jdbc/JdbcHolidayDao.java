@@ -1,5 +1,6 @@
 package ua.com.foxminded.university.dao.jdbc;
 
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -46,7 +47,11 @@ public class JdbcHolidayDao implements HolidayDao {
     }
 
     public Optional<Holiday> getById(int id) {
-        return Optional.ofNullable(jdbcTemplate.queryForObject(SQL_FIND_HOLIDAY, holidayMapper, id));
+        try {
+            return Optional.of(jdbcTemplate.queryForObject(SQL_FIND_HOLIDAY, holidayMapper, id));
+        } catch (DataAccessException e) {
+            return Optional.empty();
+        }
     }
 
     public void update(Holiday holiday) {
@@ -64,7 +69,11 @@ public class JdbcHolidayDao implements HolidayDao {
 
     @Override
     public Optional<Holiday> getByDate(LocalDate date) {
-        return Optional.ofNullable(jdbcTemplate.queryForObject(SQL_FIND_BY_DATE, holidayMapper, date));
+        try {
+            return Optional.of(jdbcTemplate.queryForObject(SQL_FIND_BY_DATE, holidayMapper, date));
+        } catch (DataAccessException e) {
+            return Optional.empty();
+        }
     }
 
 }

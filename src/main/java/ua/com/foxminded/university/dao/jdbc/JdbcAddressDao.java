@@ -1,5 +1,6 @@
 package ua.com.foxminded.university.dao.jdbc;
 
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -49,7 +50,11 @@ public class JdbcAddressDao implements AddressDao {
     }
 
     public Optional<Address> getById(int id) {
-        return Optional.ofNullable(jdbcTemplate.queryForObject(SQL_FIND_ADDRESS, addressMapper, id));
+        try {
+            return Optional.of(jdbcTemplate.queryForObject(SQL_FIND_ADDRESS, addressMapper, id));
+        } catch (DataAccessException e) {
+           return Optional.empty();
+        }
     }
 
     public void update(Address address) {

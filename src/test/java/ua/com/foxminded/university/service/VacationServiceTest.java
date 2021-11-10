@@ -21,17 +21,12 @@ import ua.com.foxminded.university.model.Vacation;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {AppConfig.class})
 public class VacationServiceTest {
 
     @Mock
@@ -44,12 +39,17 @@ public class VacationServiceTest {
     private List<Teacher> teachers;
     private DataSource dataSource;
     private Teacher teacher;
-    @Value("#{${maxPeriodsVacation}}")
     private Map<AcademicDegree, Integer> maxPeriodsVacation;
 
 
     @BeforeEach
     public void setUp() throws IOException {
+        maxPeriodsVacation = new HashMap<>();
+        maxPeriodsVacation.put(AcademicDegree.ASSOCIATE, 15);
+        maxPeriodsVacation.put(AcademicDegree.BACHELOR, 20);
+        maxPeriodsVacation.put(AcademicDegree.MASTER, 25);
+        maxPeriodsVacation.put(AcademicDegree.DOCTORAL, 30);
+
         ReflectionTestUtils.setField(vacationService, "maxPeriodsVacation", maxPeriodsVacation);
         dataSource = new DataSource();
         vacations = new ArrayList<>();
@@ -58,12 +58,12 @@ public class VacationServiceTest {
         teacher.setId(1);
         Vacation vacation1 = new Vacation(
             LocalDate.of(2021, 11, 5),
-            LocalDate.of(2021, 11, 30),
+            LocalDate.of(2021, 11, 10),
             teacher);
         vacation1.setId(1);
         Vacation vacation2 = new Vacation(
             LocalDate.of(2021, 5, 5),
-            LocalDate.of(2021, 5, 30),
+            LocalDate.of(2021, 5, 10),
             teacher
         );
         vacation2.setId(2);
@@ -81,11 +81,14 @@ public class VacationServiceTest {
     @Test
     public void givenNewVacation_whenCreate_thenCreated() throws IOException {
         Vacation vacation = new Vacation(
+            LocalDate.of(2021, 3, 1),
             LocalDate.of(2021, 3, 10),
-            LocalDate.of(2021, 3, 30),
             teacher);
 
+
+        when(vacationDao.getById(vacation.getId())).thenReturn(Optional.empty());
         when(vacationDao.getByTeacherAndVacationDates(vacation)).thenReturn(Optional.empty());
+        when(vacationDao.getByTeacherId(vacation.getTeacher().getId())).thenReturn(vacations);
 
         vacationService.create(vacation);
 
@@ -95,11 +98,13 @@ public class VacationServiceTest {
     @Test
     public void givenNewVacationWithNotAcceptablePeriod_whenCreate_thenNotCreated(){
         Vacation vacation = new Vacation(
-            LocalDate.of(2021, 3, 10),
-            LocalDate.of(2021, 4, 12),
+            LocalDate.of(2021, 3, 1),
+            LocalDate.of(2021, 4, 30),
             teacher);
 
+        when(vacationDao.getById(vacation.getId())).thenReturn(Optional.empty());
         when(vacationDao.getByTeacherAndVacationDates(vacation)).thenReturn(Optional.empty());
+        when(vacationDao.getByTeacherId(vacation.getTeacher().getId())).thenReturn(vacations);
 
         vacationService.create(vacation);
 
@@ -110,6 +115,7 @@ public class VacationServiceTest {
     public void givenExistentVacation_whenCreate_thenNotCreated(){
         Vacation vacation = vacations.get(0);
 
+        when(vacationDao.getById(vacation.getId())).thenReturn(Optional.empty());
         when(vacationDao.getByTeacherAndVacationDates(vacation)).thenReturn(Optional.of(vacation));
 
         vacationService.create(vacation);
@@ -130,7 +136,9 @@ public class VacationServiceTest {
     public void givenExistentVacation_whenUpdate_thenUpdated() {
         Vacation vacation = vacations.get(0);
 
+        when(vacationDao.getById(vacation.getId())).thenReturn(Optional.of(vacation));
         when(vacationDao.getByTeacherAndVacationDates(vacation)).thenReturn(Optional.of(vacation));
+        when(vacationDao.getByTeacherId(vacation.getTeacher().getId())).thenReturn(vacations);
 
         vacationService.update(vacation);
 
@@ -145,6 +153,7 @@ public class VacationServiceTest {
         vacation1.setStart(vacation2.getStart());
         vacation1.setEnd(vacation2.getEnd());
 
+        when(vacationDao.getById(vacation1.getId())).thenReturn(Optional.of(vacation1));
         when(vacationDao.getByTeacherAndVacationDates(vacation1)).thenReturn(Optional.of(vacation2));
 
         vacationService.update(vacation1);
@@ -155,9 +164,12 @@ public class VacationServiceTest {
     @Test
     public void givenVacationWithNotAcceptablePeriod_whenUpdate_thenNotUpdated(){
         Vacation vacation = vacations.get(0);
-        vacation.setEnd(LocalDate.of(2021,12,12));
+        vacation.setStart(LocalDate.of(2021,1,1));
+        vacation.setEnd(LocalDate.of(2021,1,26));
 
+        when(vacationDao.getById(vacation.getId())).thenReturn(Optional.of(vacation));
         when(vacationDao.getByTeacherAndVacationDates(vacation)).thenReturn(Optional.of(vacation));
+        when(vacationDao.getByTeacherId(vacation.getTeacher().getId())).thenReturn(vacations);
 
         vacationService.update(vacation);
 

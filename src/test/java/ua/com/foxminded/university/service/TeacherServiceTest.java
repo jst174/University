@@ -45,6 +45,7 @@ public class TeacherServiceTest {
     public void givenNewTeacher_whenCreate_thenCreated() throws IOException {
         Teacher teacher = dataSource.generateTeacher();
 
+        when(teacherDao.getById(teacher.getId())).thenReturn(Optional.empty());
         when(teacherDao.getByName(teacher.getFirstName(), teacher.getLastName())).thenReturn(Optional.empty());
 
         teacherService.create(teacher);
@@ -56,6 +57,7 @@ public class TeacherServiceTest {
     public void givenExistentTeacher_whenCreate_thenNotCreated() {
         Teacher teacher = teachers.get(0);
 
+        when(teacherDao.getById(teacher.getId())).thenReturn(Optional.empty());
         when(teacherDao.getByName(teacher.getFirstName(), teacher.getLastName())).thenReturn(Optional.of(teacher));
 
         teacherService.create(teacher);
@@ -76,6 +78,7 @@ public class TeacherServiceTest {
     public void givenExistentTime_whenUpdate_thenUpdated() {
         Teacher teacher = teachers.get(0);
 
+        when(teacherDao.getById(teacher.getId())).thenReturn(Optional.of(teacher));
         when(teacherDao.getByName(teacher.getFirstName(), teacher.getLastName()))
             .thenReturn(Optional.of(teacher));
 
@@ -91,6 +94,7 @@ public class TeacherServiceTest {
         teacher1.setFirstName(teacher2.getFirstName());
         teacher1.setLastName(teacher2.getLastName());
 
+        when(teacherDao.getById(teacher1.getId())).thenReturn(Optional.of(teacher1));
         when(teacherDao.getByName(teacher1.getFirstName(), teacher1.getLastName()))
             .thenReturn(Optional.of(teacher2));
 

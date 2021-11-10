@@ -1,6 +1,7 @@
 package ua.com.foxminded.university.dao.jdbc;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -71,7 +72,11 @@ public class JdbcTeacherDao implements TeacherDao {
     }
 
     public Optional<Teacher> getById(int id) {
-        return Optional.ofNullable(jdbcTemplate.queryForObject(SQL_FIND_TEACHER, teacherMapper, id));
+        try {
+            return Optional.of(jdbcTemplate.queryForObject(SQL_FIND_TEACHER, teacherMapper, id));
+        } catch (DataAccessException e) {
+            return Optional.empty();
+        }
     }
 
     @Transactional
@@ -100,6 +105,15 @@ public class JdbcTeacherDao implements TeacherDao {
         return jdbcTemplate.query(SQL_FIND_ALl, teacherMapper);
     }
 
+    @Override
+    public Optional<Teacher> getByName(String firstName, String lastName) {
+        try {
+            return Optional.of(jdbcTemplate.queryForObject(SQL_GET_BY_FULL_NAME, teacherMapper,
+                firstName, lastName));
+        } catch (DataAccessException e) {
+            return Optional.empty();
+        }
+    }
 
     private void setCourses(Teacher updatedTeacher, List<Course> courses) {
         updatedTeacher.getCourses().stream()
@@ -107,16 +121,9 @@ public class JdbcTeacherDao implements TeacherDao {
             .forEach(course -> jdbcTemplate.update(SQL_ADD_COURSE, updatedTeacher.getId(), course.getId()));
     }
 
-
     private void deleteCourses(Teacher teacher, List<Course> savedCourses) {
         savedCourses.stream().
             filter(course -> !teacher.getCourses().contains(course))
             .forEach(course -> jdbcTemplate.update(SQL_DELETE_COURSE, teacher.getId(), course.getId()));
-    }
-
-    @Override
-    public Optional<Teacher> getByName(String firstName, String lastName) {
-        return Optional.ofNullable(jdbcTemplate.queryForObject(SQL_GET_BY_FULL_NAME, teacherMapper,
-            firstName, lastName));
     }
 }

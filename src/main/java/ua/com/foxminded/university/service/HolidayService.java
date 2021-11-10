@@ -22,11 +22,11 @@ public class HolidayService {
     }
 
     public Holiday getById(int id) {
-        return holidayDao.getById(id).get();
+        return holidayDao.getById(id).orElseThrow();
     }
 
     public void update(Holiday holiday) {
-        if (isCurrent(holiday)) {
+        if (isUnique(holiday)) {
             holidayDao.update(holiday);
         }
     }
@@ -40,10 +40,10 @@ public class HolidayService {
     }
 
     private boolean isUnique(Holiday holiday) {
-        return holidayDao.getByDate(holiday.getDate()).isEmpty();
-    }
-
-    private boolean isCurrent(Holiday holiday){
-        return holidayDao.getByDate(holiday.getDate()).get().getId() == holiday.getId();
+        if (holidayDao.getById(holiday.getId()).isEmpty()) {
+            return holidayDao.getByDate(holiday.getDate()).isEmpty();
+        } else {
+            return holidayDao.getByDate(holiday.getDate()).get().getId() == holiday.getId();
+        }
     }
 }

@@ -9,6 +9,8 @@ import ua.com.foxminded.university.model.Time;
 import java.time.Duration;
 import java.util.List;
 
+import static java.time.temporal.ChronoUnit.MINUTES;
+
 @PropertySource("classpath:application.properties")
 @Service
 public class TimeService {
@@ -28,11 +30,11 @@ public class TimeService {
     }
 
     public Time getById(int id) {
-        return timeDao.getById(id).get();
+        return timeDao.getById(id).orElseThrow();
     }
 
     public void update(Time time) {
-        if ((isCurrent(time)) && (isNotLessMinLessonDuration(time))
+        if ((isUnique(time)) && (isNotLessMinLessonDuration(time))
             && (isTimeNotCrosses(time))) {
             timeDao.update(time);
         }
@@ -47,12 +49,17 @@ public class TimeService {
     }
 
     private boolean isUnique(Time time) {
-        return timeDao.getByTime(time.getStartTime(), time.getEndTime()).isEmpty();
+        if (timeDao.getById(time.getId()).isEmpty()) {
+            return timeDao.getByTime(time.getStartTime(), time.getEndTime()).isEmpty();
+        } else {
+            return timeDao.getByTime(time.getStartTime(), time.getEndTime()).get()
+                .getId() == time.getId();
+        }
     }
 
     private boolean isNotLessMinLessonDuration(Time time) {
-        return Duration.between(time.getStartTime(), time.getEndTime()).getSeconds()
-            >= Duration.ofMinutes(minLessonDuration).getSeconds();
+        return MINUTES.between(time.getStartTime(), time.getEndTime())
+            >= minLessonDuration;
     }
 
     private boolean isTimeNotCrosses(Time newTime) {
@@ -60,10 +67,5 @@ public class TimeService {
         return times.stream().allMatch(time -> (((newTime.getStartTime().isBefore(time.getStartTime()))
             && (newTime.getEndTime().isBefore(time.getStartTime())))
             || ((newTime.getStartTime().isAfter(time.getEndTime())))));
-    }
-
-    private boolean isCurrent(Time time) {
-        return timeDao.getByTime(time.getStartTime(), time.getEndTime()).get()
-            .getId() == time.getId();
     }
 }

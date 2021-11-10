@@ -26,11 +26,11 @@ public class GroupService {
     }
 
     public Group getById(int id) {
-        return groupDao.getById(id).get();
+        return groupDao.getById(id).orElseThrow();
     }
 
     public void update(Group group) {
-        if (isCurrent(group)) {
+        if (isUnique(group)) {
             groupDao.update(group);
         }
     }
@@ -48,10 +48,10 @@ public class GroupService {
     }
 
     private boolean isUnique(Group group) {
-        return groupDao.getByName(group.getName()).isEmpty();
-    }
-
-    private boolean isCurrent(Group group) {
-        return groupDao.getByName(group.getName()).get().getId() == group.getId();
+        if (groupDao.getById(group.getId()).isEmpty()) {
+            return groupDao.getByName(group.getName()).isEmpty();
+        } else {
+            return groupDao.getByName(group.getName()).get().getId() == group.getId();
+        }
     }
 }

@@ -1,5 +1,6 @@
 package ua.com.foxminded.university.dao.jdbc;
 
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -44,7 +45,11 @@ public class JdbcTimeDao implements TimeDao {
     }
 
     public Optional<Time> getById(int id) {
-        return Optional.ofNullable(jdbcTemplate.queryForObject(SQL_FIND_TIME, timeMapper, id));
+        try {
+            return Optional.of(jdbcTemplate.queryForObject(SQL_FIND_TIME, timeMapper, id));
+        } catch (DataAccessException e) {
+            return Optional.empty();
+        }
     }
 
     public void update(Time time) {
@@ -65,6 +70,10 @@ public class JdbcTimeDao implements TimeDao {
 
     @Override
     public Optional<Time> getByTime(LocalTime start, LocalTime end) {
-        return Optional.ofNullable(jdbcTemplate.queryForObject(SQL_FIND_BY_TIME, timeMapper, start, end));
+        try {
+            return Optional.of(jdbcTemplate.queryForObject(SQL_FIND_BY_TIME, timeMapper, start, end));
+        } catch (DataAccessException e) {
+            return Optional.empty();
+        }
     }
 }

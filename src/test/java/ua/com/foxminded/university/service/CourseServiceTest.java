@@ -56,6 +56,7 @@ public class CourseServiceTest {
     public void givenNewCourse_whenCreate_thenCreated() {
         Course course = new Course("History");
 
+        when(courseDao.getById(course.getId())).thenReturn(Optional.empty());
         when(courseDao.getByName(course.getName())).thenReturn(Optional.empty());
 
         courseService.create(course);
@@ -64,9 +65,10 @@ public class CourseServiceTest {
     }
 
     @Test
-    public void givenExistentCourse_whenCreate_thenNotCreated() {
-        Course course = courses.get(0);
+    public void givenCourseWithExistentName_whenCreate_thenNotCreated() {
+        Course course = new Course(courses.get(0).getName());
 
+        when(courseDao.getById(course.getId())).thenReturn(Optional.empty());
         when(courseDao.getByName(course.getName())).thenReturn(Optional.of(course));
 
         courseService.create(course);
@@ -89,6 +91,7 @@ public class CourseServiceTest {
     public void givenExistentCourse_whenUpdate_thenUpdated() {
         Course course = courses.get(0);
 
+        when(courseDao.getById(course.getId())).thenReturn(Optional.of(course));
         when(courseDao.getByName(course.getName())).thenReturn(Optional.of(course));
 
         courseService.update(course);
@@ -97,11 +100,12 @@ public class CourseServiceTest {
     }
 
     @Test
-    public void givenCourseWithOtherCourseName_whenUpdate_thenNotUpdated(){
+    public void givenCourseWithOtherCourseName_whenUpdate_thenNotUpdated() {
         Course course1 = courses.get(0);
         Course course2 = courses.get(1);
         course1.setName(course2.getName());
 
+        when(courseDao.getById(course1.getId())).thenReturn(Optional.of(course1));
         when(courseDao.getByName(course1.getName())).thenReturn(Optional.of(course2));
 
         courseService.update(course1);

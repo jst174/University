@@ -41,6 +41,7 @@ public class ClassroomServiceTest {
     public void givenNewClassroom_whenCreateClassroom_thenCreated() {
         Classroom classroom = new Classroom(102, 30);
 
+        when(classroomDao.getById(classroom.getId())).thenReturn(Optional.empty());
         when(classroomDao.findByNumber(classroom.getNumber())).thenReturn(Optional.empty());
 
         classroomService.createClassroom(classroom);
@@ -49,9 +50,10 @@ public class ClassroomServiceTest {
     }
 
     @Test
-    public void givenExistentClassroom_whenCreateClassroom_thenNotCreated(){
-        Classroom classroom = classrooms.get(0);
+    public void givenClassroomWithExistentNumber_whenCreateClassroom_thenNotCreated(){
+        Classroom classroom = new Classroom(classrooms.get(0).getNumber(), 40);
 
+        when(classroomDao.getById(classroom.getId())).thenReturn(Optional.empty());
         when(classroomDao.findByNumber(classroom.getNumber())).thenReturn(Optional.of(classroom));
 
         classroomService.createClassroom(classroom);
@@ -73,6 +75,7 @@ public class ClassroomServiceTest {
     public void givenExistentClassroom_whenUpdate_thenUpdated() {
         Classroom classroom = classrooms.get(0);
 
+        when(classroomDao.getById(classroom.getId())).thenReturn(Optional.of(classroom));
         when(classroomDao.findByNumber(classroom.getNumber())).thenReturn(Optional.of(classroom));
 
         classroomService.update(classroom);
@@ -86,6 +89,7 @@ public class ClassroomServiceTest {
         classroom1.setNumber(202);
         Classroom classroom2 = classrooms.get(1);
 
+        when(classroomDao.getById(classroom1.getId())).thenReturn(Optional.of(classroom1));
         when(classroomDao.findByNumber(classroom1.getNumber())).thenReturn(Optional.of(classroom2));
 
         classroomService.update(classroom1);

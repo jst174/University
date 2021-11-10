@@ -12,6 +12,10 @@ public class Teacher extends Person {
     private List<Course> courses;
     private List<Vacation> vacations;
 
+    public Teacher() {
+
+    }
+
     public Teacher(String firstName, String lastName, LocalDate birthDate, Gender gender, Address address,
                    String phoneNumber, String email, AcademicDegree academicDegree) {
         super(firstName, lastName, birthDate, gender, address, phoneNumber, email);
@@ -70,5 +74,90 @@ public class Teacher extends Person {
     @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), academicDegree, vacations);
+    }
+
+    public static class Builder {
+
+        private Teacher teacher;
+
+        public Builder() {
+            teacher = new Teacher();
+        }
+
+        public Builder setId(int id) {
+            teacher.setId(id);
+            return this;
+        }
+
+        public Builder setFirstName(String firstName) {
+            teacher.setFirstName(firstName);
+            return this;
+        }
+
+        public Builder setLastName(String lastName) {
+            teacher.setLastName(lastName);
+            return this;
+        }
+
+        public Builder setBirtDate(LocalDate birtDate) {
+            teacher.setBirthDate(birtDate);
+            return this;
+        }
+
+        public Builder setGender(Gender gender) {
+            teacher.setGender(gender);
+            return this;
+        }
+
+        public Builder setAddress(Address address) {
+            teacher.setAddress(address);
+            return this;
+        }
+
+        public Builder setPhoneNumber(String phoneNumber) {
+            teacher.setPhoneNumber(phoneNumber);
+            return this;
+        }
+
+        public Builder setEmail(String email) {
+            teacher.setEmail(email);
+            return this;
+        }
+
+        public Builder setAcademicDegree(AcademicDegree academicDegree) {
+            teacher.setAcademicDegree(academicDegree);
+            return this;
+        }
+
+        public Builder setCourses(List<Course> courses) {
+            teacher.setCourses(courses);
+            return this;
+        }
+
+        public Builder setVacations(List<Vacation> vacations) {
+            teacher.setVacations(vacations);
+            return this;
+        }
+
+        public Builder clone(Teacher teacher) {
+            Builder builder = new Builder();
+            builder.setId(teacher.getId());
+            builder.setFirstName(teacher.getFirstName());
+            builder.setLastName(teacher.getLastName());
+            builder.setAddress(teacher.getAddress());
+            builder.setBirtDate(teacher.getBirthDate());
+            builder.setGender(teacher.getGender());
+            builder.setPhoneNumber(teacher.getPhoneNumber());
+            builder.setEmail(teacher.getEmail());
+            builder.setAcademicDegree(teacher.getAcademicDegree());
+            builder.setCourses(teacher.getCourses());
+            builder.setVacations(teacher.getVacations());
+            return builder;
+        }
+
+        public Teacher build() {
+            return teacher;
+        }
+
     }
 }
