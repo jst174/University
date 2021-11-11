@@ -1,5 +1,6 @@
 package ua.com.foxminded.university.dao.jdbc;
 
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -11,7 +12,9 @@ import ua.com.foxminded.university.model.Holiday;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class JdbcHolidayDao implements HolidayDao {
@@ -21,6 +24,7 @@ public class JdbcHolidayDao implements HolidayDao {
     private static final String SQL_UPDATE_HOLIDAY = "UPDATE holidays SET name=?, date=? WHERE id = ?";
     private static final String SQL_DELETE_HOLIDAY = "DELETE FROM holidays WHERE id = ?";
     private static final String SQL_FIND_ALL = "SELECT * FROM holidays";
+    private static final String SQL_FIND_BY_DATE = "SELECT * FROM holidays WHERE date = ?";
 
     private HolidayMapper holidayMapper;
     private JdbcTemplate jdbcTemplate;
@@ -39,11 +43,15 @@ public class JdbcHolidayDao implements HolidayDao {
             statement.setObject(2, holiday.getDate());
             return statement;
         }, keyHolder);
-        holiday.setId((int)keyHolder.getKeys().get("id"));
+        holiday.setId((int) keyHolder.getKeys().get("id"));
     }
 
-    public Holiday getById(int id) {
-        return jdbcTemplate.queryForObject(SQL_FIND_HOLIDAY, holidayMapper, id);
+    public Optional<Holiday> getById(int id) {
+        try {
+            return Optional.of(jdbcTemplate.queryForObject(SQL_FIND_HOLIDAY, holidayMapper, id));
+        } catch (DataAccessException e) {
+            return Optional.empty();
+        }
     }
 
     public void update(Holiday holiday) {
@@ -58,4 +66,14 @@ public class JdbcHolidayDao implements HolidayDao {
     public List<Holiday> getAll() {
         return jdbcTemplate.query(SQL_FIND_ALL, holidayMapper);
     }
+
+    @Override
+    public Optional<Holiday> getByDate(LocalDate date) {
+        try {
+            return Optional.of(jdbcTemplate.queryForObject(SQL_FIND_BY_DATE, holidayMapper, date));
+        } catch (DataAccessException e) {
+            return Optional.empty();
+        }
+    }
+
 }

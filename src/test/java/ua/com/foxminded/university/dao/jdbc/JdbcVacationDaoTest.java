@@ -2,6 +2,7 @@ package ua.com.foxminded.university.dao.jdbc;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.jdbc.JdbcTestUtils.*;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,6 +20,7 @@ import ua.com.foxminded.university.model.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 
 @ExtendWith(SpringExtension.class)
@@ -31,10 +33,10 @@ public class JdbcVacationDaoTest {
     public VacationDao vacationDao;
     @Autowired
     private JdbcTemplate jdbcTemplate;
-    private  Teacher teacher;
+    private Teacher teacher;
 
     @BeforeEach
-    private  void setUp(){
+    private void setUp() {
         Address address = new Address("Russia", "Saint Petersburg", "Nevsky Prospect",
             "15", "45", "342423");
         address.setId(1);
@@ -71,9 +73,9 @@ public class JdbcVacationDaoTest {
             LocalDate.of(2021, 10, 30),
             teacher);
 
-        Vacation actual = vacationDao.getById(1);
+        Optional<Vacation> actual = vacationDao.getById(1);
 
-        assertEquals(expected, actual);
+        assertEquals(expected, actual.get());
     }
 
     @Test
@@ -101,7 +103,7 @@ public class JdbcVacationDaoTest {
     }
 
     @Test
-    public void whenGetAll_thenReturnAllVacations(){
+    public void whenGetAll_thenReturnAllVacations() {
         Vacation vacation1 = new Vacation(
             LocalDate.of(2021, 10, 15),
             LocalDate.of(2021, 10, 30),
@@ -117,6 +119,67 @@ public class JdbcVacationDaoTest {
         List<Vacation> actual = vacationDao.getAll();
 
         assertEquals(expected, actual);
+    }
+
+    @Test
+    public void givenTeacherId_whenGetByTeacherId_thenReturnVacations() {
+        Vacation vacation1 = new Vacation(
+            LocalDate.of(2021, 10, 15),
+            LocalDate.of(2021, 10, 30),
+            teacher);
+        vacation1.setId(1);
+        Vacation vacation2 = new Vacation(
+            LocalDate.of(2021, 5, 15),
+            LocalDate.of(2021, 5, 30),
+            teacher
+        );
+        vacation2.setId(2);
+        List<Vacation> expected = new ArrayList<>();
+        expected.add(vacation1);
+        expected.add(vacation2);
+
+        List<Vacation> actual = vacationDao.getByTeacherId(1);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void givenTeacherAndLessonDate_whenGetByTeacherAndLessonDate_thenReturn(){
+        Vacation vacation1 = new Vacation(
+            LocalDate.of(2021, 10, 15),
+            LocalDate.of(2021, 10, 30),
+            teacher);
+        vacation1.setId(1);
+        Vacation vacation2 = new Vacation(
+            LocalDate.of(2021, 5, 15),
+            LocalDate.of(2021, 5, 30),
+            teacher
+        );
+        vacation2.setId(2);
+
+        Optional<Vacation> actual = vacationDao.getByTeacherAndLessonDate(teacher,
+            LocalDate.of(2021, 10, 20));
+
+        assertEquals(vacation1, actual.get());
+    }
+
+    @Test
+    public void givenVacation_whenGetByTeacherAndVacationDates_thenReturn(){
+        Vacation vacation1 = new Vacation(
+            LocalDate.of(2021, 10, 15),
+            LocalDate.of(2021, 10, 30),
+            teacher);
+        vacation1.setId(1);
+        Vacation vacation2 = new Vacation(
+            LocalDate.of(2021, 5, 15),
+            LocalDate.of(2021, 5, 30),
+            teacher
+        );
+        vacation2.setId(2);
+
+        Optional<Vacation> actual = vacationDao.getByTeacherAndVacationDates(vacation1);
+
+        assertEquals(vacation1, actual.get());
     }
 
 

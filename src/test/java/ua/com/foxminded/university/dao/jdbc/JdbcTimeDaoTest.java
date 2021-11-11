@@ -18,6 +18,7 @@ import ua.com.foxminded.university.model.Time;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 
 @ExtendWith(SpringExtension.class)
@@ -45,9 +46,9 @@ public class JdbcTimeDaoTest {
     public void givenId_whenGetById_thenReturn() {
         Time expected = new Time(LocalTime.of(8, 00), LocalTime.of(9, 30));
 
-        Time actual = timeDao.getById(1);
+        Optional<Time> actual = timeDao.getById(1);
 
-        assertEquals(expected, actual);
+        assertEquals(expected, actual.get());
     }
 
     @Test
@@ -81,5 +82,16 @@ public class JdbcTimeDaoTest {
         List<Time> actual = timeDao.getAll();
 
         assertEquals(expected, actual);
+    }
+
+    @Test
+    public void givenStartAndEndTime_whenGetByTime_thenReturn(){
+        LocalTime start = LocalTime.of(8, 00);
+        LocalTime end = LocalTime.of(9, 30);
+        Time expected = new Time(start, end);
+
+        Optional<Time> actual = timeDao.getByTime(start, end);
+
+        assertEquals(expected, actual.get());
     }
 }

@@ -2,6 +2,7 @@ package ua.com.foxminded.university.dao.jdbc;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.jdbc.JdbcTestUtils.*;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import ua.com.foxminded.university.config.AppConfig;
 import ua.com.foxminded.university.config.DatabaseConfigTest;
 import ua.com.foxminded.university.dao.GroupDao;
 import ua.com.foxminded.university.model.Group;
@@ -44,7 +46,7 @@ public class JdbcGroupDaoTest {
     public void givenId_whenGetById_thenReturn() {
         Group group = new Group("MH-12");
 
-        assertEquals(group, groupDao.getById(1));
+        assertEquals(group, groupDao.getById(1).get());
     }
 
     @Test
@@ -71,7 +73,7 @@ public class JdbcGroupDaoTest {
     }
 
     @Test
-    public void whenGetAll_thenReturnAllGroups(){
+    public void whenGetAll_thenReturnAllGroups() {
         Group group1 = new Group("MH-12");
         Group group2 = new Group("JW-23");
         Group group3 = new Group("MG-54");
@@ -105,6 +107,13 @@ public class JdbcGroupDaoTest {
         List<Group> actual = groupDao.getByLessonId(1);
 
         assertEquals(expected, actual);
+    }
+
+    @Test
+    public void givenGroupName_whenGetByName_thenReturn() {
+        Group group = new Group("MH-12");
+
+        assertEquals(group, groupDao.getByName("MH-12").get());
     }
 
 

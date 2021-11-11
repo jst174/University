@@ -19,6 +19,7 @@ import ua.com.foxminded.university.model.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 
 @ExtendWith(SpringExtension.class)
@@ -81,9 +82,9 @@ public class JdbcTeacherDaoTest {
             AcademicDegree.MASTER
         );
 
-        Teacher actual = teacherDao.getById(1);
+        Optional<Teacher> actual = teacherDao.getById(1);
 
-        assertEquals(expected, actual);
+        assertEquals(expected, actual.get());
     }
 
     @Test
@@ -150,6 +151,26 @@ public class JdbcTeacherDaoTest {
         List<Teacher> actual = teacherDao.getAll();
 
         assertEquals(expected, actual);
+    }
+
+    @Test
+    public void givenFirstNameAndLastName_whenGetByName_thenReturn() {
+        Address address = new Address("Russia", "Saint Petersburg", "Nevsky Prospect",
+            "15", "45", "342423");
+        Teacher expected = new Teacher(
+            "Mike",
+            "Miller",
+            LocalDate.of(1977, 5, 13),
+            Gender.MALE,
+            address,
+            "5435345334",
+            "miller97@gmail.com",
+            AcademicDegree.MASTER
+        );
+
+        Optional<Teacher> actual = teacherDao.getByName(expected.getFirstName(), expected.getLastName());
+
+        assertEquals(expected, actual.get());
     }
 
 }

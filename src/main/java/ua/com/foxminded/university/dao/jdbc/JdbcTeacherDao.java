@@ -1,6 +1,7 @@
 package ua.com.foxminded.university.dao.jdbc;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -18,6 +19,7 @@ import ua.com.foxminded.university.model.Teacher;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
@@ -35,6 +37,7 @@ public class JdbcTeacherDao implements TeacherDao {
     private static final String SQL_FIND_ALl = "SELECT * FROM teachers";
     private static final String SQL_FIND_COURSES = "SELECT * FROM teachers_courses WHERE teacher_id = ?";
     private static final String SQL_DELETE_COURSE = "DELETE FROM teachers_courses WHERE teacher_id = ? and course_id = ?";
+    private static final String SQL_GET_BY_FULL_NAME = "SELECT * FROM teachers WHERE first_name = ? and last_name = ?";
 
     private TeacherMapper teacherMapper;
     private JdbcTemplate jdbcTemplate;
@@ -68,8 +71,12 @@ public class JdbcTeacherDao implements TeacherDao {
         setCourses(teacher, new ArrayList<>());
     }
 
-    public Teacher getById(int id) {
-        return jdbcTemplate.queryForObject(SQL_FIND_TEACHER, teacherMapper, id);
+    public Optional<Teacher> getById(int id) {
+        try {
+            return Optional.of(jdbcTemplate.queryForObject(SQL_FIND_TEACHER, teacherMapper, id));
+        } catch (DataAccessException e) {
+            return Optional.empty();
+        }
     }
 
     @Transactional
@@ -98,13 +105,21 @@ public class JdbcTeacherDao implements TeacherDao {
         return jdbcTemplate.query(SQL_FIND_ALl, teacherMapper);
     }
 
+    @Override
+    public Optional<Teacher> getByName(String firstName, String lastName) {
+        try {
+            return Optional.of(jdbcTemplate.queryForObject(SQL_GET_BY_FULL_NAME, teacherMapper,
+                firstName, lastName));
+        } catch (DataAccessException e) {
+            return Optional.empty();
+        }
+    }
 
     private void setCourses(Teacher updatedTeacher, List<Course> courses) {
         updatedTeacher.getCourses().stream()
             .filter(course -> !courses.contains(course))
             .forEach(course -> jdbcTemplate.update(SQL_ADD_COURSE, updatedTeacher.getId(), course.getId()));
     }
-
 
     private void deleteCourses(Teacher teacher, List<Course> savedCourses) {
         savedCourses.stream().

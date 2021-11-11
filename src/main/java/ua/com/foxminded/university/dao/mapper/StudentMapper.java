@@ -7,12 +7,14 @@ import ua.com.foxminded.university.dao.AddressDao;
 import ua.com.foxminded.university.dao.GroupDao;
 import ua.com.foxminded.university.dao.jdbc.JdbcAddressDao;
 import ua.com.foxminded.university.dao.jdbc.JdbcGroupDao;
+import ua.com.foxminded.university.model.Address;
 import ua.com.foxminded.university.model.Gender;
 import ua.com.foxminded.university.model.Student;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.Optional;
 
 @Component
 public class StudentMapper implements RowMapper<Student> {
@@ -24,14 +26,16 @@ public class StudentMapper implements RowMapper<Student> {
 
     @Override
     public Student mapRow(ResultSet rs, int rowNum) throws SQLException {
-        Student student = new Student(rs.getString("first_name"),
-            rs.getString("last_name"),
-            rs.getObject("birthday", LocalDate.class),
-            Gender.valueOf(rs.getString("gender")),
-            addressDao.getById(rs.getInt("address_id")),
-            rs.getString("phone_number"),
-            rs.getString("email"));
-        student.setGroup(groupDao.getById(rs.getInt("group_id")));
+        Student student = new Student();
+        addressDao.getById(rs.getInt("address_id")).ifPresent(student::setAddress);
+        student.setFirstName(rs.getString("first_name"));
+        student.setLastName(rs.getString("last_name"));
+        student.setBirthDate(rs.getObject("birthday", LocalDate.class));
+        student.setGender(Gender.valueOf(rs.getString("gender")));
+        addressDao.getById(rs.getInt("address_id")).ifPresent(student::setAddress);
+        student.setPhoneNumber(rs.getString("phone_number"));
+        student.setEmail(rs.getString("email"));
+        groupDao.getById(rs.getInt("group_id")).ifPresent(student::setGroup);
         student.setId(rs.getInt("id"));
         return student;
     }

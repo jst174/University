@@ -15,6 +15,10 @@ public class Lesson {
     private LocalDate date;
     private Time time;
 
+    public Lesson() {
+
+    }
+
     public Lesson(Course course, Classroom classroom, Teacher teacher, LocalDate localDate,
                   Time time) {
         this.course = course;
@@ -97,5 +101,65 @@ public class Lesson {
     @Override
     public int hashCode() {
         return Objects.hash(groups, course, classroom, teacher, date, time);
+    }
+
+    public static class Builder {
+
+        private Lesson lesson;
+
+        public Builder() {
+            lesson = new Lesson();
+        }
+
+        public Builder setId(int id) {
+            lesson.setId(id);
+            return this;
+        }
+
+        public Builder setCourse(Course course) {
+            lesson.setCourse(course);
+            return this;
+        }
+
+        public Builder setClassroom(Classroom classroom) {
+            lesson.setClassroom(classroom);
+            return this;
+        }
+
+        public Builder setTeacher(Teacher teacher) {
+            lesson.setTeacher(teacher);
+            return this;
+        }
+
+        public Builder setDate(LocalDate date) {
+            lesson.setDate(date);
+            return this;
+        }
+
+        public Builder setTime(Time time) {
+            lesson.setTime(time);
+            return this;
+        }
+
+        public Builder setGroups(List<Group> groups) {
+            lesson.setGroups(groups);
+            return this;
+        }
+
+        public Builder clone(Lesson lesson) {
+            Builder builder = new Builder();
+            builder.setId(lesson.getId());
+            builder.setClassroom(lesson.getClassroom());
+            builder.setDate(lesson.getDate());
+            builder.setTime(lesson.getTime());
+            builder.setCourse(lesson.getCourse());
+            builder.setTeacher(lesson.getTeacher());
+            builder.setGroups(lesson.getGroups());
+            return builder;
+        }
+
+        public Lesson build() {
+            return lesson;
+        }
     }
 }

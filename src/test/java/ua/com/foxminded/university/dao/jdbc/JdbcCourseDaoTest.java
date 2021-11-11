@@ -17,11 +17,12 @@ import ua.com.foxminded.university.model.Course;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {DatabaseConfigTest.class})
-@Sql({"/create_address_test.sql","/create_teacher_test.sql","/create_course_test.sql"})
+@Sql({"/create_address_test.sql", "/create_teacher_test.sql", "/create_course_test.sql"})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class JdbcCourseDaoTest {
 
@@ -44,9 +45,9 @@ public class JdbcCourseDaoTest {
     public void givenId_whenGetById_thenReturn() {
         Course courseExpected = new Course("History");
 
-        Course courseActual = courseDao.getById(1);
+        Optional<Course> courseActual = courseDao.getById(1);
 
-        assertEquals(courseExpected, courseActual);
+        assertEquals(courseExpected, courseActual.get());
     }
 
     @Test
@@ -96,5 +97,14 @@ public class JdbcCourseDaoTest {
         List<Course> actual = courseDao.getByTeacherId(1);
 
         assertEquals(expected, actual);
+    }
+
+    @Test
+    public void givenCourseName_whereGetByName_thenReturn() {
+        Course courseExpected = new Course("History");
+
+        Optional<Course> courseActual = courseDao.getByName("History");
+
+        assertEquals(courseExpected, courseActual.get());
     }
 }

@@ -2,6 +2,7 @@ package ua.com.foxminded.university.dao.jdbc;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -17,6 +18,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class JdbcStudentDao implements StudentDao {
@@ -28,6 +30,8 @@ public class JdbcStudentDao implements StudentDao {
         "birthday = ?, gender = ?, address_id = ?, phone_number = ?, email = ?, group_id = ? WHERE id = ?";
     private static final String SQL_DELETE_STUDENT = "DELETE FROM students WHERE id = ?";
     private static final String SQL_FIND_ALL = "SELECT * FROM students";
+    private static final String SQL_GET_BY_GROUP = "SELECT * FROM students WHERE group_id = ?";
+    private static final String SQL_GET_BY_FULL_NAME = "SELECT * FROM students WHERE first_name = ? and last_name = ?";
 
     private StudentMapper studentMapper;
     private JdbcTemplate jdbcTemplate;
@@ -58,8 +62,12 @@ public class JdbcStudentDao implements StudentDao {
         student.setId((int) keyHolder.getKeys().get("id"));
     }
 
-    public Student getById(int id) {
-        return jdbcTemplate.queryForObject(SQL_FIND_STUDENT, studentMapper, id);
+    public Optional<Student> getById(int id) {
+        try {
+            return Optional.of(jdbcTemplate.queryForObject(SQL_FIND_STUDENT, studentMapper, id));
+        } catch (DataAccessException e) {
+            return Optional.empty();
+        }
     }
 
     public void update(Student student) {
@@ -84,4 +92,18 @@ public class JdbcStudentDao implements StudentDao {
         return jdbcTemplate.query(SQL_FIND_ALL, studentMapper);
     }
 
+    @Override
+    public List<Student> getByGroupId(int groupId) {
+        return jdbcTemplate.query(SQL_GET_BY_GROUP, studentMapper, groupId);
+    }
+
+    @Override
+    public Optional<Student> getByName(String firstName, String lastName) {
+        try {
+            return Optional.ofNullable(jdbcTemplate.queryForObject(SQL_GET_BY_FULL_NAME, studentMapper,
+                firstName, lastName));
+        } catch (DataAccessException e) {
+            return Optional.empty();
+        }
+    }
 }

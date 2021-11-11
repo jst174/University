@@ -12,7 +12,9 @@ public class ClassroomMapper implements RowMapper<Classroom> {
 
     @Override
     public Classroom mapRow(ResultSet rs, int rowNum) throws SQLException {
-        Classroom classroom =  new Classroom(rs.getInt("number"), rs.getInt("capacity"));
+        Classroom classroom =  new Classroom(
+            rs.getInt("number"),
+            rs.getInt("capacity"));
         classroom.setId(rs.getInt("id"));
         return classroom;
     }

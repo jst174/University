@@ -1,5 +1,6 @@
 package ua.com.foxminded.university.dao.jdbc;
 
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -14,6 +15,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class JdbcGroupDao implements GroupDao {
@@ -24,6 +26,7 @@ public class JdbcGroupDao implements GroupDao {
     private static final String SQL_DELETE_GROUP = "DELETE FROM groups WHERE id = ?";
     private static final String SQL_FIND_ALL = "SELECT * FROM groups";
     private static final String SQL_FIND_LESSON_GROUP = "SELECT id, name, lesson_id FROM groups INNER JOIN lessons_groups ON id = group_id  WHERE lesson_id = ?";
+    private static final String SQL_FIND_BY_NAME = "SELECT * FROM groups WHERE name = ?";
 
     private JdbcTemplate jdbcTemplate;
     private GroupMapper groupMapper;
@@ -39,12 +42,16 @@ public class JdbcGroupDao implements GroupDao {
             PreparedStatement statement = connection.prepareStatement(SQL_INSERT_GROUP, Statement.RETURN_GENERATED_KEYS);
             statement.setString(1, group.getName());
             return statement;
-        },keyHolder);
-        group.setId((int)keyHolder.getKeys().get("id"));
+        }, keyHolder);
+        group.setId((int) keyHolder.getKeys().get("id"));
     }
 
-    public Group getById(int id) {
-        return jdbcTemplate.queryForObject(SQL_FIND_GROUP, groupMapper, id);
+    public Optional<Group> getById(int id) {
+        try {
+            return Optional.of(jdbcTemplate.queryForObject(SQL_FIND_GROUP, groupMapper, id));
+        } catch (DataAccessException e) {
+            return Optional.empty();
+        }
     }
 
     public void update(Group group) {
@@ -64,5 +71,14 @@ public class JdbcGroupDao implements GroupDao {
     @Override
     public List<Group> getByLessonId(int lessonId) {
         return jdbcTemplate.query(SQL_FIND_LESSON_GROUP, groupMapper, lessonId);
+    }
+
+    @Override
+    public Optional<Group> getByName(String name) {
+        try {
+            return Optional.of(jdbcTemplate.queryForObject(SQL_FIND_BY_NAME, groupMapper, name));
+        } catch (DataAccessException e) {
+            return Optional.empty();
+        }
     }
 }

@@ -1,5 +1,6 @@
 package ua.com.foxminded.university.dao.jdbc;
 
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -14,6 +15,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class JdbcCourseDao implements CourseDao {
@@ -24,6 +26,7 @@ public class JdbcCourseDao implements CourseDao {
     private static final String SQL_DELETE_COURSE = "DELETE FROM courses WHERE id = ?";
     private static final String SQL_FIND_ALL = "SELECT * FROM courses";
     private static final String SQL_FIND_TEACHER_COURSES = "SELECT id, name, teacher_id FROM courses INNER JOIN teachers_courses ON id = course_id WHERE teacher_id = ?";
+    private static final String SQL_FIND_BY_NAME = "SELECT * FROM courses WHERE name = ?";
 
     private CourseMapper courseMapper;
     private JdbcTemplate jdbcTemplate;
@@ -37,14 +40,18 @@ public class JdbcCourseDao implements CourseDao {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
             PreparedStatement statement = connection.prepareStatement(SQL_INSERT_COURSE, Statement.RETURN_GENERATED_KEYS);
-            statement.setString(1,course.getName());
+            statement.setString(1, course.getName());
             return statement;
         }, keyHolder);
-        course.setId((int)keyHolder.getKeys().get("id"));
+        course.setId((int) keyHolder.getKeys().get("id"));
     }
 
-    public Course getById(int id) {
-        return jdbcTemplate.queryForObject(SQL_FIND_COURSE, courseMapper, id);
+    public Optional<Course> getById(int id) {
+        try {
+            return Optional.of(jdbcTemplate.queryForObject(SQL_FIND_COURSE, courseMapper, id));
+        } catch (DataAccessException e) {
+            return Optional.empty();
+        }
     }
 
     public void update(Course course) {
@@ -63,5 +70,14 @@ public class JdbcCourseDao implements CourseDao {
     @Override
     public List<Course> getByTeacherId(int teacherId) {
         return jdbcTemplate.query(SQL_FIND_TEACHER_COURSES, courseMapper, teacherId);
+    }
+
+    @Override
+    public Optional<Course> getByName(String name) {
+        try {
+            return Optional.of(jdbcTemplate.queryForObject(SQL_FIND_BY_NAME, courseMapper, name));
+        } catch (DataAccessException e) {
+            return Optional.empty();
+        }
     }
 }

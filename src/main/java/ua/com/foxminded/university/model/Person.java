@@ -5,80 +5,84 @@ import java.util.Objects;
 
 public abstract class Person {
 
-	private String firstName;
-	private String lastName;
-	private LocalDate birthDate;
-	private Gender gender;
-	private Address address;
-	private String phoneNumber;
-	private String email;
+    private String firstName;
+    private String lastName;
+    private LocalDate birthDate;
+    private Gender gender;
+    private Address address;
+    private String phoneNumber;
+    private String email;
 
-	public Person(String firstName, String lastName, LocalDate birthDate, Gender gender, Address address,
-			String phoneNumber, String email) {
-		this.firstName = firstName;
-		this.lastName = lastName;
-		this.birthDate = birthDate;
-		this.gender = gender;
-		this.address = address;
-		this.phoneNumber = phoneNumber;
-		this.email = email;
-	}
+    public Person() {
 
-	public String getFirstName() {
-		return firstName;
-	}
+    }
 
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
+    public Person(String firstName, String lastName, LocalDate birthDate, Gender gender, Address address,
+                  String phoneNumber, String email) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.birthDate = birthDate;
+        this.gender = gender;
+        this.address = address;
+        this.phoneNumber = phoneNumber;
+        this.email = email;
+    }
 
-	public String getLastName() {
-		return lastName;
-	}
+    public String getFirstName() {
+        return firstName;
+    }
 
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
 
-	public LocalDate getBirthDate() {
-		return birthDate;
-	}
+    public String getLastName() {
+        return lastName;
+    }
 
-	public void setBirthDate(LocalDate birthDate) {
-		this.birthDate = birthDate;
-	}
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
 
-	public Gender getGender() {
-		return gender;
-	}
+    public LocalDate getBirthDate() {
+        return birthDate;
+    }
 
-	public void setGender(Gender gender) {
-		this.gender = gender;
-	}
+    public void setBirthDate(LocalDate birthDate) {
+        this.birthDate = birthDate;
+    }
 
-	public Address getAddress() {
-		return address;
-	}
+    public Gender getGender() {
+        return gender;
+    }
 
-	public void setAddress(Address address) {
-		this.address = address;
-	}
+    public void setGender(Gender gender) {
+        this.gender = gender;
+    }
 
-	public String getPhoneNumber() {
-		return phoneNumber;
-	}
+    public Address getAddress() {
+        return address;
+    }
 
-	public void setPhoneNumber(String phoneNumber) {
-		this.phoneNumber = phoneNumber;
-	}
+    public void setAddress(Address address) {
+        this.address = address;
+    }
 
-	public String getEmail() {
-		return email;
-	}
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -92,4 +96,5 @@ public abstract class Person {
     public int hashCode() {
         return Objects.hash(firstName, lastName, birthDate, gender, address, phoneNumber, email);
     }
+
 }

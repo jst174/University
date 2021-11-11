@@ -1,5 +1,6 @@
 package ua.com.foxminded.university.dao.jdbc;
 
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -10,7 +11,9 @@ import ua.com.foxminded.university.model.Time;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class JdbcTimeDao implements TimeDao {
@@ -20,6 +23,7 @@ public class JdbcTimeDao implements TimeDao {
     private static final String SQL_UPDATE_TIME = "UPDATE times SET start = ?, ending = ? WHERE id = ?";
     private static final String SQL_DELETE_TIME = "DELETE FROM times WHERE id = ?";
     private static final String SQL_FIND_ALL = "SELECT * FROM times";
+    private static final String SQL_FIND_BY_TIME = "SELECT * FROM times WHERE start = ? and ending = ?";
 
     private TimeMapper timeMapper;
     private JdbcTemplate jdbcTemplate;
@@ -40,8 +44,12 @@ public class JdbcTimeDao implements TimeDao {
         time.setId((int) keyHolder.getKeys().get("id"));
     }
 
-    public Time getById(int id) {
-        return jdbcTemplate.queryForObject(SQL_FIND_TIME, timeMapper, id);
+    public Optional<Time> getById(int id) {
+        try {
+            return Optional.of(jdbcTemplate.queryForObject(SQL_FIND_TIME, timeMapper, id));
+        } catch (DataAccessException e) {
+            return Optional.empty();
+        }
     }
 
     public void update(Time time) {
@@ -60,4 +68,12 @@ public class JdbcTimeDao implements TimeDao {
     }
 
 
+    @Override
+    public Optional<Time> getByTime(LocalTime start, LocalTime end) {
+        try {
+            return Optional.of(jdbcTemplate.queryForObject(SQL_FIND_BY_TIME, timeMapper, start, end));
+        } catch (DataAccessException e) {
+            return Optional.empty();
+        }
+    }
 }

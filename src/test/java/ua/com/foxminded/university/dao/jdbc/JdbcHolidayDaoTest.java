@@ -2,6 +2,7 @@ package ua.com.foxminded.university.dao.jdbc;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.jdbc.JdbcTestUtils.*;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,7 @@ import ua.com.foxminded.university.model.Holiday;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 
 @ExtendWith(SpringExtension.class)
@@ -45,9 +47,9 @@ public class JdbcHolidayDaoTest {
     public void givenId_whenGetById_thenReturn() {
         Holiday expected = new Holiday("New Year", LocalDate.of(2021, 12, 31));
 
-        Holiday actual = holidayDao.getById(1);
+        Optional<Holiday> actual = holidayDao.getById(1);
 
-        assertEquals(expected, actual);
+        assertEquals(expected, actual.get());
     }
 
     @Test
@@ -63,7 +65,7 @@ public class JdbcHolidayDaoTest {
     }
 
     @Test
-    public void givenId_whenDelete_thenDeleted(){
+    public void givenId_whenDelete_thenDeleted() {
         int expectedRows = countRowsInTable(jdbcTemplate, "holidays") - 1;
 
         holidayDao.delete(1);
@@ -72,7 +74,7 @@ public class JdbcHolidayDaoTest {
     }
 
     @Test
-    public void whenGetAll_thenReturnAllHolidays(){
+    public void whenGetAll_thenReturnAllHolidays() {
         Holiday holiday1 = new Holiday("New Year", LocalDate.of(2021, 12, 31));
         Holiday holiday2 = new Holiday("Day of knowledge", LocalDate.of(2021, 9, 1));
         List<Holiday> expected = new ArrayList<>();
@@ -82,5 +84,15 @@ public class JdbcHolidayDaoTest {
         List<Holiday> actual = holidayDao.getAll();
 
         assertEquals(expected, actual);
+    }
+
+    @Test
+    public void givenHolidayDate_whenGetByDate_thenReturn() {
+        LocalDate date = LocalDate.of(2021, 12, 31);
+        Holiday expected = new Holiday("New Year", date);
+
+        Optional<Holiday> actual = holidayDao.getByDate(LocalDate.of(2021, 12, 31));
+
+        assertEquals(expected, actual.get());
     }
 }

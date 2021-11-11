@@ -7,6 +7,10 @@ public class Course {
     private int id;
     private String name;
 
+    public Course() {
+
+    }
+
     public Course(String name) {
         this.name = name;
     }
@@ -43,5 +47,28 @@ public class Course {
     @Override
     public int hashCode() {
         return Objects.hash(name);
+    }
+
+    public static class Builder {
+
+        private Course course;
+
+        public Builder() {
+            course = new Course();
+        }
+
+        public Builder setId(int id) {
+            course.setId(id);
+            return this;
+        }
+
+        public Builder setName(String name) {
+            course.setName(name);
+            return this;
+        }
+
+        public Course build() {
+            return course;
+        }
     }
 }

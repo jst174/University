@@ -5,35 +5,39 @@ import java.util.Objects;
 
 public class Student extends Person {
 
-	private int id;
-	private Group group;
+    private int id;
+    private Group group;
 
-	public Student(String firstName, String lastName, LocalDate birthDate, Gender gender, Address address,
-			String phoneNumber, String email) {
-		super(firstName, lastName, birthDate, gender, address, phoneNumber, email);
-	}
+    public Student() {
 
-	public int getId() {
-		return id;
-	}
+    }
 
-	public void setId(int id) {
-		this.id = id;
-	}
+    public Student(String firstName, String lastName, LocalDate birthDate, Gender gender, Address address,
+                   String phoneNumber, String email) {
+        super(firstName, lastName, birthDate, gender, address, phoneNumber, email);
+    }
 
-	public Group getGroup() {
-		return group;
-	}
+    public int getId() {
+        return id;
+    }
 
-	public void setGroup(Group group) {
-		this.group = group;
-	}
+    public void setId(int id) {
+        this.id = id;
+    }
 
-	@Override
-	public String toString() {
-		return getFirstName() + " " + getLastName() + "; " + getBirthDate() + "; " + getGender() + "; " + getAddress()
-				+ "; " + getPhoneNumber() + "; " + getEmail() + "; " + group;
-	}
+    public Group getGroup() {
+        return group;
+    }
+
+    public void setGroup(Group group) {
+        this.group = group;
+    }
+
+    @Override
+    public String toString() {
+        return getFirstName() + " " + getLastName() + "; " + getBirthDate() + "; " + getGender() + "; " + getAddress()
+            + "; " + getPhoneNumber() + "; " + getEmail() + "; " + group;
+    }
 
     @Override
     public boolean equals(Object o) {

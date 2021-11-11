@@ -10,6 +10,10 @@ public class Vacation {
     private LocalDate end;
     private Teacher teacher;
 
+    public Vacation() {
+
+    }
+
     public Vacation(LocalDate start, LocalDate end, Teacher teacher) {
         this.start = start;
         this.end = end;

@@ -1,7 +1,7 @@
 package ua.com.foxminded.university.dao.jdbc;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.BatchPreparedStatementSetter;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -10,12 +10,14 @@ import org.springframework.transaction.annotation.Transactional;
 import ua.com.foxminded.university.dao.GroupDao;
 import ua.com.foxminded.university.dao.LessonDao;
 import ua.com.foxminded.university.dao.mapper.LessonMapper;
-import ua.com.foxminded.university.model.Group;
-import ua.com.foxminded.university.model.Lesson;
+import ua.com.foxminded.university.model.*;
+import ua.com.foxminded.university.model.Time;
 
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class JdbcLessonDao implements LessonDao {
@@ -30,6 +32,11 @@ public class JdbcLessonDao implements LessonDao {
     private static final String SQL_FIND_ALL = "SELECT * FROM lessons";
     private static final String SQL_ADD_GROUP = "INSERT INTO lessons_groups(lesson_id, group_id) VALUES (?,?)";
     private static final String SQL_DELETE_GROUP = "DELETE FROM lessons_groups WHERE lesson_id = ? and group_id = ?";
+    private static final String SQL_FIND_LESSONS_BY_TEACHER = "SELECT * FROM lessons WHERE teacher_id = ?";
+    private static final String SQL_FIND_LESSONS_BY_CLASSROOM = "SELECT * FROM lessons WHERE classroom_id = ?";
+    private static final String SQL_FIND_BY_DATE_AND_TIME_AND_TEACHER = "SELECT * FROM lessons WHERE date = ? and time_id = ? and teacher_id = ?";
+    private static final String SQL_FIND_BY_DATE_AND_TIME_AND_CLASSROOM = "SELECT * FROM lessons WHERE date = ? and time_id = ? and classroom_id = ?";
+    private static final String SQL_FIND_BY_DATE_AND_TIME = "SELECT * FROM lessons WHERE date = ? and time_id = ?";
 
     private JdbcTemplate jdbcTemplate;
     private LessonMapper lessonMapper;
@@ -57,8 +64,12 @@ public class JdbcLessonDao implements LessonDao {
         setGroups(lesson, new ArrayList<>());
     }
 
-    public Lesson getById(int id) {
-        return jdbcTemplate.queryForObject(SQL_FIND_LESSON, lessonMapper, id);
+    public Optional<Lesson> getById(int id) {
+        try {
+            return Optional.of(jdbcTemplate.queryForObject(SQL_FIND_LESSON, lessonMapper, id));
+        } catch (DataAccessException e) {
+            return Optional.empty();
+        }
     }
 
     @Override
@@ -85,6 +96,37 @@ public class JdbcLessonDao implements LessonDao {
         return jdbcTemplate.query(SQL_FIND_ALL, lessonMapper);
     }
 
+    @Override
+    public List<Lesson> getByTeacherId(int teacherId) {
+        return jdbcTemplate.query(SQL_FIND_LESSONS_BY_TEACHER, lessonMapper, teacherId);
+    }
+
+    @Override
+    public List<Lesson> getByClassroomId(int classroomId) {
+        return jdbcTemplate.query(SQL_FIND_LESSONS_BY_CLASSROOM, lessonMapper, classroomId);
+    }
+
+    @Override
+    public Optional<Lesson> getByDateAndTimeAndTeacher(LocalDate date, Time time, Teacher teacher) {
+        return Optional.ofNullable(jdbcTemplate.queryForObject(SQL_FIND_BY_DATE_AND_TIME_AND_TEACHER, lessonMapper, date,
+            time.getId(), teacher.getId()));
+    }
+
+    @Override
+    public Optional<Lesson> getByDateAndTimeAndClassroom(LocalDate date, Time time, Classroom classroom) {
+        try {
+            return Optional.of(jdbcTemplate.queryForObject(SQL_FIND_BY_DATE_AND_TIME_AND_CLASSROOM, lessonMapper, date,
+                time.getId(), classroom.getId()));
+        } catch (DataAccessException e) {
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public List<Lesson> getByDateAndTime(LocalDate date, Time time) {
+        return jdbcTemplate.query(SQL_FIND_BY_DATE_AND_TIME, lessonMapper, date,
+            time.getId());
+    }
 
     private void setGroups(Lesson lesson, List<Group> groups) {
         lesson.getGroups().stream()
