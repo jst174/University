@@ -1,5 +1,6 @@
 package ua.com.foxminded.university.service;
 
+import static java.lang.String.format;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -50,15 +51,18 @@ public class ClassroomServiceTest {
     }
 
     @Test
-    public void givenClassroomWithExistentNumber_whenCreateClassroom_thenNotCreated(){
+    public void givenClassroomWithExistentNumber_whenCreateClassroom_thenThrowException() {
         Classroom classroom = new Classroom(classrooms.get(0).getNumber(), 40);
 
         when(classroomDao.getById(classroom.getId())).thenReturn(Optional.empty());
         when(classroomDao.findByNumber(classroom.getNumber())).thenReturn(Optional.of(classroom));
 
-        classroomService.createClassroom(classroom);
+        Exception exception = assertThrows(ServiceException.class, () -> classroomService.createClassroom(classroom));
 
-        verify(classroomDao, never()).create(classroom);
+        String expectedMessage = format("Classroom with number %s already exist", classroom.getNumber());
+        String actualMessage = exception.getMessage();
+
+        assertEquals(expectedMessage, actualMessage);
     }
 
 
@@ -69,6 +73,18 @@ public class ClassroomServiceTest {
         when(classroomDao.getById(1)).thenReturn(Optional.of(classroom));
 
         assertEquals(classroom, classroomService.getById(1));
+    }
+
+    @Test
+    public void givenNotExistentClassroomId_whenGetById_thenThrowException() {
+        when(classroomDao.getById(20)).thenReturn(Optional.empty());
+
+        Exception exception = assertThrows(ServiceException.class, () -> classroomService.getById(20));
+
+        String expectedMessage = format("Classroom with id %s not found", 20);
+        String actualMessage = exception.getMessage();
+
+        assertEquals(expectedMessage, actualMessage);
     }
 
     @Test
@@ -84,7 +100,7 @@ public class ClassroomServiceTest {
     }
 
     @Test
-    public void givenClassroomWithOtherClassroomNumber_whenUpdate_thenNotUpdated(){
+    public void givenClassroomWithOtherClassroomNumber_whenUpdate_thenThrowException() {
         Classroom classroom1 = classrooms.get(0);
         classroom1.setNumber(202);
         Classroom classroom2 = classrooms.get(1);
@@ -92,9 +108,12 @@ public class ClassroomServiceTest {
         when(classroomDao.getById(classroom1.getId())).thenReturn(Optional.of(classroom1));
         when(classroomDao.findByNumber(classroom1.getNumber())).thenReturn(Optional.of(classroom2));
 
-        classroomService.update(classroom1);
+        Exception exception = assertThrows(ServiceException.class, () -> classroomService.update(classroom1));
 
-        verify(classroomDao, never()).update(classroom1);
+        String expectedMessage = format("Classroom with number %s already exist", classroom1.getNumber());
+        String actualMessage = exception.getMessage();
+
+        assertEquals(expectedMessage, actualMessage);
     }
 
     @Test

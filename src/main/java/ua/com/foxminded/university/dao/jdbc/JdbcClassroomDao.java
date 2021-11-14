@@ -7,6 +7,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ua.com.foxminded.university.dao.ClassroomDao;
+import ua.com.foxminded.university.dao.DaoException;
 import ua.com.foxminded.university.dao.mapper.ClassroomMapper;
 import ua.com.foxminded.university.model.Classroom;
 
@@ -14,6 +15,8 @@ import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.List;
 import java.util.Optional;
+
+import static java.lang.String.format;
 
 @Component
 public class JdbcClassroomDao implements ClassroomDao {
@@ -34,14 +37,19 @@ public class JdbcClassroomDao implements ClassroomDao {
     }
 
     public void create(Classroom classroom) {
-        KeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbcTemplate.update(connection -> {
-            PreparedStatement statement = connection.prepareStatement(SQL_INSERT_CLASSROOM, Statement.RETURN_GENERATED_KEYS);
-            statement.setInt(1, classroom.getNumber());
-            statement.setInt(2, classroom.getCapacity());
-            return statement;
-        }, keyHolder);
-        classroom.setId((int) keyHolder.getKeys().get("id"));
+        try {
+            KeyHolder keyHolder = new GeneratedKeyHolder();
+            jdbcTemplate.update(connection -> {
+                PreparedStatement statement = connection.prepareStatement(SQL_INSERT_CLASSROOM, Statement.RETURN_GENERATED_KEYS);
+                statement.setInt(1, classroom.getNumber());
+                statement.setInt(2, classroom.getCapacity());
+                return statement;
+            }, keyHolder);
+            classroom.setId((int) keyHolder.getKeys().get("id"));
+        } catch (DataAccessException e) {
+            String msg = format("Couldn't create classroom %s", classroom.getNumber());
+            throw new DaoException(msg, e);
+        }
     }
 
     public Optional<Classroom> getById(int id) {
@@ -53,16 +61,31 @@ public class JdbcClassroomDao implements ClassroomDao {
     }
 
     public void update(Classroom classroom) {
-        jdbcTemplate.update(SQL_UPDATE_CLASSROOM, classroom.getNumber(), classroom.getCapacity(), classroom.getId());
+        try {
+            jdbcTemplate.update(SQL_UPDATE_CLASSROOM, classroom.getNumber(), classroom.getCapacity(), classroom.getId());
+        } catch (DataAccessException e) {
+            String msg = format("Couldn't update classroom %s", classroom.getNumber());
+            throw new DaoException(msg, e);
+        }
     }
 
     public void delete(int id) {
-        jdbcTemplate.update(SQL_DELETE_CLASSROOM, id);
+        try {
+            jdbcTemplate.update(SQL_DELETE_CLASSROOM, id);
+        } catch (DataAccessException e) {
+            String msg = format("Couldn't delete classroom with id = %s", id);
+            throw new DaoException(msg, e);
+        }
     }
 
     @Override
     public List<Classroom> getAll() {
-        return jdbcTemplate.query(SQL_FIND_ALL, classroomMapper);
+        try {
+            return jdbcTemplate.query(SQL_FIND_ALL, classroomMapper);
+        } catch (DataAccessException e) {
+            String msg = "Couldn't find all classroom";
+            throw new DaoException(msg, e);
+        }
     }
 
     @Override
