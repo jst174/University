@@ -1,9 +1,8 @@
-package ua.com.foxminded.university.service;
+package ua.com.foxminded.university.exceptions;
 
 public class ServiceException extends RuntimeException {
 
     public ServiceException() {
-        super();
     }
 
     public ServiceException(String message) {

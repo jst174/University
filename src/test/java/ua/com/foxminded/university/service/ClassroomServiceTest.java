@@ -11,11 +11,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ua.com.foxminded.university.dao.ClassroomDao;
+import ua.com.foxminded.university.exceptions.ServiceException;
 import ua.com.foxminded.university.model.Classroom;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
@@ -54,8 +54,8 @@ public class ClassroomServiceTest {
     public void givenClassroomWithExistentNumber_whenCreateClassroom_thenThrowException() {
         Classroom classroom = new Classroom(classrooms.get(0).getNumber(), 40);
 
-        when(classroomDao.getById(classroom.getId())).thenReturn(Optional.empty());
-        when(classroomDao.findByNumber(classroom.getNumber())).thenReturn(Optional.of(classroom));
+        when(classroomDao.getById(classroom.getId())).thenReturn(Optional.of(classroom));
+        when(classroomDao.findByNumber(classroom.getNumber())).thenReturn(Optional.of(classrooms.get(0)));
 
         Exception exception = assertThrows(ServiceException.class, () -> classroomService.createClassroom(classroom));
 
