@@ -27,18 +27,14 @@ public class GroupService {
         this.lessonDao = lessonDao;
     }
 
-    public void create(Group group) {
-        try {
-            logger.debug("Creating group '{}'", group.getName());
-            if (isUnique(group)) {
-                groupDao.create(group);
-            }
-        } catch (NotUniqueNameException e) {
-            throw new ServiceException(e.getMessage());
+    public void create(Group group) throws NotUniqueNameException {
+        logger.debug("Creating group '{}'", group.getName());
+        if (isUnique(group)) {
+            groupDao.create(group);
         }
     }
 
-    public Group getById(int id) {
+    public Group getById(int id) throws ServiceException {
         try {
             logger.debug("Getting group with id '{}'", id);
             return groupDao.getById(id).orElseThrow();
@@ -48,14 +44,10 @@ public class GroupService {
         }
     }
 
-    public void update(Group group) {
-        try {
-            logger.debug("Updating group '{}'", group.getName());
-            if (isUnique(group)) {
-                groupDao.update(group);
-            }
-        } catch (NotUniqueNameException e) {
-            throw new ServiceException(e.getMessage());
+    public void update(Group group) throws NotUniqueNameException {
+        logger.debug("Updating group '{}'", group.getName());
+        if (isUnique(group)) {
+            groupDao.update(group);
         }
     }
 

@@ -11,6 +11,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ua.com.foxminded.university.dao.ClassroomDao;
+import ua.com.foxminded.university.exceptions.NotUniqueNameException;
 import ua.com.foxminded.university.exceptions.ServiceException;
 import ua.com.foxminded.university.model.Classroom;
 
@@ -39,7 +40,7 @@ public class ClassroomServiceTest {
     }
 
     @Test
-    public void givenNewClassroom_whenCreateClassroom_thenCreated() {
+    public void givenNewClassroom_whenCreateClassroom_thenCreated() throws NotUniqueNameException {
         Classroom classroom = new Classroom(102, 30);
 
         when(classroomDao.getById(classroom.getId())).thenReturn(Optional.empty());
@@ -57,7 +58,7 @@ public class ClassroomServiceTest {
         when(classroomDao.getById(classroom.getId())).thenReturn(Optional.of(classroom));
         when(classroomDao.findByNumber(classroom.getNumber())).thenReturn(Optional.of(classrooms.get(0)));
 
-        Exception exception = assertThrows(ServiceException.class, () -> classroomService.createClassroom(classroom));
+        Exception exception = assertThrows(NotUniqueNameException.class, () -> classroomService.createClassroom(classroom));
 
         String expectedMessage = format("Classroom with number %s already exist", classroom.getNumber());
         String actualMessage = exception.getMessage();
@@ -88,7 +89,7 @@ public class ClassroomServiceTest {
     }
 
     @Test
-    public void givenExistentClassroom_whenUpdate_thenUpdated() {
+    public void givenExistentClassroom_whenUpdate_thenUpdated() throws NotUniqueNameException {
         Classroom classroom = classrooms.get(0);
 
         when(classroomDao.getById(classroom.getId())).thenReturn(Optional.of(classroom));
@@ -108,7 +109,7 @@ public class ClassroomServiceTest {
         when(classroomDao.getById(classroom1.getId())).thenReturn(Optional.of(classroom1));
         when(classroomDao.findByNumber(classroom1.getNumber())).thenReturn(Optional.of(classroom2));
 
-        Exception exception = assertThrows(ServiceException.class, () -> classroomService.update(classroom1));
+        Exception exception = assertThrows(NotUniqueNameException.class, () -> classroomService.update(classroom1));
 
         String expectedMessage = format("Classroom with number %s already exist", classroom1.getNumber());
         String actualMessage = exception.getMessage();

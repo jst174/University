@@ -1,6 +1,6 @@
 package ua.com.foxminded.university.exceptions;
 
-public class NotUniqueNameException extends Exception {
+public class NotUniqueNameException extends ServiceException {
 
     public NotUniqueNameException() {
     }
@@ -9,7 +9,7 @@ public class NotUniqueNameException extends Exception {
         super(message);
     }
 
-    public NotUniqueNameException(String message, Throwable cause) {
+    public NotUniqueNameException(String message, ServiceException cause) {
         super(message, cause);
     }
 }

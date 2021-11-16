@@ -10,6 +10,7 @@ import ua.com.foxminded.university.model.Classroom;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 
@@ -25,19 +26,14 @@ public class ClassroomService {
         this.classroomDao = classroomDao;
     }
 
-    public void createClassroom(Classroom classroom) {
-        try {
+    public void createClassroom(Classroom classroom) throws NotUniqueNameException {
             logger.debug("Creating classroom '{}'", classroom.getNumber());
             if (isUnique(classroom)) {
                 classroomDao.create(classroom);
             }
-        } catch (NotUniqueNameException e) {
-            throw new ServiceException(e.getMessage());
-        }
-
     }
 
-    public Classroom getById(int id) {
+    public Classroom getById(int id) throws ServiceException {
         try {
             logger.debug("Getting classroom  with id - '{}'", id);
             return classroomDao.getById(id).orElseThrow();
@@ -47,15 +43,11 @@ public class ClassroomService {
         }
     }
 
-    public void update(Classroom classroom) {
-        try {
+    public void update(Classroom classroom) throws NotUniqueNameException {
             logger.debug("Updating classroom '{}'", classroom.getNumber());
             if (isUnique(classroom)) {
                 classroomDao.update(classroom);
             }
-        } catch (NotUniqueNameException e) {
-            throw new ServiceException(e.getMessage());
-        }
     }
 
     public void delete(int id) {
@@ -69,13 +61,14 @@ public class ClassroomService {
     }
 
     private boolean isUnique(Classroom classroom) throws NotUniqueNameException {
-        if (classroomDao.getById(classroom.getId()).isEmpty()) {
-            return classroomDao.findByNumber(classroom.getNumber()).isEmpty();
-        } else if (classroomDao.findByNumber(classroom.getNumber()).get().getId() == classroom.getId()) {
-            return true;
-        } else {
+        Optional<Classroom> classroomByNumber = classroomDao.findByNumber(classroom.getNumber());
+        Optional<Classroom> classroomById = classroomDao.getById(classroom.getId());
+        if ((classroomById.isPresent() && classroomByNumber.orElseThrow().getId() != classroom.getId())
+            || (classroomById.isEmpty() && classroomByNumber.isPresent())) {
             String msg = format("Classroom with number %s already exist", classroom.getNumber());
             throw new NotUniqueNameException(msg);
+        } else {
+            return true;
         }
     }
 }

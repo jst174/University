@@ -26,18 +26,14 @@ public class CourseService {
         this.courseDao = courseDao;
     }
 
-    public void create(Course course) {
-        try {
+    public void create(Course course) throws NotUniqueNameException {
             logger.debug("Creating course '{}'", course.getName());
             if (isUnique(course)) {
                 courseDao.create(course);
             }
-        } catch (NotUniqueNameException e) {
-            throw new SecurityException(e.getMessage());
-        }
     }
 
-    public Course getById(int id) {
+    public Course getById(int id) throws ServiceException {
         try {
             logger.debug("Getting course with id '{}'", id);
             return courseDao.getById(id).orElseThrow();
@@ -47,15 +43,11 @@ public class CourseService {
         }
     }
 
-    public void update(Course course) {
-        try {
+    public void update(Course course) throws NotUniqueNameException {
             logger.debug("Updating course '{}'", course.getName());
             if (isUnique(course)) {
                 courseDao.update(course);
             }
-        } catch (NotUniqueNameException e) {
-            throw new SecurityException(e.getMessage());
-        }
     }
 
     public void delete(int id) {

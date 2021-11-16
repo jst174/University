@@ -1,6 +1,6 @@
 package ua.com.foxminded.university.exceptions;
 
-public class ServiceException extends RuntimeException {
+public class ServiceException extends Exception {
 
     public ServiceException() {
     }
@@ -9,7 +9,7 @@ public class ServiceException extends RuntimeException {
         super(message);
     }
 
-    public ServiceException(String message, RuntimeException cause) {
+    public ServiceException(String message, Exception cause) {
         super(message, cause);
     }
 }
