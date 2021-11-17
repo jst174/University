@@ -11,6 +11,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ua.com.foxminded.university.dao.ClassroomDao;
+import ua.com.foxminded.university.exceptions.NoEntityException;
 import ua.com.foxminded.university.exceptions.NotUniqueNameException;
 import ua.com.foxminded.university.exceptions.ServiceException;
 import ua.com.foxminded.university.model.Classroom;
@@ -43,7 +44,6 @@ public class ClassroomServiceTest {
     public void givenNewClassroom_whenCreateClassroom_thenCreated() throws NotUniqueNameException {
         Classroom classroom = new Classroom(102, 30);
 
-        when(classroomDao.getById(classroom.getId())).thenReturn(Optional.empty());
         when(classroomDao.findByNumber(classroom.getNumber())).thenReturn(Optional.empty());
 
         classroomService.createClassroom(classroom);
@@ -55,7 +55,6 @@ public class ClassroomServiceTest {
     public void givenClassroomWithExistentNumber_whenCreateClassroom_thenThrowException() {
         Classroom classroom = new Classroom(classrooms.get(0).getNumber(), 40);
 
-        when(classroomDao.getById(classroom.getId())).thenReturn(Optional.of(classroom));
         when(classroomDao.findByNumber(classroom.getNumber())).thenReturn(Optional.of(classrooms.get(0)));
 
         Exception exception = assertThrows(NotUniqueNameException.class, () -> classroomService.createClassroom(classroom));
@@ -68,7 +67,7 @@ public class ClassroomServiceTest {
 
 
     @Test
-    public void givenExistClassroomId_whenGetById_thenReturn() {
+    public void givenExistClassroomId_whenGetById_thenReturn() throws NoEntityException {
         Classroom classroom = classrooms.get(0);
 
         when(classroomDao.getById(1)).thenReturn(Optional.of(classroom));
@@ -80,7 +79,7 @@ public class ClassroomServiceTest {
     public void givenNotExistentClassroomId_whenGetById_thenThrowException() {
         when(classroomDao.getById(20)).thenReturn(Optional.empty());
 
-        Exception exception = assertThrows(ServiceException.class, () -> classroomService.getById(20));
+        Exception exception = assertThrows(NoEntityException.class, () -> classroomService.getById(20));
 
         String expectedMessage = format("Classroom with id %s not found", 20);
         String actualMessage = exception.getMessage();
@@ -92,7 +91,6 @@ public class ClassroomServiceTest {
     public void givenExistentClassroom_whenUpdate_thenUpdated() throws NotUniqueNameException {
         Classroom classroom = classrooms.get(0);
 
-        when(classroomDao.getById(classroom.getId())).thenReturn(Optional.of(classroom));
         when(classroomDao.findByNumber(classroom.getNumber())).thenReturn(Optional.of(classroom));
 
         classroomService.update(classroom);
@@ -106,7 +104,6 @@ public class ClassroomServiceTest {
         classroom1.setNumber(202);
         Classroom classroom2 = classrooms.get(1);
 
-        when(classroomDao.getById(classroom1.getId())).thenReturn(Optional.of(classroom1));
         when(classroomDao.findByNumber(classroom1.getNumber())).thenReturn(Optional.of(classroom2));
 
         Exception exception = assertThrows(NotUniqueNameException.class, () -> classroomService.update(classroom1));
@@ -124,6 +121,13 @@ public class ClassroomServiceTest {
         classroomService.delete(1);
 
         verify(classroomDao).delete(1);
+    }
+
+    @Test
+    public void whenGetAll_thenReturn() {
+        when(classroomDao.getAll()).thenReturn(classrooms);
+
+        assertEquals(classrooms, classroomService.getAll());
     }
 
 }

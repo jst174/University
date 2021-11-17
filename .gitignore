@@ -3,7 +3,7 @@
 *.war
 *.ear
 *.class
-
+*.log
 
 # Intellij
 .idea/

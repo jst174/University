@@ -9,6 +9,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import ua.com.foxminded.university.DataSource;
 import ua.com.foxminded.university.dao.CourseDao;
 import ua.com.foxminded.university.dao.TeacherDao;
+import ua.com.foxminded.university.exceptions.NotUniqueNameException;
+import ua.com.foxminded.university.exceptions.ServiceException;
 import ua.com.foxminded.university.model.Course;
 import ua.com.foxminded.university.model.Teacher;
 
@@ -53,7 +55,7 @@ public class CourseServiceTest {
     }
 
     @Test
-    public void givenNewCourse_whenCreate_thenCreated() {
+    public void givenNewCourse_whenCreate_thenCreated() throws NotUniqueNameException {
         Course course = new Course("History");
 
         when(courseDao.getById(course.getId())).thenReturn(Optional.empty());
@@ -65,7 +67,7 @@ public class CourseServiceTest {
     }
 
     @Test
-    public void givenCourseWithExistentName_whenCreate_thenNotCreated() {
+    public void givenCourseWithExistentName_whenCreate_thenNotCreated() throws NotUniqueNameException {
         Course course = new Course(courses.get(0).getName());
 
         when(courseDao.getById(course.getId())).thenReturn(Optional.empty());
@@ -78,7 +80,7 @@ public class CourseServiceTest {
 
 
     @Test
-    public void givenExistentId_whenGetById_thenReturn() {
+    public void givenExistentId_whenGetById_thenReturn() throws ServiceException {
         Course course = courses.get(0);
 
         when(courseDao.getById(1)).thenReturn(Optional.of(course));
@@ -88,7 +90,7 @@ public class CourseServiceTest {
     }
 
     @Test
-    public void givenExistentCourse_whenUpdate_thenUpdated() {
+    public void givenExistentCourse_whenUpdate_thenUpdated() throws NotUniqueNameException {
         Course course = courses.get(0);
 
         when(courseDao.getById(course.getId())).thenReturn(Optional.of(course));
@@ -100,7 +102,7 @@ public class CourseServiceTest {
     }
 
     @Test
-    public void givenCourseWithOtherCourseName_whenUpdate_thenNotUpdated() {
+    public void givenCourseWithOtherCourseName_whenUpdate_thenNotUpdated() throws NotUniqueNameException {
         Course course1 = courses.get(0);
         Course course2 = courses.get(1);
         course1.setName(course2.getName());

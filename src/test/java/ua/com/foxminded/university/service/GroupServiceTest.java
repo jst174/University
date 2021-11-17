@@ -12,6 +12,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import ua.com.foxminded.university.DataSource;
 import ua.com.foxminded.university.dao.GroupDao;
 import ua.com.foxminded.university.dao.LessonDao;
+import ua.com.foxminded.university.exceptions.NotUniqueNameException;
+import ua.com.foxminded.university.exceptions.ServiceException;
 import ua.com.foxminded.university.model.Group;
 import ua.com.foxminded.university.model.Lesson;
 
@@ -55,7 +57,7 @@ public class GroupServiceTest {
     }
 
     @Test
-    public void givenNewGroup_whenCreate_thenCreated() {
+    public void givenNewGroup_whenCreate_thenCreated() throws NotUniqueNameException {
         Group group = new Group("GD-22");
 
         when(groupDao.getById(group.getId())).thenReturn(Optional.empty());
@@ -67,7 +69,7 @@ public class GroupServiceTest {
     }
 
     @Test
-    public void givenGroupWithExistentName_whenCreate_thenNotCreated() {
+    public void givenGroupWithExistentName_whenCreate_thenNotCreated() throws NotUniqueNameException {
         Group group = new Group(groups.get(0).getName());
 
         when(groupDao.getById(group.getId())).thenReturn(Optional.empty());
@@ -79,7 +81,7 @@ public class GroupServiceTest {
     }
 
     @Test
-    public void givenExistentGroupId_whenGetById_thenReturn() {
+    public void givenExistentGroupId_whenGetById_thenReturn() throws ServiceException {
         Group group = groups.get(0);
 
         when(groupDao.getById(1)).thenReturn(Optional.of(group));
@@ -88,7 +90,7 @@ public class GroupServiceTest {
     }
 
     @Test
-    public void givenExistentGroup_whenUpdate_thenUpdated() {
+    public void givenExistentGroup_whenUpdate_thenUpdated() throws NotUniqueNameException {
         Group group = groups.get(0);
 
         when(groupDao.getById(group.getId())).thenReturn(Optional.of(group));
@@ -100,7 +102,7 @@ public class GroupServiceTest {
     }
 
     @Test
-    public void givenGroupWithOtherGroupName_whenUpdate_thenUpdated() {
+    public void givenGroupWithOtherGroupName_whenUpdate_thenUpdated() throws NotUniqueNameException {
         Group group1 = groups.get(0);
         Group group2 = groups.get(1);
         group1.setName(group2.getName());
