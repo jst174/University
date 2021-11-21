@@ -11,9 +11,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ua.com.foxminded.university.dao.ClassroomDao;
-import ua.com.foxminded.university.exceptions.NoEntityException;
+import ua.com.foxminded.university.exceptions.EntityNotFoundException;
 import ua.com.foxminded.university.exceptions.NotUniqueNameException;
-import ua.com.foxminded.university.exceptions.ServiceException;
 import ua.com.foxminded.university.model.Classroom;
 
 import java.util.ArrayList;
@@ -59,15 +58,14 @@ public class ClassroomServiceTest {
 
         Exception exception = assertThrows(NotUniqueNameException.class, () -> classroomService.createClassroom(classroom));
 
-        String expectedMessage = format("Classroom with number %s already exist", classroom.getNumber());
-        String actualMessage = exception.getMessage();
+        String expectedMessage = "Classroom with number = 101 already exist";
 
-        assertEquals(expectedMessage, actualMessage);
+        assertEquals(expectedMessage, exception.getMessage());
     }
 
 
     @Test
-    public void givenExistClassroomId_whenGetById_thenReturn() throws NoEntityException {
+    public void givenExistClassroomId_whenGetById_thenReturn() throws EntityNotFoundException {
         Classroom classroom = classrooms.get(0);
 
         when(classroomDao.getById(1)).thenReturn(Optional.of(classroom));
@@ -79,12 +77,11 @@ public class ClassroomServiceTest {
     public void givenNotExistentClassroomId_whenGetById_thenThrowException() {
         when(classroomDao.getById(20)).thenReturn(Optional.empty());
 
-        Exception exception = assertThrows(NoEntityException.class, () -> classroomService.getById(20));
+        Exception exception = assertThrows(EntityNotFoundException.class, () -> classroomService.getById(20));
 
-        String expectedMessage = format("Classroom with id %s not found", 20);
-        String actualMessage = exception.getMessage();
+        String expectedMessage = "Classroom with id = 20 not found";
 
-        assertEquals(expectedMessage, actualMessage);
+        assertEquals(expectedMessage, exception.getMessage());
     }
 
     @Test
@@ -108,10 +105,9 @@ public class ClassroomServiceTest {
 
         Exception exception = assertThrows(NotUniqueNameException.class, () -> classroomService.update(classroom1));
 
-        String expectedMessage = format("Classroom with number %s already exist", classroom1.getNumber());
-        String actualMessage = exception.getMessage();
+        String expectedMessage = "Classroom with number = 202 already exist";
 
-        assertEquals(expectedMessage, actualMessage);
+        assertEquals(expectedMessage, exception.getMessage());
     }
 
     @Test

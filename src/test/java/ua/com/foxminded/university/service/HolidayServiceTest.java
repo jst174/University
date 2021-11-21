@@ -7,6 +7,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ua.com.foxminded.university.dao.HolidayDao;
+import ua.com.foxminded.university.exceptions.EntityNotFoundException;
+import ua.com.foxminded.university.exceptions.NotUniqueDateException;
 import ua.com.foxminded.university.model.Holiday;
 
 import java.time.LocalDate;
@@ -38,11 +40,10 @@ public class HolidayServiceTest {
     }
 
     @Test
-    public void givenNewHoliday_whenCreate_thenCreated() {
+    public void givenNewHoliday_whenCreate_thenCreated() throws NotUniqueDateException {
         LocalDate date = LocalDate.of(2022, 3, 8);
         Holiday holiday = new Holiday("Women's Day", date);
 
-        when(holidayDao.getById(holiday.getId())).thenReturn(Optional.empty());
         when(holidayDao.getByDate(holiday.getDate())).thenReturn(Optional.empty());
 
         holidayService.create(holiday);
@@ -51,19 +52,20 @@ public class HolidayServiceTest {
     }
 
     @Test
-    public void givenHolidayWithOtherHolidayDate_whenCreate_thenNotCreated() {
+    public void givenHolidayWithOtherHolidayDate_whenCreate_thenThrowException() throws NotUniqueDateException {
         Holiday holiday = new Holiday("holiday", holidays.get(0).getDate());
 
-        when(holidayDao.getById(holiday.getId())).thenReturn(Optional.empty());
-        when(holidayDao.getByDate(holiday.getDate())).thenReturn(Optional.of(holiday));
+        when(holidayDao.getByDate(holiday.getDate())).thenReturn(Optional.of(holidays.get(0)));
 
-        holidayService.create(holiday);
+        Exception exception = assertThrows(NotUniqueDateException.class, () -> holidayService.create(holiday));
 
-        verify(holidayDao, never()).create(holiday);
+        String expectedMessage = "Holiday with date = 2022-01-01 already exist";
+
+        assertEquals(expectedMessage, exception.getMessage());
     }
 
     @Test
-    public void givenExistentHolidayId_whenGetById_thenReturn() {
+    public void givenExistentHolidayId_whenGetById_thenReturn() throws EntityNotFoundException {
         Holiday holiday = holidays.get(0);
 
         when(holidayDao.getById(1)).thenReturn(Optional.of(holiday));
@@ -72,10 +74,20 @@ public class HolidayServiceTest {
     }
 
     @Test
-    public void givenExistentHoliday_whenUpdate_thenUpdated() {
+    public void givenNotExistentHolidayId_whenGetById_thenThrowException() {
+        when(holidayDao.getById(20)).thenReturn(Optional.empty());
+
+        Exception exception = assertThrows(EntityNotFoundException.class, () -> holidayService.getById(20));
+
+        String expectedMessage = "Holiday with id = 20 not found";
+
+        assertEquals(expectedMessage, exception.getMessage());
+    }
+
+    @Test
+    public void givenExistentHoliday_whenUpdate_thenUpdated() throws NotUniqueDateException {
         Holiday holiday = holidays.get(0);
 
-        when(holidayDao.getById(holiday.getId())).thenReturn(Optional.of(holiday));
         when(holidayDao.getByDate(holiday.getDate())).thenReturn(Optional.of(holiday));
 
         holidayService.update(holiday);
@@ -84,17 +96,18 @@ public class HolidayServiceTest {
     }
 
     @Test
-    public void givenHolidayWithOtherHolidayDate_whenUpdate_thenNotUpdated() {
+    public void givenHolidayWithOtherHolidayDate_whenUpdate_thenThrowException() throws NotUniqueDateException {
         Holiday holiday1 = holidays.get(0);
         Holiday holiday2 = holidays.get(1);
         holiday1.setDate(holiday2.getDate());
 
-        when(holidayDao.getById(holiday1.getId())).thenReturn(Optional.of(holiday1));
         when(holidayDao.getByDate(holiday1.getDate())).thenReturn(Optional.of(holiday2));
 
-        holidayService.update(holiday1);
+        Exception exception = assertThrows(NotUniqueDateException.class, () -> holidayService.update(holiday1));
 
-        verify(holidayDao, never()).update(holiday1);
+        String expectedMessage = "Holiday with date = 2022-01-07 already exist";
+
+        assertEquals(expectedMessage, exception.getMessage());
     }
 
     @Test
@@ -102,6 +115,13 @@ public class HolidayServiceTest {
         holidayService.delete(1);
 
         verify(holidayDao).delete(1);
+    }
+
+    @Test
+    public void whenGetAll_thenReturn() {
+        when(holidayDao.getAll()).thenReturn(holidays);
+
+        assertEquals(holidays, holidayService.getAll());
     }
 
 }
