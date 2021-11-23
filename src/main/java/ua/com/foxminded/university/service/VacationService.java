@@ -21,6 +21,7 @@ import static java.time.temporal.ChronoUnit.DAYS;
 public class VacationService {
 
     private static final Logger logger = LoggerFactory.getLogger(VacationService.class);
+
     private VacationDao vacationDao;
     @Value("#{${maxPeriodsVacation}}")
     private Map<AcademicDegree, Integer> maxPeriodsVacation;
@@ -75,7 +76,8 @@ public class VacationService {
         if ((maxVacationPeriod) < (vacations.stream()
             .mapToLong(v -> DAYS.between(v.getStart(), v.getEnd()))
             .sum())) {
-            throw new NotAvailablePeriodException(format("Vacation with period = %s days not available",
+            throw new NotAvailablePeriodException(format("Vacation with period = %s days not available. " +
+                    "The total duration of all vacations is longer than the maximum allowed",
                 DAYS.between(vacation.getStart(), vacation.getEnd())));
         }
     }

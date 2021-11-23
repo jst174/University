@@ -17,6 +17,7 @@ import static java.lang.String.format;
 public class TeacherService {
 
     private static final Logger logger = LoggerFactory.getLogger(TeacherService.class);
+
     private TeacherDao teacherDao;
 
     public TeacherService(TeacherDao teacherDao) {

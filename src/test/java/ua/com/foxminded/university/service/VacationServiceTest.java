@@ -82,7 +82,7 @@ public class VacationServiceTest {
     }
 
     @Test
-    public void givenNewVacation_whenCreate_thenCreated() throws IOException, NotAvailablePeriodException, NotUniqueVacationDatesException {
+    public void givenNewVacation_whenCreate_thenCreated() throws NotAvailablePeriodException, NotUniqueVacationDatesException {
         Vacation vacation = new Vacation(
             LocalDate.of(2021, 3, 1),
             LocalDate.of(2021, 3, 10),
@@ -97,7 +97,7 @@ public class VacationServiceTest {
     }
 
     @Test
-    public void givenNewVacationWithNotAcceptablePeriod_whenCreate_thenThrowException() {
+    public void givenNewVacationWithNotAcceptablePeriod_whenCreate_thenNotAvailablePeriodExceptionThrow() {
         Vacation vacation = new Vacation(
             LocalDate.of(2021, 3, 1),
             LocalDate.of(2021, 4, 30),
@@ -108,13 +108,16 @@ public class VacationServiceTest {
 
         Exception exception = assertThrows(NotAvailablePeriodException.class, () -> vacationService.create(vacation));
 
-        String expectedMessage = "Vacation with period = 60 days not available";
+        String expectedMessage = "Vacation with period = 60 days not available. " +
+            "The total duration of all vacations is longer than the maximum allowed";
+
+        verify(vacationDao, never()).create(vacation);
 
         assertEquals(expectedMessage, exception.getMessage());
     }
 
     @Test
-    public void givenExistentVacation_whenCreate_thenThrowException() {
+    public void givenExistentVacation_whenCreate_thenNotUniqueVacationDatesExceptionThrow() {
         Vacation vacation = new Vacation();
         vacation.setStart(vacations.get(0).getStart());
         vacation.setEnd(vacations.get(0).getEnd());
@@ -125,6 +128,8 @@ public class VacationServiceTest {
         Exception exception = assertThrows(NotUniqueVacationDatesException.class, () -> vacationService.create(vacation));
 
         String expectedMessage = "Teacher's vacation with start = 2021-11-05 and end = 2021-11-10 already exist";
+
+        verify(vacationDao, never()).create(vacation);
 
         assertEquals(expectedMessage, exception.getMessage());
     }
@@ -139,7 +144,7 @@ public class VacationServiceTest {
     }
 
     @Test
-    public void givenNotExistentId_whenGetById_thenThrowException() {
+    public void givenNotExistentId_whenGetById_thenEntityNotFoundExceptionThrow() {
         when(vacationDao.getById(20)).thenReturn(Optional.empty());
 
         Exception exception = assertThrows(EntityNotFoundException.class, () -> vacationService.getById(20));
@@ -162,7 +167,7 @@ public class VacationServiceTest {
     }
 
     @Test
-    public void givenVacationWithOtherVacationTeacherAndVacationDates_whenUpdate_thenThrowException() {
+    public void givenVacationWithOtherVacationTeacherAndVacationDates_whenUpdate_thenNotUniqueVacationDatesExceptionThrow() {
         Vacation vacation1 = vacations.get(0);
         Vacation vacation2 = vacations.get(1);
         vacation1.setTeacher(vacation2.getTeacher());
@@ -175,21 +180,26 @@ public class VacationServiceTest {
 
         String expectedMessage = "Teacher's vacation with start = 2021-05-05 and end = 2021-05-10 already exist";
 
+        verify(vacationDao, never()).update(vacation1);
+
         assertEquals(expectedMessage, exception.getMessage());
     }
 
     @Test
-    public void givenVacationWithNotAcceptablePeriod_whenUpdate_thenThrowException() {
+    public void givenVacationWithNotAcceptablePeriod_whenUpdate_thenNotAvailablePeriodExceptionThrow() {
         Vacation vacation = vacations.get(0);
         vacation.setStart(LocalDate.of(2021, 1, 1));
         vacation.setEnd(LocalDate.of(2021, 1, 26));
 
         when(vacationDao.getByTeacherAndVacationDates(vacation)).thenReturn(Optional.of(vacation));
-        when(vacationDao.getByTeacherId(vacation.getTeacher().getId())).thenReturn(vacations);
+        when(vacationDao.getByTeacherId(1)).thenReturn(vacations);
 
         Exception exception = assertThrows(NotAvailablePeriodException.class, () -> vacationService.update(vacation));
 
-        String expectedMessage = "Vacation with period = 25 days not available";
+        String expectedMessage = "Vacation with period = 25 days not available. " +
+            "The total duration of all vacations is longer than the maximum allowed";
+
+        verify(vacationDao, never()).update(vacation);
 
         assertEquals(expectedMessage, exception.getMessage());
     }

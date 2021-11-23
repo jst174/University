@@ -56,7 +56,7 @@ public class TeacherServiceTest {
     }
 
     @Test
-    public void givenExistentTeacher_whenCreate_thenThrowException() {
+    public void givenExistentTeacher_whenCreate_thenNotUniqueNameExceptionThrow() {
         Teacher teacher = new Teacher();
         teacher.setFirstName(teachers.get(0).getFirstName());
         teacher.setLastName(teachers.get(0).getLastName());
@@ -67,6 +67,8 @@ public class TeacherServiceTest {
 
         String expectedMessage = format("Teacher with name %s %s already exist",
             teacher.getFirstName(), teacher.getLastName());
+
+        verify(teacherDao, never()).create(teacher);
 
         assertEquals(expectedMessage, exception.getMessage());
     }
@@ -81,7 +83,7 @@ public class TeacherServiceTest {
     }
 
     @Test
-    public void givenNotExistentId_whenGetById_thenThrowException() {
+    public void givenNotExistentId_whenGetById_thenEntityNotFoundExceptionThrow() {
         when(teacherDao.getById(20)).thenReturn(Optional.empty());
 
         Exception exception = assertThrows(EntityNotFoundException.class, () -> teacherService.getById(20));
@@ -104,7 +106,7 @@ public class TeacherServiceTest {
     }
 
     @Test
-    public void givenTeacherWithOtherTeacherName_whenUpdate_thenNotUpdated() {
+    public void givenTeacherWithOtherTeacherName_whenUpdate_thenNotUniqueNameExceptionThrow() {
         Teacher teacher1 = teachers.get(0);
         Teacher teacher2 = teachers.get(1);
         teacher1.setFirstName(teacher2.getFirstName());
@@ -117,6 +119,8 @@ public class TeacherServiceTest {
 
         String expectedMessage = format("Teacher with name %s %s already exist",
             teacher1.getFirstName(), teacher1.getLastName());
+
+        verify(teacherDao, never()).update(teacher1);
 
         assertEquals(expectedMessage, exception.getMessage());
     }

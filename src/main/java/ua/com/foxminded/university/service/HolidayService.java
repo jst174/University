@@ -16,6 +16,7 @@ import static java.lang.String.format;
 public class HolidayService {
 
     private static final Logger logger = LoggerFactory.getLogger(HolidayService.class);
+
     private HolidayDao holidayDao;
 
     public HolidayService(HolidayDao holidayDao) {

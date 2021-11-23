@@ -21,6 +21,7 @@ import static java.time.temporal.ChronoUnit.MINUTES;
 public class TimeService {
 
     private static final Logger logger = LoggerFactory.getLogger(TimeService.class);
+
     private TimeDao timeDao;
     @Value("${lesson.min.duration}")
     private int minLessonDuration;

@@ -67,7 +67,7 @@ public class CourseServiceTest {
     }
 
     @Test
-    public void givenCourseWithExistentName_whenCreate_thenThrowException() {
+    public void givenCourseWithExistentName_whenCreate_thenNotUniqueNameExceptionThrow() {
         Course course = new Course(courses.get(0).getName());
 
         when(courseDao.getByName(course.getName())).thenReturn(Optional.of(courses.get(0)));
@@ -75,6 +75,8 @@ public class CourseServiceTest {
         Exception exception = assertThrows(NotUniqueNameException.class, () -> courseService.create(course));
 
         String expectedMessage = "Course with name = Math already exist";
+
+        verify(courseDao, never()).create(course);
 
         assertEquals(expectedMessage, exception.getMessage());
     }
@@ -91,7 +93,7 @@ public class CourseServiceTest {
     }
 
     @Test
-    public void givenNotExistentCourseId_whenGetById_thenThrowException() {
+    public void givenNotExistentCourseId_whenGetById_thenEntityNotFoundExceptionThrow() {
         when(courseDao.getById(20)).thenReturn(Optional.empty());
 
         Exception exception = assertThrows(EntityNotFoundException.class, () -> courseService.getById(20));
@@ -113,7 +115,7 @@ public class CourseServiceTest {
     }
 
     @Test
-    public void givenCourseWithOtherCourseName_whenUpdate_thenNotUpdated() {
+    public void givenCourseWithOtherCourseName_whenUpdate_thenNotUniqueNameExceptionThrow() {
         Course course1 = courses.get(0);
         Course course2 = courses.get(1);
         course1.setName(course2.getName());
@@ -123,6 +125,8 @@ public class CourseServiceTest {
         Exception exception = assertThrows(NotUniqueNameException.class, () -> courseService.update(course1));
 
         String expectedMessage = "Course with name = Physics already exist";
+
+        verify(courseDao, never()).update(course1);
 
         assertEquals(expectedMessage, exception.getMessage());
     }

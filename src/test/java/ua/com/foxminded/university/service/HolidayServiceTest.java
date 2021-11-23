@@ -52,7 +52,7 @@ public class HolidayServiceTest {
     }
 
     @Test
-    public void givenHolidayWithOtherHolidayDate_whenCreate_thenThrowException() throws NotUniqueDateException {
+    public void givenHolidayWithOtherHolidayDate_whenCreate_thenNotUniqueDateExceptionThrow() {
         Holiday holiday = new Holiday("holiday", holidays.get(0).getDate());
 
         when(holidayDao.getByDate(holiday.getDate())).thenReturn(Optional.of(holidays.get(0)));
@@ -60,6 +60,8 @@ public class HolidayServiceTest {
         Exception exception = assertThrows(NotUniqueDateException.class, () -> holidayService.create(holiday));
 
         String expectedMessage = "Holiday with date = 2022-01-01 already exist";
+
+        verify(holidayDao, never()).create(holiday);
 
         assertEquals(expectedMessage, exception.getMessage());
     }
@@ -74,7 +76,7 @@ public class HolidayServiceTest {
     }
 
     @Test
-    public void givenNotExistentHolidayId_whenGetById_thenThrowException() {
+    public void givenNotExistentHolidayId_whenGetById_thenEntityNotFoundExceptionThrow() {
         when(holidayDao.getById(20)).thenReturn(Optional.empty());
 
         Exception exception = assertThrows(EntityNotFoundException.class, () -> holidayService.getById(20));
@@ -96,7 +98,7 @@ public class HolidayServiceTest {
     }
 
     @Test
-    public void givenHolidayWithOtherHolidayDate_whenUpdate_thenThrowException() throws NotUniqueDateException {
+    public void givenHolidayWithOtherHolidayDate_whenUpdate_thenNotUniqueDateExceptionThrow() {
         Holiday holiday1 = holidays.get(0);
         Holiday holiday2 = holidays.get(1);
         holiday1.setDate(holiday2.getDate());
@@ -106,6 +108,8 @@ public class HolidayServiceTest {
         Exception exception = assertThrows(NotUniqueDateException.class, () -> holidayService.update(holiday1));
 
         String expectedMessage = "Holiday with date = 2022-01-07 already exist";
+
+        verify(holidayDao, never()).update(holiday1);
 
         assertEquals(expectedMessage, exception.getMessage());
     }

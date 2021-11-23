@@ -19,6 +19,7 @@ import static java.lang.String.format;
 public class LessonService {
 
     private static final Logger logger = LoggerFactory.getLogger(LessonService.class);
+
     private LessonDao lessonDao;
     private TeacherDao teacherDao;
     private VacationDao vacationDao;

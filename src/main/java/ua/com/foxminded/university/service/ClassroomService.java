@@ -8,7 +8,6 @@ import ua.com.foxminded.university.exceptions.NotUniqueNameException;
 import ua.com.foxminded.university.model.Classroom;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.slf4j.Logger;
 
@@ -18,6 +17,7 @@ import static java.lang.String.format;
 public class ClassroomService {
 
     private static final Logger logger = LoggerFactory.getLogger(ClassroomService.class);
+
     private ClassroomDao classroomDao;
 
     public ClassroomService(ClassroomDao classroomDao) {

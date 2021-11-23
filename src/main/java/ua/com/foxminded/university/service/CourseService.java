@@ -18,6 +18,7 @@ import static java.lang.String.format;
 public class CourseService {
 
     private static final Logger logger = LoggerFactory.getLogger(CourseService.class);
+
     private CourseDao courseDao;
 
     public CourseService(CourseDao courseDao) {

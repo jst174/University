@@ -69,7 +69,7 @@ public class GroupServiceTest {
     }
 
     @Test
-    public void givenGroupWithExistentName_whenCreate_thenThrowException() {
+    public void givenGroupWithExistentName_whenCreate_thenNotUniqueNameExceptionThrow() {
         Group group = new Group(groups.get(0).getName());
 
         when(groupDao.getByName(group.getName())).thenReturn(Optional.of(groups.get(0)));
@@ -77,6 +77,8 @@ public class GroupServiceTest {
         Exception exception = assertThrows(NotUniqueNameException.class, () -> groupService.create(group));
 
         String expectedMessage = "Group with name = ND-12 already exist";
+
+        verify(groupDao, never()).create(group);
 
         assertEquals(expectedMessage, exception.getMessage());
     }
@@ -91,7 +93,7 @@ public class GroupServiceTest {
     }
 
     @Test
-    public void givenNotExistentGroupId_whenGetById_thenThrowException() {
+    public void givenNotExistentGroupId_whenGetById_thenEntityNotFoundExceptionThrow() {
         when(groupDao.getById(20)).thenReturn(Optional.empty());
 
         Exception exception = assertThrows(EntityNotFoundException.class, () -> groupService.getById(20));
@@ -113,7 +115,7 @@ public class GroupServiceTest {
     }
 
     @Test
-    public void givenGroupWithOtherGroupName_whenUpdate_thenThrowException() {
+    public void givenGroupWithOtherGroupName_whenUpdate_thenNotUniqueNameExceptionThrow() {
         Group group1 = groups.get(0);
         Group group2 = groups.get(1);
         group1.setName(group2.getName());
@@ -123,6 +125,8 @@ public class GroupServiceTest {
         Exception exception = assertThrows(NotUniqueNameException.class, () -> groupService.update(group1));
 
         String expectedMessage = "Group with name = FR-32 already exist";
+
+        verify(groupDao, never()).update(group1);
 
         assertEquals(expectedMessage, exception.getMessage());
     }

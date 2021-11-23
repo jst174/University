@@ -51,7 +51,7 @@ public class ClassroomServiceTest {
     }
 
     @Test
-    public void givenClassroomWithExistentNumber_whenCreateClassroom_thenThrowException() {
+    public void givenClassroomWithExistentNumber_whenCreateClassroom_thenNotUniqueNameExceptionThrow() {
         Classroom classroom = new Classroom(classrooms.get(0).getNumber(), 40);
 
         when(classroomDao.findByNumber(classroom.getNumber())).thenReturn(Optional.of(classrooms.get(0)));
@@ -59,6 +59,8 @@ public class ClassroomServiceTest {
         Exception exception = assertThrows(NotUniqueNameException.class, () -> classroomService.createClassroom(classroom));
 
         String expectedMessage = "Classroom with number = 101 already exist";
+
+        verify(classroomDao, never()).create(classroom);
 
         assertEquals(expectedMessage, exception.getMessage());
     }
@@ -74,7 +76,7 @@ public class ClassroomServiceTest {
     }
 
     @Test
-    public void givenNotExistentClassroomId_whenGetById_thenThrowException() {
+    public void givenNotExistentClassroomId_whenGetById_thenEntityNotFoundExceptionThrow() {
         when(classroomDao.getById(20)).thenReturn(Optional.empty());
 
         Exception exception = assertThrows(EntityNotFoundException.class, () -> classroomService.getById(20));
@@ -96,7 +98,7 @@ public class ClassroomServiceTest {
     }
 
     @Test
-    public void givenClassroomWithOtherClassroomNumber_whenUpdate_thenThrowException() {
+    public void givenClassroomWithOtherClassroomNumber_whenUpdate_thenNotUniqueNameExceptionThrow() {
         Classroom classroom1 = classrooms.get(0);
         classroom1.setNumber(202);
         Classroom classroom2 = classrooms.get(1);
@@ -106,6 +108,8 @@ public class ClassroomServiceTest {
         Exception exception = assertThrows(NotUniqueNameException.class, () -> classroomService.update(classroom1));
 
         String expectedMessage = "Classroom with number = 202 already exist";
+
+        verify(classroomDao, never()).update(classroom1);
 
         assertEquals(expectedMessage, exception.getMessage());
     }

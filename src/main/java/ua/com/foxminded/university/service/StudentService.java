@@ -19,6 +19,7 @@ import static java.lang.String.format;
 public class StudentService {
 
     private static final Logger logger = LoggerFactory.getLogger(StudentService.class);
+
     private StudentDao studentDao;
     @Value("${max.group.size}")
     private int maxGroupSize;
@@ -68,8 +69,10 @@ public class StudentService {
     }
 
     private void verifyGroupAvailability(Group group) throws NotAvailableGroupException {
-        if (studentDao.getByGroupId(group.getId()).size() >= maxGroupSize) {
-            throw new NotAvailableGroupException(format("Group with name %s not available", group.getName()));
+        int groupSize = studentDao.getByGroupId(group.getId()).size();
+        if (groupSize >= maxGroupSize) {
+            throw new NotAvailableGroupException(format("Group with name %s not available. " +
+                "Group is fully filled, size = %s", group.getName(), groupSize));
         }
     }
 

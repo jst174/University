@@ -107,7 +107,7 @@ public class LessonServiceTest {
     }
 
     @Test
-    public void givenLessonWhereDateIsHoliday_whenCreate_thenThrowException() {
+    public void givenLessonWhereDateIsHoliday_whenCreate_thenNotAvailableDayExceptionThrow() {
         Lesson lesson = new Lesson(courses.get(0), new Classroom(432, 50), teachers.get(0),
             LocalDate.of(2021, 12, 15), getTimes().get(0));
         Holiday holiday = new Holiday("holiday", LocalDate.of(2021, 12, 15));
@@ -118,11 +118,13 @@ public class LessonServiceTest {
 
         String expectedMessage = "Date 2021-12-15 is not available due to holiday";
 
+        verify(lessonDao, never()).create(lesson);
+
         assertEquals(expectedMessage, exception.getMessage());
     }
 
     @Test
-    public void givenLessonWhereDateIsWeekend_whenCreate_thenThrowException() {
+    public void givenLessonWhereDateIsWeekend_whenCreate_thenNotAvailableDayExceptionThrow() {
         Lesson lesson = new Lesson(courses.get(0), new Classroom(432, 50), teachers.get(0),
             LocalDate.of(2021, 11, 6), getTimes().get(0));
 
@@ -132,11 +134,13 @@ public class LessonServiceTest {
 
         String expectedMessage = "Date 2021-11-06 is not available due to weekend";
 
+        verify(lessonDao, never()).create(lesson);
+
         assertEquals(expectedMessage, exception.getMessage());
     }
 
     @Test
-    public void givenLessonWithBusyClassroom_whenCreate_thenThrowException() {
+    public void givenLessonWithBusyClassroom_whenCreate_thenNotAvailableClassroomExceptionThrow() {
         Lesson lesson = new Lesson(courses.get(0), getClassrooms().get(0), teachers.get(0),
             LocalDate.of(2021, 11, 9), getTimes().get(0));
 
@@ -149,11 +153,13 @@ public class LessonServiceTest {
 
         String expectedMessage = "Classroom 101 is already busy at this time";
 
+        verify(lessonDao, never()).create(lesson);
+
         assertEquals(expectedMessage, exception.getMessage());
     }
 
     @Test
-    public void givenLessonWithTeacherNotMatchedCourse_whenCreate_thenThrowException() {
+    public void givenLessonWithTeacherNotMatchedCourse_whenCreate_thenNotAvailableTeacherExceptionThrow() {
         Lesson lesson = new Lesson(courses.get(0), getClassrooms().get(0), teachers.get(0),
             LocalDate.of(2021, 11, 9), getTimes().get(0));
         List<Course> courses = new ArrayList<>();
@@ -169,11 +175,13 @@ public class LessonServiceTest {
 
         String expectedMessage = format("Teacher %s %s cannot teach Math", teachers.get(0).getFirstName(), teachers.get(0).getLastName());
 
+        verify(lessonDao, never()).create(lesson);
+
         assertEquals(expectedMessage, exception.getMessage());
     }
 
     @Test
-    public void givenLessonWithTeacherOnVacation_whenCreate_thenThrowException() {
+    public void givenLessonWithTeacherOnVacation_whenCreate_thenNotAvailableTeacherExceptionThrow() {
         Lesson lesson = new Lesson(courses.get(0), getClassrooms().get(0), teachers.get(0),
             LocalDate.of(2021, 11, 9), getTimes().get(0));
 
@@ -187,11 +195,13 @@ public class LessonServiceTest {
 
         String expectedMessage = format("Teacher %s %s on vacation", teachers.get(0).getFirstName(), teachers.get(0).getLastName());
 
+        verify(lessonDao, never()).create(lesson);
+
         assertEquals(expectedMessage, exception.getMessage());
     }
 
     @Test
-    public void givenLessonWithBusyTeacher_whenCreate_thenThrowException() {
+    public void givenLessonWithBusyTeacher_whenCreate_thenNotAvailableTeacherExceptionThrow() {
         Lesson lesson = new Lesson(courses.get(0), getClassrooms().get(0), teachers.get(0),
             LocalDate.of(2021, 11, 9), getTimes().get(0));
 
@@ -207,11 +217,13 @@ public class LessonServiceTest {
 
         String expectedMessage = format("Teacher %s %s is already busy at this time", teachers.get(0).getFirstName(), teachers.get(0).getLastName());
 
+        verify(lessonDao, never()).create(lesson);
+
         assertEquals(expectedMessage, exception.getMessage());
     }
 
     @Test
-    public void givenLessonWithClassroomWherePlacesIsNotEnough_whenCreate_thenThrowException() throws IOException {
+    public void givenLessonWithClassroomWherePlacesIsNotEnough_whenCreate_thenNotAvailableClassroomExceptionThrow() throws IOException {
         Lesson lesson = new Lesson(courses.get(0), getClassrooms().get(0), teachers.get(0),
             LocalDate.of(2021, 11, 9), getTimes().get(0));
         Group group1 = new Group("GD-32");
@@ -239,11 +251,13 @@ public class LessonServiceTest {
         String expectedMessage = "Classroom 101 is not available. " +
             "Classroom capacity is less than the number of students";
 
+        verify(lessonDao, never()).create(lesson);
+
         assertEquals(expectedMessage, exception.getMessage());
     }
 
     @Test
-    public void givenLessonWithBusyGroup_whenCreate_thenThrowException() throws IOException {
+    public void givenLessonWithBusyGroup_whenCreate_thenNotAvailableGroupExceptionThrow() throws IOException {
         Lesson lesson = new Lesson(courses.get(0), getClassrooms().get(0), teachers.get(0),
             LocalDate.of(2021, 10, 26), getTimes().get(0));
         lesson.setGroups(groups);
@@ -265,6 +279,8 @@ public class LessonServiceTest {
 
         String expectedMessage = "One of the groups already has a lesson at this time";
 
+        verify(lessonDao, never()).create(lesson);
+
         assertEquals(expectedMessage, exception.getMessage());
     }
 
@@ -279,7 +295,7 @@ public class LessonServiceTest {
     }
 
     @Test
-    public void givenNotExistentLessonId_whenGetById_thenThrowException() {
+    public void givenNotExistentLessonId_whenGetById_thenEntityNotFoundExceptionThrow() {
         when(lessonDao.getById(20)).thenReturn(Optional.empty());
 
         Exception exception = assertThrows(EntityNotFoundException.class, () -> lessonService.getById(20));
@@ -322,7 +338,7 @@ public class LessonServiceTest {
     }
 
     @Test
-    public void givenLessonWhereDateIsHoliday_whenUpdate_thenThrowException() {
+    public void givenLessonWhereDateIsHoliday_whenUpdate_thenNotAvailableDayExceptionThrow() {
         Lesson lesson = new Lesson(courses.get(0), new Classroom(432, 50), teachers.get(0),
             LocalDate.of(2021, 12, 15), getTimes().get(0));
         Holiday holiday = new Holiday("holiday", LocalDate.of(2021, 12, 15));
@@ -333,11 +349,13 @@ public class LessonServiceTest {
 
         String expectedException = "Date 2021-12-15 is not available due to holiday";
 
+        verify(lessonDao, never()).update(lesson);
+
         assertEquals(expectedException, exception.getMessage());
     }
 
     @Test
-    public void givenLessonWhereDateIsWeekend_whenUpdate_thenThrowException() {
+    public void givenLessonWhereDateIsWeekend_whenUpdate_thenNotAvailableDayExceptionThrow() {
         Lesson lesson = new Lesson(courses.get(0), new Classroom(432, 50), teachers.get(0),
             LocalDate.of(2021, 11, 6), getTimes().get(0));
 
@@ -347,11 +365,13 @@ public class LessonServiceTest {
 
         String expectedException = "Date 2021-11-06 is not available due to weekend";
 
+        verify(lessonDao, never()).update(lesson);
+
         assertEquals(expectedException, exception.getMessage());
     }
 
     @Test
-    public void givenLessonWithBusyClassroom_whenUpdate_thenThrowException() {
+    public void givenLessonWithBusyClassroom_whenUpdate_thenNotAvailableClassroomExceptionThrow() {
         Lesson lesson = new Lesson(courses.get(0), getClassrooms().get(0), teachers.get(0),
             LocalDate.of(2021, 11, 9), getTimes().get(0));
 
@@ -364,11 +384,13 @@ public class LessonServiceTest {
 
         String expectedException = "Classroom 101 is already busy at this time";
 
+        verify(lessonDao, never()).update(lesson);
+
         assertEquals(expectedException, exception.getMessage());
     }
 
     @Test
-    public void givenLessonWithTeacherNotMatchedCourse_whenUpdate_thenThrowException() {
+    public void givenLessonWithTeacherNotMatchedCourse_whenUpdate_thenNotAvailableTeacherExceptionThrow() {
         Lesson lesson = new Lesson(courses.get(0), getClassrooms().get(0), teachers.get(0),
             LocalDate.of(2021, 11, 9), getTimes().get(0));
         List<Course> courses = new ArrayList<>();
@@ -384,11 +406,13 @@ public class LessonServiceTest {
 
         String expectedMessage = format("Teacher %s %s cannot teach Math", teachers.get(0).getFirstName(), teachers.get(0).getLastName());
 
+        verify(lessonDao, never()).update(lesson);
+
         assertEquals(expectedMessage, exception.getMessage());
     }
 
     @Test
-    public void givenLessonWithTeacherOnVacation_whenUpdate_thenThrowException() {
+    public void givenLessonWithTeacherOnVacation_whenUpdate_thenNotAvailableTeacherExceptionThrow() {
         Lesson lesson = new Lesson(courses.get(0), getClassrooms().get(0), teachers.get(0),
             LocalDate.of(2021, 11, 9), getTimes().get(0));
 
@@ -402,11 +426,13 @@ public class LessonServiceTest {
 
         String expectedMessage = format("Teacher %s %s on vacation", teachers.get(0).getFirstName(), teachers.get(0).getLastName());
 
+        verify(lessonDao, never()).update(lesson);
+
         assertEquals(expectedMessage, exception.getMessage());
     }
 
     @Test
-    public void givenLessonWithBusyTeacher_whenUpdate_thenThrowException() {
+    public void givenLessonWithBusyTeacher_whenUpdate_thenNotAvailableTeacherExceptionThrow() {
         Lesson lesson = new Lesson(courses.get(0), getClassrooms().get(0), teachers.get(0),
             LocalDate.of(2021, 11, 9), getTimes().get(0));
 
@@ -422,11 +448,13 @@ public class LessonServiceTest {
 
         String expectedMessage = format("Teacher %s %s is already busy at this time", teachers.get(0).getFirstName(), teachers.get(0).getLastName());
 
+        verify(lessonDao, never()).update(lesson);
+
         assertEquals(expectedMessage, exception.getMessage());
     }
 
     @Test
-    public void givenLessonWithClassroomWherePlacesIsNotEnough_whenUpdate_thenThrowException() throws IOException {
+    public void givenLessonWithClassroomWherePlacesIsNotEnough_whenUpdate_thenNotAvailableClassroomExceptionThrow() throws IOException {
         Lesson lesson = new Lesson(courses.get(0), getClassrooms().get(0), teachers.get(0),
             LocalDate.of(2021, 11, 9), getTimes().get(0));
         Group group1 = new Group("GD-32");
@@ -454,11 +482,13 @@ public class LessonServiceTest {
         String expectedMessage = "Classroom 101 is not available. " +
             "Classroom capacity is less than the number of students";
 
+        verify(lessonDao, never()).update(lesson);
+
         assertEquals(expectedMessage, exception.getMessage());
     }
 
     @Test
-    public void givenLessonWithBusyGroup_whenUpdate_thenThrowException() throws IOException {
+    public void givenLessonWithBusyGroup_whenUpdate_thenNotAvailableGroupExceptionThrow() throws IOException {
         Lesson lesson = new Lesson(courses.get(0), getClassrooms().get(0), teachers.get(0),
             LocalDate.of(2021, 10, 26), getTimes().get(0));
         lesson.setGroups(groups);
@@ -479,6 +509,8 @@ public class LessonServiceTest {
         Exception exception = assertThrows(NotAvailableGroupException.class, () -> lessonService.update(lesson));
 
         String expectedMessage = "One of the groups already has a lesson at this time";
+
+        verify(lessonDao, never()).update(lesson);
 
         assertEquals(expectedMessage, exception.getMessage());
     }
