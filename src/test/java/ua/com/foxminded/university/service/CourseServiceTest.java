@@ -8,17 +8,14 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ua.com.foxminded.university.DataSource;
 import ua.com.foxminded.university.dao.CourseDao;
-import ua.com.foxminded.university.dao.TeacherDao;
 import ua.com.foxminded.university.exceptions.EntityNotFoundException;
 import ua.com.foxminded.university.exceptions.NotUniqueNameException;
-import ua.com.foxminded.university.exceptions.ServiceException;
 import ua.com.foxminded.university.model.Course;
 import ua.com.foxminded.university.model.Teacher;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -58,7 +55,6 @@ public class CourseServiceTest {
     @Test
     public void givenNewCourse_whenCreate_thenCreated() throws NotUniqueNameException {
         Course course = new Course("History");
-
         when(courseDao.getByName(course.getName())).thenReturn(Optional.empty());
 
         courseService.create(course);
@@ -69,15 +65,12 @@ public class CourseServiceTest {
     @Test
     public void givenCourseWithExistentName_whenCreate_thenNotUniqueNameExceptionThrow() {
         Course course = new Course(courses.get(0).getName());
-
         when(courseDao.getByName(course.getName())).thenReturn(Optional.of(courses.get(0)));
 
         Exception exception = assertThrows(NotUniqueNameException.class, () -> courseService.create(course));
 
         String expectedMessage = "Course with name = Math already exist";
-
         verify(courseDao, never()).create(course);
-
         assertEquals(expectedMessage, exception.getMessage());
     }
 
@@ -99,14 +92,12 @@ public class CourseServiceTest {
         Exception exception = assertThrows(EntityNotFoundException.class, () -> courseService.getById(20));
 
         String expectedMessage = "Course with id = 20 not found";
-
         assertEquals(expectedMessage, exception.getMessage());
     }
 
     @Test
     public void givenExistentCourse_whenUpdate_thenUpdated() throws NotUniqueNameException {
         Course course = courses.get(0);
-
         when(courseDao.getByName(course.getName())).thenReturn(Optional.of(course));
 
         courseService.update(course);
@@ -119,15 +110,12 @@ public class CourseServiceTest {
         Course course1 = courses.get(0);
         Course course2 = courses.get(1);
         course1.setName(course2.getName());
-
         when(courseDao.getByName(course1.getName())).thenReturn(Optional.of(course2));
 
         Exception exception = assertThrows(NotUniqueNameException.class, () -> courseService.update(course1));
 
         String expectedMessage = "Course with name = Physics already exist";
-
         verify(courseDao, never()).update(course1);
-
         assertEquals(expectedMessage, exception.getMessage());
     }
 

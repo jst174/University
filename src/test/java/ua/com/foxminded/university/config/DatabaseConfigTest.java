@@ -3,8 +3,6 @@ package ua.com.foxminded.university.config;
 import org.springframework.context.annotation.*;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
-//import ua.com.foxminded.university.config.DatabaseConfig;
 
 import javax.sql.DataSource;
 

@@ -73,12 +73,13 @@ public class VacationService {
         List<Vacation> vacations = vacationDao.getByTeacherId(vacation.getTeacher().getId());
         vacations.add(vacation);
         int maxVacationPeriod = maxPeriodsVacation.get(vacation.getTeacher().getAcademicDegree());
-        if ((maxVacationPeriod) < (vacations.stream()
-            .mapToLong(v -> DAYS.between(v.getStart(), v.getEnd()))
-            .sum())) {
+        int sumVacations = vacations.stream()
+            .mapToInt(v -> (int) DAYS.between(v.getStart(), v.getEnd()))
+            .sum();
+        if (maxVacationPeriod < sumVacations) {
             throw new NotAvailablePeriodException(format("Vacation with period = %s days not available. " +
-                    "The total duration of all vacations is longer than the maximum allowed",
-                DAYS.between(vacation.getStart(), vacation.getEnd())));
+                    "The sum of all vacations = %s is longer than the maximum allowed = %s",
+                DAYS.between(vacation.getStart(), vacation.getEnd()), sumVacations, maxVacationPeriod));
         }
     }
 }

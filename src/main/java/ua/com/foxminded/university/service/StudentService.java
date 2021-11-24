@@ -72,7 +72,7 @@ public class StudentService {
         int groupSize = studentDao.getByGroupId(group.getId()).size();
         if (groupSize >= maxGroupSize) {
             throw new NotAvailableGroupException(format("Group with name %s not available. " +
-                "Group is fully filled, size = %s", group.getName(), groupSize));
+                "Max group size = %s has already been reached", group.getName(), groupSize));
         }
     }
 

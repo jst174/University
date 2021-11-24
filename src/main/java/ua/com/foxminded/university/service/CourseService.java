@@ -6,11 +6,9 @@ import org.springframework.stereotype.Service;
 import ua.com.foxminded.university.dao.CourseDao;
 import ua.com.foxminded.university.exceptions.EntityNotFoundException;
 import ua.com.foxminded.university.exceptions.NotUniqueNameException;
-import ua.com.foxminded.university.exceptions.ServiceException;
 import ua.com.foxminded.university.model.Course;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import static java.lang.String.format;
 

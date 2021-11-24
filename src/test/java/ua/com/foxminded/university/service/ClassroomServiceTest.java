@@ -1,6 +1,5 @@
 package ua.com.foxminded.university.service;
 
-import static java.lang.String.format;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -42,7 +41,6 @@ public class ClassroomServiceTest {
     @Test
     public void givenNewClassroom_whenCreateClassroom_thenCreated() throws NotUniqueNameException {
         Classroom classroom = new Classroom(102, 30);
-
         when(classroomDao.findByNumber(classroom.getNumber())).thenReturn(Optional.empty());
 
         classroomService.createClassroom(classroom);
@@ -53,15 +51,12 @@ public class ClassroomServiceTest {
     @Test
     public void givenClassroomWithExistentNumber_whenCreateClassroom_thenNotUniqueNameExceptionThrow() {
         Classroom classroom = new Classroom(classrooms.get(0).getNumber(), 40);
-
         when(classroomDao.findByNumber(classroom.getNumber())).thenReturn(Optional.of(classrooms.get(0)));
 
         Exception exception = assertThrows(NotUniqueNameException.class, () -> classroomService.createClassroom(classroom));
 
         String expectedMessage = "Classroom with number = 101 already exist";
-
         verify(classroomDao, never()).create(classroom);
-
         assertEquals(expectedMessage, exception.getMessage());
     }
 
@@ -82,14 +77,12 @@ public class ClassroomServiceTest {
         Exception exception = assertThrows(EntityNotFoundException.class, () -> classroomService.getById(20));
 
         String expectedMessage = "Classroom with id = 20 not found";
-
         assertEquals(expectedMessage, exception.getMessage());
     }
 
     @Test
     public void givenExistentClassroom_whenUpdate_thenUpdated() throws NotUniqueNameException {
         Classroom classroom = classrooms.get(0);
-
         when(classroomDao.findByNumber(classroom.getNumber())).thenReturn(Optional.of(classroom));
 
         classroomService.update(classroom);
@@ -102,22 +95,17 @@ public class ClassroomServiceTest {
         Classroom classroom1 = classrooms.get(0);
         classroom1.setNumber(202);
         Classroom classroom2 = classrooms.get(1);
-
         when(classroomDao.findByNumber(classroom1.getNumber())).thenReturn(Optional.of(classroom2));
 
         Exception exception = assertThrows(NotUniqueNameException.class, () -> classroomService.update(classroom1));
 
         String expectedMessage = "Classroom with number = 202 already exist";
-
         verify(classroomDao, never()).update(classroom1);
-
         assertEquals(expectedMessage, exception.getMessage());
     }
 
     @Test
     public void givenExistentId_whenDelete_thenDeleted() {
-        Classroom classroom = classrooms.get(0);
-
         classroomService.delete(1);
 
         verify(classroomDao).delete(1);

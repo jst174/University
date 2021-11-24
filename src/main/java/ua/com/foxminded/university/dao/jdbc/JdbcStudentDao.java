@@ -1,7 +1,6 @@
 package ua.com.foxminded.university.dao.jdbc;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -11,10 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ua.com.foxminded.university.dao.AddressDao;
 import ua.com.foxminded.university.dao.StudentDao;
 import ua.com.foxminded.university.dao.mapper.StudentMapper;
-import ua.com.foxminded.university.model.Address;
 import ua.com.foxminded.university.model.Student;
-
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.List;

@@ -10,7 +10,6 @@ import ua.com.foxminded.university.model.Lesson;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 import static java.lang.String.format;
@@ -129,10 +128,12 @@ public class LessonService {
 
     private void verifyClassroomCapacity(Lesson lesson) throws NotAvailableClassroomException {
         List<Group> groups = lesson.getGroups();
+        int classroomCapacity = lesson.getClassroom().getCapacity();
         int numberOfStudents = groups.stream().mapToInt(group -> group.getStudents().size()).reduce(Integer::sum).orElse(0);
-        if (numberOfStudents > lesson.getClassroom().getCapacity()) {
+        if (numberOfStudents > classroomCapacity) {
             throw new NotAvailableClassroomException(format("Classroom %s is not available. " +
-                "Classroom capacity is less than the number of students", lesson.getClassroom().getNumber()));
+                    "Classroom capacity = %s is less than the number of students = %s",
+                lesson.getClassroom().getNumber(), classroomCapacity, numberOfStudents));
         }
     }
 

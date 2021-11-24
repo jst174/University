@@ -11,7 +11,6 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import ua.com.foxminded.university.config.AppConfig;
 import ua.com.foxminded.university.config.DatabaseConfigTest;
 import ua.com.foxminded.university.dao.GroupDao;
 import ua.com.foxminded.university.model.Group;

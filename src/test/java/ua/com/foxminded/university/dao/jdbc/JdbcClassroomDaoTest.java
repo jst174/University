@@ -1,7 +1,6 @@
 package ua.com.foxminded.university.dao.jdbc;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.jdbc.JdbcTestUtils.*;
 
 import org.junit.jupiter.api.Test;
@@ -12,7 +11,6 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.jdbc.JdbcTestUtils;
 import ua.com.foxminded.university.config.DatabaseConfigTest;
 import ua.com.foxminded.university.dao.ClassroomDao;
 import ua.com.foxminded.university.model.Classroom;

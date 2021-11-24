@@ -7,11 +7,9 @@ import ua.com.foxminded.university.dao.GroupDao;
 import ua.com.foxminded.university.dao.LessonDao;
 import ua.com.foxminded.university.exceptions.EntityNotFoundException;
 import ua.com.foxminded.university.exceptions.NotUniqueNameException;
-import ua.com.foxminded.university.exceptions.ServiceException;
 import ua.com.foxminded.university.model.Group;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import static java.lang.String.format;
 

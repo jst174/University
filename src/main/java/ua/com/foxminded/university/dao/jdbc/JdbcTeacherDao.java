@@ -2,12 +2,10 @@ package ua.com.foxminded.university.dao.jdbc;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.com.foxminded.university.dao.AddressDao;
 import ua.com.foxminded.university.dao.CourseDao;
@@ -15,12 +13,10 @@ import ua.com.foxminded.university.dao.TeacherDao;
 import ua.com.foxminded.university.dao.mapper.TeacherMapper;
 import ua.com.foxminded.university.model.Course;
 import ua.com.foxminded.university.model.Teacher;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Component
 public class JdbcTeacherDao implements TeacherDao {

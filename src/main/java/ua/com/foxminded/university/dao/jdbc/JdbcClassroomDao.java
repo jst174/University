@@ -6,7 +6,6 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ua.com.foxminded.university.dao.ClassroomDao;
-import ua.com.foxminded.university.exceptions.DaoException;
 import ua.com.foxminded.university.dao.mapper.ClassroomMapper;
 import ua.com.foxminded.university.model.Classroom;
 
@@ -14,8 +13,6 @@ import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.List;
 import java.util.Optional;
-
-import static java.lang.String.format;
 
 @Component
 public class JdbcClassroomDao implements ClassroomDao {
