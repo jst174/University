@@ -5,11 +5,11 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
+
 import ua.com.foxminded.university.dao.HolidayDao;
 import ua.com.foxminded.university.dao.mapper.HolidayMapper;
 import ua.com.foxminded.university.model.Holiday;
 
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.time.LocalDate;

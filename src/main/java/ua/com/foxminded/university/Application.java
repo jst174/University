@@ -3,13 +3,7 @@ package ua.com.foxminded.university;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import ua.com.foxminded.university.config.DatabaseConfig;
-import ua.com.foxminded.university.dao.TimeDao;
-import ua.com.foxminded.university.dao.jdbc.*;
 import ua.com.foxminded.university.model.*;
-
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.LocalTime;
 
 public class Application {
 

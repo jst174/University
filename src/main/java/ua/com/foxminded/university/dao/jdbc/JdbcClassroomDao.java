@@ -1,7 +1,6 @@
 package ua.com.foxminded.university.dao.jdbc;
 
 import org.springframework.dao.DataAccessException;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -42,6 +41,7 @@ public class JdbcClassroomDao implements ClassroomDao {
             return statement;
         }, keyHolder);
         classroom.setId((int) keyHolder.getKeys().get("id"));
+
     }
 
     public Optional<Classroom> getById(int id) {

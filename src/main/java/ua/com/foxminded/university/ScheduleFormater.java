@@ -2,14 +2,10 @@ package ua.com.foxminded.university;
 
 import static java.lang.System.lineSeparator;
 
-import java.util.Comparator;
 import java.util.List;
-import java.util.function.Function;
 
-import ua.com.foxminded.university.model.Course;
 import ua.com.foxminded.university.model.Group;
 import ua.com.foxminded.university.model.Lesson;
-import ua.com.foxminded.university.model.University;
 
 public class ScheduleFormater {
 

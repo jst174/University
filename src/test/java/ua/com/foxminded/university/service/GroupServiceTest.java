@@ -12,6 +12,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import ua.com.foxminded.university.DataSource;
 import ua.com.foxminded.university.dao.GroupDao;
 import ua.com.foxminded.university.dao.LessonDao;
+import ua.com.foxminded.university.exceptions.EntityNotFoundException;
+import ua.com.foxminded.university.exceptions.NotUniqueNameException;
 import ua.com.foxminded.university.model.Group;
 import ua.com.foxminded.university.model.Lesson;
 
@@ -19,7 +21,6 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
@@ -55,10 +56,8 @@ public class GroupServiceTest {
     }
 
     @Test
-    public void givenNewGroup_whenCreate_thenCreated() {
+    public void givenNewGroup_whenCreate_thenCreated() throws NotUniqueNameException {
         Group group = new Group("GD-22");
-
-        when(groupDao.getById(group.getId())).thenReturn(Optional.empty());
         when(groupDao.getByName(group.getName())).thenReturn(Optional.empty());
 
         groupService.create(group);
@@ -67,19 +66,19 @@ public class GroupServiceTest {
     }
 
     @Test
-    public void givenGroupWithExistentName_whenCreate_thenNotCreated() {
+    public void givenGroupWithExistentName_whenCreate_thenNotUniqueNameExceptionThrow() {
         Group group = new Group(groups.get(0).getName());
+        when(groupDao.getByName(group.getName())).thenReturn(Optional.of(groups.get(0)));
 
-        when(groupDao.getById(group.getId())).thenReturn(Optional.empty());
-        when(groupDao.getByName(group.getName())).thenReturn(Optional.of(group));
+        Exception exception = assertThrows(NotUniqueNameException.class, () -> groupService.create(group));
 
-        groupService.create(group);
-
+        String expectedMessage = "Group with name = ND-12 already exist";
         verify(groupDao, never()).create(group);
+        assertEquals(expectedMessage, exception.getMessage());
     }
 
     @Test
-    public void givenExistentGroupId_whenGetById_thenReturn() {
+    public void givenExistentGroupId_whenGetById_thenReturn() throws EntityNotFoundException {
         Group group = groups.get(0);
 
         when(groupDao.getById(1)).thenReturn(Optional.of(group));
@@ -88,10 +87,18 @@ public class GroupServiceTest {
     }
 
     @Test
-    public void givenExistentGroup_whenUpdate_thenUpdated() {
-        Group group = groups.get(0);
+    public void givenNotExistentGroupId_whenGetById_thenEntityNotFoundExceptionThrow() {
+        when(groupDao.getById(20)).thenReturn(Optional.empty());
 
-        when(groupDao.getById(group.getId())).thenReturn(Optional.of(group));
+        Exception exception = assertThrows(EntityNotFoundException.class, () -> groupService.getById(20));
+
+        String expectedMessage = "Group with id = 20 not found";
+        assertEquals(expectedMessage, exception.getMessage());
+    }
+
+    @Test
+    public void givenExistentGroup_whenUpdate_thenUpdated() throws NotUniqueNameException {
+        Group group = groups.get(0);
         when(groupDao.getByName(group.getName())).thenReturn(Optional.of(group));
 
         groupService.update(group);
@@ -100,17 +107,17 @@ public class GroupServiceTest {
     }
 
     @Test
-    public void givenGroupWithOtherGroupName_whenUpdate_thenUpdated() {
+    public void givenGroupWithOtherGroupName_whenUpdate_thenNotUniqueNameExceptionThrow() {
         Group group1 = groups.get(0);
         Group group2 = groups.get(1);
         group1.setName(group2.getName());
-
-        when(groupDao.getById(group1.getId())).thenReturn(Optional.of(group1));
         when(groupDao.getByName(group1.getName())).thenReturn(Optional.of(group2));
 
-        groupService.update(group1);
+        Exception exception = assertThrows(NotUniqueNameException.class, () -> groupService.update(group1));
 
+        String expectedMessage = "Group with name = FR-32 already exist";
         verify(groupDao, never()).update(group1);
+        assertEquals(expectedMessage, exception.getMessage());
     }
 
     @Test
@@ -118,6 +125,13 @@ public class GroupServiceTest {
         groupService.delete(1);
 
         verify(groupDao).delete(1);
+    }
+
+    @Test
+    public void whenGetAll_thenReturn() {
+        when(groupDao.getAll()).thenReturn(groups);
+
+        assertEquals(groups, groupService.getAll());
     }
 
     @Test

@@ -1,17 +1,23 @@
 package ua.com.foxminded.university.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import ua.com.foxminded.university.dao.*;
+import ua.com.foxminded.university.exceptions.*;
 import ua.com.foxminded.university.model.Group;
 import ua.com.foxminded.university.model.Lesson;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
+
+import static java.lang.String.format;
 
 @Service
 public class LessonService {
+
+    private static final Logger logger = LoggerFactory.getLogger(LessonService.class);
 
     private LessonDao lessonDao;
     private TeacherDao teacherDao;
@@ -35,90 +41,107 @@ public class LessonService {
         this.groupDao = groupDao;
     }
 
-    public void create(Lesson lesson) {
-        if (checkConditions(lesson)) {
-            lessonDao.create(lesson);
-        }
-
+    public void create(Lesson lesson) throws NotAvailableTeacherException, NotAvailableGroupException, NotAvailableClassroomException, NotAvailableDayException {
+        logger.debug("Creating lesson");
+        checkConditions(lesson);
+        lessonDao.create(lesson);
     }
 
-    public Lesson getById(int id) {
-        return lessonDao.getById(id).orElseThrow();
+    public Lesson getById(int id) throws EntityNotFoundException {
+        logger.debug("Getting lesson with id = {}", id);
+        return lessonDao.getById(id).orElseThrow(() ->
+            new EntityNotFoundException(format("Lesson with id = %s not found", id)));
     }
 
-    public void update(Lesson lesson) {
-        if (checkConditions(lesson)) {
-            lessonDao.update(lesson);
-        }
+    public void update(Lesson lesson) throws NotAvailableTeacherException, NotAvailableGroupException, NotAvailableClassroomException, NotAvailableDayException {
+        logger.debug("Updating lesson with id = {}", lesson.getId());
+        checkConditions(lesson);
+        lessonDao.update(lesson);
     }
 
     public void delete(int id) {
+        logger.debug("Deleting lesson with id = {}", id);
         lessonDao.delete(id);
     }
 
     public List<Lesson> getAll() {
+        logger.debug("Getting all lessons");
         return lessonDao.getAll();
     }
 
-    private boolean checkConditions(Lesson lesson) {
-        return !isHoliday(lesson) && !isWeekend(lesson) && !isClassroomBusy(lesson)
-            && isTeacherMatchedCourse(lesson) && !isTeacherOnVacation(lesson) && !isTeacherBusy(lesson)
-            && isEnoughClassroomCapacity(lesson) && !isGroupBusy(lesson);
+    private void checkConditions(Lesson lesson) throws NotAvailableDayException, NotAvailableClassroomException, NotAvailableTeacherException, NotAvailableGroupException {
+        verifyHoliday(lesson);
+        verifyWeekend(lesson);
+        verifyClassroomBusyness(lesson);
+        verifyTeacherMatchWithCourse(lesson);
+        verifyTeacherVacation(lesson);
+        verifyTeacherBusyness(lesson);
+        verifyClassroomCapacity(lesson);
+        verifyGroupBusyness(lesson);
     }
 
-    private boolean isTeacherOnVacation(Lesson lesson) {
-        return vacationDao.getByTeacherAndLessonDate(lesson.getTeacher(), lesson.getDate()).isPresent();
-    }
-
-    private boolean isTeacherMatchedCourse(Lesson lesson) {
-        return lesson.getTeacher().getCourses().contains(lesson.getCourse());
-    }
-
-    private boolean isTeacherBusy(Lesson lesson) {
-        if (lessonDao.getById(lesson.getId()).isEmpty()) {
-            return lessonDao.getByDateAndTimeAndTeacher(lesson.getDate(), lesson.getTime(),
-                lesson.getTeacher()).isPresent();
-        } else {
-            return !(lessonDao.getByDateAndTimeAndTeacher(lesson.getDate(), lesson.getTime(),
-                lesson.getTeacher()).get().getId() == lesson.getId());
+    private void verifyTeacherVacation(Lesson lesson) throws NotAvailableTeacherException {
+        if (vacationDao.getByTeacherAndLessonDate(lesson.getTeacher(), lesson.getDate()).isPresent()) {
+            throw new NotAvailableTeacherException(format("Teacher %s %s on vacation",
+                lesson.getTeacher().getFirstName(), lesson.getTeacher().getLastName()));
         }
     }
 
-    private boolean isClassroomBusy(Lesson lesson) {
-        if (lessonDao.getById(lesson.getId()).isEmpty()) {
-            return lessonDao.getByDateAndTimeAndClassroom(lesson.getDate(), lesson.getTime(),
-                lesson.getClassroom()).isPresent();
-        } else {
-            return !(lessonDao.getByDateAndTimeAndClassroom(lesson.getDate(), lesson.getTime(),
-                lesson.getClassroom()).get().getId() == lesson.getId());
+    private void verifyTeacherMatchWithCourse(Lesson lesson) throws NotAvailableTeacherException {
+        if (!lesson.getTeacher().getCourses().contains(lesson.getCourse())) {
+            throw new NotAvailableTeacherException(format("Teacher %s %s cannot teach %s",
+                lesson.getTeacher().getFirstName(), lesson.getTeacher().getLastName(),
+                lesson.getCourse().getName()));
         }
     }
 
-    private boolean isHoliday(Lesson lesson) {
-        return holidayDao.getByDate(lesson.getDate()).isPresent();
+    private void verifyTeacherBusyness(Lesson lesson) throws NotAvailableTeacherException {
+        if (lessonDao.getByDateAndTimeAndTeacher(lesson.getDate(), lesson.getTime(), lesson.getTeacher())
+            .filter(l -> l.getId() != lesson.getId())
+            .isPresent()) {
+            throw new NotAvailableTeacherException(format("Teacher %s %s is already busy at this time",
+                lesson.getTeacher().getFirstName(), lesson.getTeacher().getLastName()));
+        }
     }
 
-    private boolean isWeekend(Lesson lesson) {
+    private void verifyClassroomBusyness(Lesson lesson) throws NotAvailableClassroomException {
+        if (lessonDao.getByDateAndTimeAndClassroom(lesson.getDate(), lesson.getTime(), lesson.getClassroom())
+            .filter(l -> l.getId() != lesson.getId())
+            .isPresent()) {
+            throw new NotAvailableClassroomException(format("Classroom %s is already busy at this time",
+                lesson.getClassroom().getNumber()));
+        }
+    }
+
+    private void verifyHoliday(Lesson lesson) throws NotAvailableDayException {
+        if (holidayDao.getByDate(lesson.getDate()).isPresent()) {
+            throw new NotAvailableDayException(format("Date %s is not available due to holiday", lesson.getDate()));
+        }
+    }
+
+    private void verifyWeekend(Lesson lesson) throws NotAvailableDayException {
         LocalDate lessonDate = lesson.getDate();
-        return (lessonDate.getDayOfWeek() == DayOfWeek.SATURDAY) || (lessonDate.getDayOfWeek() == DayOfWeek.SUNDAY);
+        if ((lessonDate.getDayOfWeek() == DayOfWeek.SATURDAY) || (lessonDate.getDayOfWeek() == DayOfWeek.SUNDAY)) {
+            throw new NotAvailableDayException(format("Date %s is not available due to weekend", lessonDate));
+        }
     }
 
-    private boolean isEnoughClassroomCapacity(Lesson lesson) {
+    private void verifyClassroomCapacity(Lesson lesson) throws NotAvailableClassroomException {
         List<Group> groups = lesson.getGroups();
+        int classroomCapacity = lesson.getClassroom().getCapacity();
         int numberOfStudents = groups.stream().mapToInt(group -> group.getStudents().size()).reduce(Integer::sum).orElse(0);
-        return numberOfStudents <= lesson.getClassroom().getCapacity();
+        if (numberOfStudents > classroomCapacity) {
+            throw new NotAvailableClassroomException(format("Classroom %s is not available. " +
+                    "Classroom capacity = %s is less than the number of students = %s",
+                lesson.getClassroom().getNumber(), classroomCapacity, numberOfStudents));
+        }
     }
 
-    private boolean isGroupBusy(Lesson newLesson) {
-        if (lessonDao.getById(newLesson.getId()).isEmpty()) {
-            List<Lesson> lessons = lessonDao.getByDateAndTime(newLesson.getDate(), newLesson.getTime());
-            List<Group> groups = new ArrayList<>();
-            lessons.forEach(lesson -> groups.addAll(lesson.getGroups()));
-            return groups.stream().anyMatch(group -> newLesson.getGroups().contains(group));
-        } else {
-            return lessonDao.getByDateAndTime(newLesson.getDate(), newLesson.getTime())
-                .stream()
-                .noneMatch(lesson -> lesson.getId() == newLesson.getId());
+    private void verifyGroupBusyness(Lesson newLesson) throws NotAvailableGroupException {
+        if (lessonDao.getByDateAndTime(newLesson.getDate(), newLesson.getTime())
+            .stream().filter(l -> l.getId() != newLesson.getId())
+            .noneMatch(l -> l.getGroups().retainAll(newLesson.getGroups()))) {
+            throw new NotAvailableGroupException("One of the groups already has a lesson at this time");
         }
     }
 }

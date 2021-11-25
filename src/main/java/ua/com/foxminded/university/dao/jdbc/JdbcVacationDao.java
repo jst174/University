@@ -9,8 +9,6 @@ import ua.com.foxminded.university.dao.VacationDao;
 import ua.com.foxminded.university.dao.mapper.VacationMapper;
 import ua.com.foxminded.university.model.Teacher;
 import ua.com.foxminded.university.model.Vacation;
-
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.time.LocalDate;

@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 import ua.com.foxminded.university.dao.TimeDao;
 import ua.com.foxminded.university.dao.mapper.TimeMapper;
 import ua.com.foxminded.university.model.Time;
-
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.time.LocalTime;
