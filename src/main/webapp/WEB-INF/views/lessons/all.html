@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <title>List of students</title>
+  <title>List of lessons</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
         integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
@@ -13,27 +13,31 @@
 <table class="table table-striped">
   <thead>
   <tr>
-    <th scope="col">Name</th>
-    <th scope="col">Group</th>
-    <th scope="col">PhoneNumber</th>
-    <th scope="col">Email</th>
+    <th scope="col">Date</th>
+    <th scope="col">Time</th>
+    <th scope="col">Classroom</th>
+    <th scope="col">Course</th>
+    <th scope="col">Teacher</th>
   </tr>
   </thead>
   <tbody>
-  <tr th:each="student: ${studentPage.content}">
-    <td th:text="${student.getFirstName()}+' '+${student.getLastName()}"/>
-    <td th:text="${student.getGroup().getName()}"/>
-    <td th:text="${student.getPhoneNumber()}"/>
-    <td th:text="${student.getEmail()}"/>
+  <tr th:each="lesson: ${lessonPage.content}">
+    <td th:text="${lesson.getDate()}"/>
+    <td th:text="${lesson.getTime().getStartTime()} + '-'
+    +${lesson.getTime().getEndTime()}"/>
+    <td th:text="${lesson.getClassroom().getNumber()}"/>
+    <td th:text="${lesson.getCourse().getName()}"/>
+    <td th:text="${lesson.getTeacher().getFirstName()}+' '
+    +${lesson.getTeacher().getLastName()}"/>
   </tr>
   </tbody>
 </table>
 <nav aria-label="page navigation">
-  <ul th:if="${studentPage.totalPages} > 1" class="pagination">
+  <ul th:if="${lessonPage.totalPages} > 1" class="pagination">
     <th:block th:each="pageNumber : ${pageNumbers}">
-      <li class="page-item" th:classappend="${pageNumber==studentPage.number + 1} ? active">
+      <li class="page-item" th:classappend="${pageNumber==lessonPage.number + 1} ? active">
         <a class="page-link"
-           th:href="@{/students(size=${studentPage.size}, page=${pageNumber})}"
+           th:href="@{/lessons(size=${lessonPage.size}, page=${pageNumber})}"
            th:text="${pageNumber}"></a>
       </li>
     </th:block>

@@ -5,11 +5,11 @@
   <title th:text="${student.getFirstName()}+' '+${student.getLastName()}">Student</title>
 </head>
 <body>
-<p th:text="id + ':' + ' ' +${student.getId()}">VALUE</p>
-<p th:text="Name + ':' + ' ' +${student.getFirstName()}+' '+${student.getLastName()}">VALUE</p>
-<p th:text="Birthday + ':' + ' ' +${student.getBirthDate()}">VALUE</p>
-<p th:text="Gender + ':' + ' ' +${student.getGender()}">VALUE</p>
-<p th:text="Phone number + ':' + ' ' +${student.getPhoneNumber()}">VALUE</p>
-<p th:text="Email + ':' + ' ' +${student.getEmail()}">VALUE</p>
+<p> Name: <span th:text="${student.getFirstName()}+' '+${student.getLastName()}">value</span></p>
+<p> Birthday: <span th:text="${student.getBirthDate()}">value</span></p>
+<p> Gender: <span th:text="${student.getGender()}">value</span></p>
+<p> Group: <span th:text="${student.getGroup().getName()}">value</span></p>
+<p> Phone number: <span th:text="${student.getPhoneNumber()}">value</span></p>
+<p> Email: <span th:text="${student.getEmail()}">value</span></p>
 </body>
 </html>

@@ -2,12 +2,17 @@ package ua.com.foxminded.university.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ua.com.foxminded.university.dao.CourseDao;
 import ua.com.foxminded.university.exceptions.EntityNotFoundException;
 import ua.com.foxminded.university.exceptions.NotUniqueNameException;
 import ua.com.foxminded.university.model.Course;
 
+import java.util.Collections;
 import java.util.List;
 
 import static java.lang.String.format;
@@ -54,6 +59,21 @@ public class CourseService {
     public List<Course> getByTeacherId(int teacherId) {
         logger.debug("Getting courses by teacher with id = {}", teacherId);
         return courseDao.getByTeacherId(teacherId);
+    }
+
+    public Page<Course> findPaginated(Pageable pageable) {
+        List<Course> courses = courseDao.getAll();
+        int pageSize = pageable.getPageSize();
+        int currentPage = pageable.getPageNumber();
+        int startItem = currentPage * pageSize;
+        List<Course> list;
+        if (courses.size() < startItem) {
+            list = Collections.emptyList();
+        } else {
+            int toIndex = Math.min(startItem + pageSize, courses.size());
+            list = courses.subList(startItem, toIndex);
+        }
+        return new PageImpl<Course>(list, PageRequest.of(currentPage, pageSize), courses.size());
     }
 
     private void verifyNameUniqueness(Course course) throws NotUniqueNameException {

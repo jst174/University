@@ -13,18 +13,27 @@
 <table class="table table-striped">
   <thead>
   <tr>
-    <th scope="col">id</th>
     <th scope="col">Number</th>
     <th scope="col">Capacity</th>
   </tr>
   </thead>
   <tbody>
-  <tr th:each="classroom : ${classrooms}">
-    <td th:text="${classroom.getId()}"/>
+  <tr th:each="classroom : ${classroomPage.content}">
     <td th:text="${classroom.getNumber()}"/>
     <td th:text="${classroom.getCapacity()}"/>
   </tr>
   </tbody>
 </table>
+<nav aria-label="page navigation">
+  <ul th:if="${classroomPage.totalPages} > 1" class="pagination">
+    <th:block th:each="pageNumber : ${pageNumbers}">
+      <li class="page-item" th:classappend="${pageNumber==classroomPage.number + 1} ? active">
+        <a class="page-link"
+           th:href="@{/classrooms(size=${classroomPage.size}, page=${pageNumber})}"
+           th:text="${pageNumber}"></a>
+      </li>
+    </th:block>
+  </ul>
+</nav>
 </body>
 </html>

@@ -2,12 +2,17 @@ package ua.com.foxminded.university.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ua.com.foxminded.university.dao.TeacherDao;
 import ua.com.foxminded.university.exceptions.EntityNotFoundException;
 import ua.com.foxminded.university.exceptions.NotUniqueNameException;
 import ua.com.foxminded.university.model.Teacher;
 
+import java.util.Collections;
 import java.util.List;
 
 import static java.lang.String.format;
@@ -49,6 +54,21 @@ public class TeacherService {
     public List<Teacher> getAll() {
         logger.debug("Getting all teacher");
         return teacherDao.getAll();
+    }
+
+    public Page<Teacher> findPaginated(Pageable pageable) {
+        List<Teacher> teachers = teacherDao.getAll();
+        int pageSize = pageable.getPageSize();
+        int currentPage = pageable.getPageNumber();
+        int startItem = currentPage * pageSize;
+        List<Teacher> list;
+        if (teachers.size() < startItem) {
+            list = Collections.emptyList();
+        } else {
+            int toIndex = Math.min(startItem + pageSize, teachers.size());
+            list = teachers.subList(startItem, toIndex);
+        }
+        return new PageImpl<Teacher>(list, PageRequest.of(currentPage, pageSize), teachers.size());
     }
 
     private void verifyNameUniqueness(Teacher teacher) throws NotUniqueNameException {

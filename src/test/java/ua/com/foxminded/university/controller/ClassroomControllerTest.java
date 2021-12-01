@@ -3,7 +3,10 @@ package ua.com.foxminded.university.controller;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -12,7 +15,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import ua.com.foxminded.university.config.SpringMvcConfig;
-import ua.com.foxminded.university.config.TestContext;
 import ua.com.foxminded.university.model.Classroom;
 import ua.com.foxminded.university.service.ClassroomService;
 
@@ -26,20 +28,20 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {SpringMvcConfig.class, TestContext.class})
+@ContextConfiguration(classes = {SpringMvcConfig.class})
 @WebAppConfiguration
 public class ClassroomControllerTest {
 
     private MockMvc mockMvc;
-    @Autowired
+    @Mock
     private ClassroomService classroomService;
-    @Autowired
-    private WebApplicationContext webApplicationContext;
+    @InjectMocks
+    private ClassroomController classroomController;
 
     @BeforeEach
     public void setUp() {
-        Mockito.reset(classroomService);
-        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        MockitoAnnotations.openMocks(this);
+        mockMvc = MockMvcBuilders.standaloneSetup(classroomController).build();
     }
 
     @Test

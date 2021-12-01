@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <title>List of students</title>
+  <title>List of courses</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
         integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
@@ -14,26 +14,20 @@
   <thead>
   <tr>
     <th scope="col">Name</th>
-    <th scope="col">Group</th>
-    <th scope="col">PhoneNumber</th>
-    <th scope="col">Email</th>
   </tr>
   </thead>
   <tbody>
-  <tr th:each="student: ${studentPage.content}">
-    <td th:text="${student.getFirstName()}+' '+${student.getLastName()}"/>
-    <td th:text="${student.getGroup().getName()}"/>
-    <td th:text="${student.getPhoneNumber()}"/>
-    <td th:text="${student.getEmail()}"/>
+  <tr th:each="course : ${coursePage.content}">
+    <td th:text="${course.getName()}"/>
   </tr>
   </tbody>
 </table>
 <nav aria-label="page navigation">
-  <ul th:if="${studentPage.totalPages} > 1" class="pagination">
+  <ul th:if="${coursePage.totalPages} > 1" class="pagination">
     <th:block th:each="pageNumber : ${pageNumbers}">
-      <li class="page-item" th:classappend="${pageNumber==studentPage.number + 1} ? active">
+      <li class="page-item" th:classappend="${pageNumber==coursePage.number + 1} ? active">
         <a class="page-link"
-           th:href="@{/students(size=${studentPage.size}, page=${pageNumber})}"
+           th:href="@{/courses(size=${coursePage.size}, page=${pageNumber})}"
            th:text="${pageNumber}"></a>
       </li>
     </th:block>

@@ -2,6 +2,10 @@ package ua.com.foxminded.university.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ua.com.foxminded.university.dao.*;
 import ua.com.foxminded.university.exceptions.*;
@@ -10,6 +14,7 @@ import ua.com.foxminded.university.model.Lesson;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 
 import static java.lang.String.format;
@@ -67,6 +72,21 @@ public class LessonService {
     public List<Lesson> getAll() {
         logger.debug("Getting all lessons");
         return lessonDao.getAll();
+    }
+
+    public Page<Lesson> findPaginated(Pageable pageable) {
+        List<Lesson> lessons = lessonDao.getAll();
+        int pageSize = pageable.getPageSize();
+        int currentPage = pageable.getPageNumber();
+        int startItem = currentPage * pageSize;
+        List<Lesson> list;
+        if (lessons.size() < startItem) {
+            list = Collections.emptyList();
+        } else {
+            int toIndex = Math.min(startItem + pageSize, lessons.size());
+            list = lessons.subList(startItem, toIndex);
+        }
+        return new PageImpl<Lesson>(list, PageRequest.of(currentPage, pageSize), lessons.size());
     }
 
     private void checkConditions(Lesson lesson) throws NotAvailableDayException, NotAvailableClassroomException, NotAvailableTeacherException, NotAvailableGroupException {

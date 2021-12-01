@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<head>
+  <meta charset="UTF-8">
+  <title th:text="${teacher.getFirstName()}+' '+${teacher.getLastName()}">Student</title>
+</head>
+<body>
+<p> Name: <span th:text="${teacher.getFirstName()}+' '+${teacher.getLastName()}">value</span></p>
+<p> Birthday: <span th:text="${teacher.getBirthDate()}">value</span></p>
+<p> Gender: <span th:text="${teacher.getGender()}">value</span></p>
+<p> Academic degree: <span th:text="${teacher.getAcademicDegree()}">value</span></p>
+<p> Phone number: <span th:text="${teacher.getPhoneNumber()}">value</span></p>
+<p> Email: <span th:text="${teacher.getEmail()}">value</span></p>
+
+</body>
+</html>
