@@ -56,29 +56,14 @@ public class GroupService {
         groupDao.delete(id);
     }
 
-    public List<Group> getAll() {
+    public Page<Group> getAll(Pageable pageable) {
         logger.debug("Getting all group");
-        return groupDao.getAll();
+        return groupDao.getAll(pageable);
     }
 
     public List<Group> getByLessonId(int lessonId) {
         logger.debug("Getting groups by lesson with id = {}", lessonId);
         return groupDao.getByLessonId(lessonId);
-    }
-
-    public Page<Group> findPaginated(Pageable pageable) {
-        List<Group> groups = groupDao.getAll();
-        int pageSize = pageable.getPageSize();
-        int currentPage = pageable.getPageNumber();
-        int startItem = currentPage * pageSize;
-        List<Group> list;
-        if (groups.size() < startItem) {
-            list = Collections.emptyList();
-        } else {
-            int toIndex = Math.min(startItem + pageSize, groups.size());
-            list = groups.subList(startItem, toIndex);
-        }
-        return new PageImpl<Group>(list, PageRequest.of(currentPage, pageSize), groups.size());
     }
 
     private void verifyNameUniqueness(Group group) throws NotUniqueNameException {

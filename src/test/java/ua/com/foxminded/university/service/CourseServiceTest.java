@@ -6,6 +6,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import ua.com.foxminded.university.DataSource;
 import ua.com.foxminded.university.dao.CourseDao;
 import ua.com.foxminded.university.exceptions.EntityNotFoundException;
@@ -128,9 +132,11 @@ public class CourseServiceTest {
 
     @Test
     public void whenGetAll_thenReturn() {
-        when(courseDao.getAll()).thenReturn(courses);
+        Pageable pageable = PageRequest.of(1, 10);
+        Page<Course> coursePage = new PageImpl<Course>(courses, pageable, courses.size());
+        when(courseDao.getAll(pageable)).thenReturn(coursePage);
 
-        assertEquals(courses, courseService.getAll());
+        assertEquals(coursePage, courseService.getAll(pageable));
     }
 
     @Test

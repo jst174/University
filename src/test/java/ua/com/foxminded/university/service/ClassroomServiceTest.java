@@ -9,6 +9,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import ua.com.foxminded.university.dao.ClassroomDao;
 import ua.com.foxminded.university.exceptions.EntityNotFoundException;
 import ua.com.foxminded.university.exceptions.NotUniqueNameException;
@@ -113,9 +117,12 @@ public class ClassroomServiceTest {
 
     @Test
     public void whenGetAll_thenReturn() {
-        when(classroomDao.getAll()).thenReturn(classrooms);
+        Pageable pageable = PageRequest.of(1, 10);
+        Page<Classroom> classroomPage =
+            new PageImpl<Classroom>(classrooms, pageable, classrooms.size());
+        when(classroomDao.getAll(pageable)).thenReturn(classroomPage);
 
-        assertEquals(classrooms, classroomService.getAll());
+        assertEquals(classroomPage, classroomService.getAll(pageable));
     }
 
 }

@@ -1,16 +1,22 @@
 package ua.com.foxminded.university.dao.jdbc;
 
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ua.com.foxminded.university.dao.GroupDao;
 import ua.com.foxminded.university.dao.mapper.GroupMapper;
+import ua.com.foxminded.university.model.Classroom;
 import ua.com.foxminded.university.model.Group;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -77,5 +83,21 @@ public class JdbcGroupDao implements GroupDao {
         } catch (DataAccessException e) {
             return Optional.empty();
         }
+    }
+
+    @Override
+    public Page<Group> getAll(Pageable pageable) {
+        List<Group> groups = jdbcTemplate.query(SQL_FIND_ALL, groupMapper);
+        int pageSize = pageable.getPageSize();
+        int currentPage = pageable.getPageNumber();
+        int startItem = currentPage * pageSize;
+        List<Group> list;
+        if (groups.size() < startItem) {
+            list = Collections.emptyList();
+        } else {
+            int toIndex = Math.min(startItem + pageSize, groups.size());
+            list = groups.subList(startItem, toIndex);
+        }
+        return new PageImpl<Group>(list, PageRequest.of(currentPage, pageSize), groups.size());
     }
 }

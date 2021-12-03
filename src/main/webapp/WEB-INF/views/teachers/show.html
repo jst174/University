@@ -11,6 +11,23 @@
 <p> Academic degree: <span th:text="${teacher.getAcademicDegree()}">value</span></p>
 <p> Phone number: <span th:text="${teacher.getPhoneNumber()}">value</span></p>
 <p> Email: <span th:text="${teacher.getEmail()}">value</span></p>
-
+<p> Address: <span th:text="${teacher.getAddress().getCountry()}">country</span>,
+  <span th:text="${teacher.getAddress().getCity()}">city</span>,
+  <span th:text="${teacher.getAddress().getStreet()}">street</span>,
+  <span th:text="${teacher.getAddress().getHouseNumber()}">house number</span>,
+  <span th:text="${teacher.getAddress().getApartmentNumber()}">apartment number</span>,
+  <span th:text="${teacher.getAddress().getPostcode()}">postcode</span></p>
+<table class="table table-striped">
+  <thead>
+  <tr>
+    <th scope="col">Courses</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr th:each="course: ${teacher.getCourses()}">
+    <td th:text="${course.getName()}"/>
+  </tr>
+  </tbody>
+</table>
 </body>
 </html>

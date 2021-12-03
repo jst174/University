@@ -30,7 +30,7 @@
 </table>
 <nav aria-label="page navigation">
   <ul th:if="${studentPage.totalPages} > 1" class="pagination">
-    <th:block th:each="pageNumber : ${pageNumbers}">
+    <th:block th:each="pageNumber : ${#numbers.sequence(1, studentPage.totalPages)}">
       <li class="page-item" th:classappend="${pageNumber==studentPage.number + 1} ? active">
         <a class="page-link"
            th:href="@{/students(size=${studentPage.size}, page=${pageNumber})}"

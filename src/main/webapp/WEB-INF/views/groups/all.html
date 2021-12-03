@@ -24,7 +24,7 @@
 </table>
 <nav aria-label="page navigation">
   <ul th:if="${groupPage.totalPages} > 1" class="pagination">
-    <th:block th:each="pageNumber : ${pageNumbers}">
+    <th:block th:each="pageNumber : ${#numbers.sequence(1, groupPage.totalPages)}">
       <li class="page-item" th:classappend="${pageNumber==groupPage.number + 1} ? active">
         <a class="page-link"
            th:href="@{/groups(size=${groupPage.size}, page=${pageNumber})}"

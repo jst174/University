@@ -1,17 +1,24 @@
 package ua.com.foxminded.university.dao.jdbc;
 
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ua.com.foxminded.university.dao.VacationDao;
 import ua.com.foxminded.university.dao.mapper.VacationMapper;
+import ua.com.foxminded.university.model.Classroom;
 import ua.com.foxminded.university.model.Teacher;
 import ua.com.foxminded.university.model.Vacation;
+
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -99,5 +106,21 @@ public class JdbcVacationDao implements VacationDao {
         } catch (DataAccessException e) {
             return Optional.empty();
         }
+    }
+
+    @Override
+    public Page<Vacation> getAll(Pageable pageable) {
+        List<Vacation> vacations = jdbcTemplate.query(SQL_FIND_ALL, vacationMapper);
+        int pageSize = pageable.getPageSize();
+        int currentPage = pageable.getPageNumber();
+        int startItem = currentPage * pageSize;
+        List<Vacation> list;
+        if (vacations.size() < startItem) {
+            list = Collections.emptyList();
+        } else {
+            int toIndex = Math.min(startItem + pageSize, vacations.size());
+            list = vacations.subList(startItem, toIndex);
+        }
+        return new PageImpl<Vacation>(list, PageRequest.of(currentPage, pageSize), vacations.size());
     }
 }

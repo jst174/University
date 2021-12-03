@@ -65,19 +65,9 @@ public class VacationService {
         return vacationDao.getByTeacherId(teacherId);
     }
 
-    public Page<Vacation> findPaginated(Pageable pageable) {
-        List<Vacation> vacations = vacationDao.getAll();
-        int pageSize = pageable.getPageSize();
-        int currentPage = pageable.getPageNumber();
-        int startItem = currentPage * pageSize;
-        List<Vacation> list;
-        if (vacations.size() < startItem) {
-            list = Collections.emptyList();
-        } else {
-            int toIndex = Math.min(startItem + pageSize, vacations.size());
-            list = vacations.subList(startItem, toIndex);
-        }
-        return new PageImpl<Vacation>(list, PageRequest.of(currentPage, pageSize), vacations.size());
+    public Page<Vacation> getAll(Pageable pageable) {
+        logger.debug("Getting all vacations");
+        return vacationDao.getAll(pageable);
     }
 
     private void verifyUniqueness(Vacation vacation) throws NotUniqueVacationDatesException {

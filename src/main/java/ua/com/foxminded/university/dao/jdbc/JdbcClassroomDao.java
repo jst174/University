@@ -1,6 +1,10 @@
 package ua.com.foxminded.university.dao.jdbc;
 
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -11,6 +15,7 @@ import ua.com.foxminded.university.model.Classroom;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -63,6 +68,22 @@ public class JdbcClassroomDao implements ClassroomDao {
     @Override
     public List<Classroom> getAll() {
         return jdbcTemplate.query(SQL_FIND_ALL, classroomMapper);
+    }
+
+    @Override
+    public Page<Classroom> getAll(Pageable pageable) {
+        List<Classroom> classrooms = jdbcTemplate.query(SQL_FIND_ALL, classroomMapper);
+        int pageSize = pageable.getPageSize();
+        int currentPage = pageable.getPageNumber();
+        int startItem = currentPage * pageSize;
+        List<Classroom> list;
+        if (classrooms.size() < startItem) {
+            list = Collections.emptyList();
+        } else {
+            int toIndex = Math.min(startItem + pageSize, classrooms.size());
+            list = classrooms.subList(startItem, toIndex);
+        }
+        return new PageImpl<Classroom>(list, PageRequest.of(currentPage, pageSize), classrooms.size());
     }
 
     @Override

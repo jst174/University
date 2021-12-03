@@ -51,24 +51,9 @@ public class TeacherService {
         teacherDao.delete(id);
     }
 
-    public List<Teacher> getAll() {
+    public Page<Teacher> getAll(Pageable pageable) {
         logger.debug("Getting all teacher");
-        return teacherDao.getAll();
-    }
-
-    public Page<Teacher> findPaginated(Pageable pageable) {
-        List<Teacher> teachers = teacherDao.getAll();
-        int pageSize = pageable.getPageSize();
-        int currentPage = pageable.getPageNumber();
-        int startItem = currentPage * pageSize;
-        List<Teacher> list;
-        if (teachers.size() < startItem) {
-            list = Collections.emptyList();
-        } else {
-            int toIndex = Math.min(startItem + pageSize, teachers.size());
-            list = teachers.subList(startItem, toIndex);
-        }
-        return new PageImpl<Teacher>(list, PageRequest.of(currentPage, pageSize), teachers.size());
+        return teacherDao.getAll(pageable);
     }
 
     private void verifyNameUniqueness(Teacher teacher) throws NotUniqueNameException {

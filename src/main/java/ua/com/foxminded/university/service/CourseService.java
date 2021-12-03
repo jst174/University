@@ -51,29 +51,14 @@ public class CourseService {
         courseDao.delete(id);
     }
 
-    public List<Course> getAll() {
+    public Page<Course> getAll(Pageable pageable) {
         logger.debug("Getting all course");
-        return courseDao.getAll();
+        return courseDao.getAll(pageable);
     }
 
     public List<Course> getByTeacherId(int teacherId) {
         logger.debug("Getting courses by teacher with id = {}", teacherId);
         return courseDao.getByTeacherId(teacherId);
-    }
-
-    public Page<Course> findPaginated(Pageable pageable) {
-        List<Course> courses = courseDao.getAll();
-        int pageSize = pageable.getPageSize();
-        int currentPage = pageable.getPageNumber();
-        int startItem = currentPage * pageSize;
-        List<Course> list;
-        if (courses.size() < startItem) {
-            list = Collections.emptyList();
-        } else {
-            int toIndex = Math.min(startItem + pageSize, courses.size());
-            list = courses.subList(startItem, toIndex);
-        }
-        return new PageImpl<Course>(list, PageRequest.of(currentPage, pageSize), courses.size());
     }
 
     private void verifyNameUniqueness(Course course) throws NotUniqueNameException {

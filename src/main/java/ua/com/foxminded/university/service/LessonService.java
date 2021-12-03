@@ -69,9 +69,9 @@ public class LessonService {
         lessonDao.delete(id);
     }
 
-    public List<Lesson> getAll() {
+    public Page<Lesson> getAll(Pageable pageable) {
         logger.debug("Getting all lessons");
-        return lessonDao.getAll();
+        return lessonDao.getAll(pageable);
     }
 
     public Page<Lesson> findPaginated(Pageable pageable) {

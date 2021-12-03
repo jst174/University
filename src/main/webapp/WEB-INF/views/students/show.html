@@ -11,5 +11,11 @@
 <p> Group: <span th:text="${student.getGroup().getName()}">value</span></p>
 <p> Phone number: <span th:text="${student.getPhoneNumber()}">value</span></p>
 <p> Email: <span th:text="${student.getEmail()}">value</span></p>
+<p> Address: <span th:text="${student.getAddress().getCountry()}">country</span>,
+  <span th:text="${student.getAddress().getCity()}">city</span>,
+  <span th:text="${student.getAddress().getStreet()}">street</span>,
+  <span th:text="${student.getAddress().getHouseNumber()}">house number</span>,
+  <span th:text="${student.getAddress().getApartmentNumber()}">apartment number</span>,
+  <span th:text="${student.getAddress().getPostcode()}">postcode</span></p>
 </body>
 </html>

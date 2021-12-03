@@ -2,6 +2,7 @@ package ua.com.foxminded.university.controller;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -25,20 +26,8 @@ public class ClassroomController {
     }
 
     @GetMapping
-    public String getAll(Model model,
-                         @RequestParam("page") Optional<Integer> page,
-                         @RequestParam("size") Optional<Integer> size) {
-        int currentPage = page.orElse(1);
-        int pageSize = size.orElse(10);
-        Page<Classroom> classroomPage = classroomService.findPaginated(PageRequest.of(currentPage - 1, pageSize));
-        model.addAttribute("classroomPage", classroomPage);
-        int totalPages = classroomPage.getTotalPages();
-        if (totalPages > 0) {
-            List<Integer> pageNumbers = IntStream.rangeClosed(1, totalPages)
-                .boxed()
-                .collect(Collectors.toList());
-            model.addAttribute("pageNumbers", pageNumbers);
-        }
+    public String getAll(Model model, Pageable pageable) {
+        model.addAttribute("classroomPage", classroomService.getAll(pageable));
         return "classrooms/all";
     }
 

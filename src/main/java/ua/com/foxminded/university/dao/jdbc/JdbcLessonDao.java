@@ -2,6 +2,10 @@ package ua.com.foxminded.university.dao.jdbc;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -17,6 +21,7 @@ import ua.com.foxminded.university.model.Time;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -127,6 +132,22 @@ public class JdbcLessonDao implements LessonDao {
     public List<Lesson> getByDateAndTime(LocalDate date, Time time) {
         return jdbcTemplate.query(SQL_FIND_BY_DATE_AND_TIME, lessonMapper, date,
             time.getId());
+    }
+
+    @Override
+    public Page<Lesson> getAll(Pageable pageable) {
+        List<Lesson> lessons = jdbcTemplate.query(SQL_FIND_ALL, lessonMapper);
+        int pageSize = pageable.getPageSize();
+        int currentPage = pageable.getPageNumber();
+        int startItem = currentPage * pageSize;
+        List<Lesson> list;
+        if (lessons.size() < startItem) {
+            list = Collections.emptyList();
+        } else {
+            int toIndex = Math.min(startItem + pageSize, lessons.size());
+            list = lessons.subList(startItem, toIndex);
+        }
+        return new PageImpl<Lesson>(list, PageRequest.of(currentPage, pageSize), lessons.size());
     }
 
     private void setGroups(Lesson lesson, List<Group> groups) {

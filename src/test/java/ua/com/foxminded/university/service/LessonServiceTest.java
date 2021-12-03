@@ -6,6 +6,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import ua.com.foxminded.university.DataSource;
 import ua.com.foxminded.university.dao.*;
 import ua.com.foxminded.university.exceptions.*;
@@ -470,9 +474,12 @@ public class LessonServiceTest {
 
     @Test
     public void whenGetAll_thenReturn() {
-        when(lessonDao.getAll()).thenReturn(lessons);
+        Pageable pageable = PageRequest.of(1, 10);
+        Page<Lesson> lessonPage =
+            new PageImpl<Lesson>(lessons, pageable, lessons.size());
+        when(lessonDao.getAll(pageable)).thenReturn(lessonPage);
 
-        assertEquals(lessons, lessonService.getAll());
+        assertEquals(lessonPage, lessonService.getAll(pageable));
     }
 
     private List<Teacher> getTeachers() {

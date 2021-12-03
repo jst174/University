@@ -59,24 +59,9 @@ public class StudentService {
         studentDao.delete(id);
     }
 
-    public List<Student> getAll() {
+    public Page<Student> getAll(Pageable pageable) {
         logger.debug("Getting all students");
-        return studentDao.getAll();
-    }
-
-    public Page<Student> findPaginated(Pageable pageable) {
-        List<Student> students = studentDao.getAll();
-        int pageSize = pageable.getPageSize();
-        int currentPage = pageable.getPageNumber();
-        int startItem = currentPage * pageSize;
-        List<Student> list;
-        if (students.size() < startItem) {
-            list = Collections.emptyList();
-        } else {
-            int toIndex = Math.min(startItem + pageSize, students.size());
-            list = students.subList(startItem, toIndex);
-        }
-        return new PageImpl<Student>(list, PageRequest.of(currentPage, pageSize), students.size());
+        return studentDao.getAll(pageable);
     }
 
     private void verifyNameUniqueness(Student student) throws NotUniqueNameException {

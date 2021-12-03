@@ -6,6 +6,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
 import ua.com.foxminded.university.DataSource;
 import ua.com.foxminded.university.dao.TeacherDao;
@@ -14,6 +18,7 @@ import ua.com.foxminded.university.exceptions.EntityNotFoundException;
 import ua.com.foxminded.university.exceptions.NotAvailablePeriodException;
 import ua.com.foxminded.university.exceptions.NotUniqueVacationDatesException;
 import ua.com.foxminded.university.model.AcademicDegree;
+import ua.com.foxminded.university.model.Classroom;
 import ua.com.foxminded.university.model.Teacher;
 import ua.com.foxminded.university.model.Vacation;
 
@@ -195,5 +200,15 @@ public class VacationServiceTest {
         when(vacationDao.getByTeacherId(1)).thenReturn(vacations);
 
         assertEquals(vacations, vacationService.getByTeacherId(1));
+    }
+
+    @Test
+    public void whenGetAll_thenReturn() {
+        Pageable pageable = PageRequest.of(1, 10);
+        Page<Vacation> vacationPage =
+            new PageImpl<Vacation>(vacations, pageable, vacations.size());
+        when(vacationDao.getAll(pageable)).thenReturn(vacationPage);
+
+        assertEquals(vacationPage, vacationService.getAll(pageable));
     }
 }

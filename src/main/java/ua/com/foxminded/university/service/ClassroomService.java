@@ -52,24 +52,9 @@ public class ClassroomService {
         classroomDao.delete(id);
     }
 
-    public List<Classroom> getAll() {
+    public Page<Classroom> getAll(Pageable pageable) {
         logger.debug("Getting all classrooms");
-        return classroomDao.getAll();
-    }
-
-    public Page<Classroom> findPaginated(Pageable pageable) {
-        List<Classroom> classrooms = classroomDao.getAll();
-        int pageSize = pageable.getPageSize();
-        int currentPage = pageable.getPageNumber();
-        int startItem = currentPage * pageSize;
-        List<Classroom> list;
-        if (classrooms.size() < startItem) {
-            list = Collections.emptyList();
-        } else {
-            int toIndex = Math.min(startItem + pageSize, classrooms.size());
-            list = classrooms.subList(startItem, toIndex);
-        }
-        return new PageImpl<Classroom>(list, PageRequest.of(currentPage, pageSize), classrooms.size());
+        return classroomDao.getAll(pageable);
     }
 
     private void verifyNameUniqueness(Classroom classroom) throws NotUniqueNameException {

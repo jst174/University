@@ -2,6 +2,10 @@ package ua.com.foxminded.university.dao.jdbc;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -10,9 +14,12 @@ import org.springframework.transaction.annotation.Transactional;
 import ua.com.foxminded.university.dao.AddressDao;
 import ua.com.foxminded.university.dao.StudentDao;
 import ua.com.foxminded.university.dao.mapper.StudentMapper;
+import ua.com.foxminded.university.model.Classroom;
 import ua.com.foxminded.university.model.Student;
+
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -101,5 +108,21 @@ public class JdbcStudentDao implements StudentDao {
         } catch (DataAccessException e) {
             return Optional.empty();
         }
+    }
+
+    @Override
+    public Page<Student> getAll(Pageable pageable) {
+        List<Student> students = jdbcTemplate.query(SQL_FIND_ALL, studentMapper);
+        int pageSize = pageable.getPageSize();
+        int currentPage = pageable.getPageNumber();
+        int startItem = currentPage * pageSize;
+        List<Student> list;
+        if (students.size() < startItem) {
+            list = Collections.emptyList();
+        } else {
+            int toIndex = Math.min(startItem + pageSize, students.size());
+            list = students.subList(startItem, toIndex);
+        }
+        return new PageImpl<Student>(list, PageRequest.of(currentPage, pageSize), students.size());
     }
 }
