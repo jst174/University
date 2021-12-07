@@ -12,6 +12,4 @@ public interface StudentDao extends Dao<Student> {
     List<Student> getByGroupId(int groupId);
 
     Optional<Student> getByName(String firstName, String lastName);
-
-    Page<Student> getAll(Pageable pageable);
 }

@@ -12,6 +12,4 @@ public interface GroupDao extends Dao<Group> {
     List<Group> getByLessonId(int lessonId);
 
     Optional<Group> getByName(String name);
-
-    Page<Group> getAll(Pageable pageable);
 }

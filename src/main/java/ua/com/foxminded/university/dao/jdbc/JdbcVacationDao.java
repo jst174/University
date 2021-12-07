@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import ua.com.foxminded.university.dao.VacationDao;
 import ua.com.foxminded.university.dao.mapper.VacationMapper;
 import ua.com.foxminded.university.model.Classroom;
+import ua.com.foxminded.university.model.Course;
 import ua.com.foxminded.university.model.Teacher;
 import ua.com.foxminded.university.model.Vacation;
 
@@ -110,17 +111,10 @@ public class JdbcVacationDao implements VacationDao {
 
     @Override
     public Page<Vacation> getAll(Pageable pageable) {
-        List<Vacation> vacations = jdbcTemplate.query(SQL_FIND_ALL, vacationMapper);
+        int totalRows = jdbcTemplate.query(SQL_FIND_ALL, vacationMapper).size();
         int pageSize = pageable.getPageSize();
-        int currentPage = pageable.getPageNumber();
-        int startItem = currentPage * pageSize;
-        List<Vacation> list;
-        if (vacations.size() < startItem) {
-            list = Collections.emptyList();
-        } else {
-            int toIndex = Math.min(startItem + pageSize, vacations.size());
-            list = vacations.subList(startItem, toIndex);
-        }
-        return new PageImpl<Vacation>(list, PageRequest.of(currentPage, pageSize), vacations.size());
+        List<Vacation> vacations = jdbcTemplate.query("SELECT * FROM vacations LIMIT " + pageSize
+            + " OFFSET " + pageable.getOffset(), vacationMapper);
+        return new PageImpl<Vacation>(vacations, PageRequest.of(pageable.getPageNumber(), pageSize), totalRows);
     }
 }

@@ -31,12 +31,12 @@ public class LessonController {
 
     @GetMapping
     public String getAll(Model model, Pageable pageable) {
-        model.addAttribute("lessonPage", lessonService.findPaginated(pageable));
+        model.addAttribute("lessonPage", lessonService.getAll(pageable));
         return "lessons/all";
     }
 
     @GetMapping("/{id}")
-    public String getById(@PathVariable("id") int id, Model model) throws EntityNotFoundException {
+    public String getById(@PathVariable int id, Model model) throws EntityNotFoundException {
         model.addAttribute("lesson", lessonService.getById(id));
         return "lessons/show";
     }

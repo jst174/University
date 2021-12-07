@@ -13,67 +13,64 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import ua.com.foxminded.university.model.Classroom;
-import ua.com.foxminded.university.service.ClassroomService;
+import ua.com.foxminded.university.model.Course;
+import ua.com.foxminded.university.model.Holiday;
+import ua.com.foxminded.university.service.HolidayService;
 
 import java.util.Arrays;
 import java.util.List;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class ClassroomControllerTest {
+public class HolidayControllerTest {
 
     private MockMvc mockMvc;
     @Mock
-    private ClassroomService classroomService;
+    private HolidayService holidayService;
     @InjectMocks
-    private ClassroomController classroomController;
+    private HolidayController holidayController;
 
     @BeforeAll
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        mockMvc = MockMvcBuilders.standaloneSetup(classroomController)
+        mockMvc = MockMvcBuilders.standaloneSetup(holidayController)
             .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
             .build();
     }
 
     @Test
-    public void whenGetAll_thenAddClassroomsToModelAndShowViewWithAllClassrooms() throws Exception {
+    public void whenGetAll_thenAddHolidaysToModelAndShowViewWithAllHolidays() throws Exception {
         Pageable pageable = PageRequest.of(1, 10);
-        List<Classroom> expectedClassrooms = Arrays.asList(TestData.classroom1, TestData.classroom2);
-        Page<Classroom> classroomPage = new PageImpl<Classroom>(expectedClassrooms, pageable, expectedClassrooms.size());
-        when(classroomService.getAll(pageable)).thenReturn(classroomPage);
-        mockMvc.perform(get("/classrooms")
+        List<Holiday> expectedHolidays = Arrays.asList(TestData.holiday1, TestData.holiday2);
+        Page<Holiday> holidayPage = new PageImpl<Holiday>(expectedHolidays, pageable, expectedHolidays.size());
+        when(holidayService.getAll(pageable)).thenReturn(holidayPage);
+        mockMvc.perform(get("/holidays")
                 .param("size", "10")
                 .param("page", "1"))
             .andExpect(status().isOk())
-            .andExpect(view().name("classrooms/all"))
-            .andExpect(model().attribute("classroomPage", classroomPage));
+            .andExpect(view().name("holidays/all"))
+            .andExpect(model().attribute("holidayPage", holidayPage));
     }
 
     @Test
-    public void whenGetById_thenAddClassroomToModelAndShowViewWithClassroom() throws Exception {
-        Classroom expectedClassroom = TestData.classroom1;
-        when(classroomService.getById(1)).thenReturn(expectedClassroom);
-        mockMvc.perform(get("/classrooms/{id}", 1))
+    public void whenGetById_thenAddHolidayToModelAndShowViewWithHoliday() throws Exception {
+        Holiday expectedHoliday = TestData.holiday1;
+        when(holidayService.getById(1)).thenReturn(expectedHoliday);
+        mockMvc.perform(get("/holidays/{id}", 1))
             .andExpect(status().isOk())
-            .andExpect(view().name("classrooms/show"))
-            .andExpect(model().attribute("classroom", expectedClassroom));
+            .andExpect(view().name("holidays/show"))
+            .andExpect(model().attribute("holiday", expectedHoliday));
     }
 
     interface TestData {
-        Classroom classroom1 = new Classroom.Builder()
-            .setNumber(102)
-            .setCapacity(30)
+        Holiday holiday1 = new Holiday.Builder()
             .setId(1)
             .build();
-        Classroom classroom2 = new Classroom.Builder()
-            .setNumber(202)
-            .setCapacity(50)
+        Holiday holiday2 = new Holiday.Builder()
             .setId(2)
             .build();
     }

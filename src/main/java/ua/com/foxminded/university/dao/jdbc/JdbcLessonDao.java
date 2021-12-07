@@ -136,18 +136,11 @@ public class JdbcLessonDao implements LessonDao {
 
     @Override
     public Page<Lesson> getAll(Pageable pageable) {
-        List<Lesson> lessons = jdbcTemplate.query(SQL_FIND_ALL, lessonMapper);
+        int totalRows = jdbcTemplate.query(SQL_FIND_ALL, lessonMapper).size();
         int pageSize = pageable.getPageSize();
-        int currentPage = pageable.getPageNumber();
-        int startItem = currentPage * pageSize;
-        List<Lesson> list;
-        if (lessons.size() < startItem) {
-            list = Collections.emptyList();
-        } else {
-            int toIndex = Math.min(startItem + pageSize, lessons.size());
-            list = lessons.subList(startItem, toIndex);
-        }
-        return new PageImpl<Lesson>(list, PageRequest.of(currentPage, pageSize), lessons.size());
+        List<Lesson> lessons = jdbcTemplate.query("SELECT * FROM lessons LIMIT " + pageSize
+            + " OFFSET " + pageable.getOffset(), lessonMapper);
+        return new PageImpl<Lesson>(lessons, PageRequest.of(pageable.getPageNumber(), pageSize), totalRows);
     }
 
     private void setGroups(Lesson lesson, List<Group> groups) {

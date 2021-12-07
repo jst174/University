@@ -1,6 +1,10 @@
 package ua.com.foxminded.university.dao.jdbc;
 
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -8,11 +12,13 @@ import org.springframework.stereotype.Component;
 
 import ua.com.foxminded.university.dao.HolidayDao;
 import ua.com.foxminded.university.dao.mapper.HolidayMapper;
+import ua.com.foxminded.university.model.Course;
 import ua.com.foxminded.university.model.Holiday;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -65,6 +71,15 @@ public class JdbcHolidayDao implements HolidayDao {
     @Override
     public List<Holiday> getAll() {
         return jdbcTemplate.query(SQL_FIND_ALL, holidayMapper);
+    }
+
+    @Override
+    public Page<Holiday> getAll(Pageable pageable) {
+        int totalRows = jdbcTemplate.query(SQL_FIND_ALL, holidayMapper).size();
+        int pageSize = pageable.getPageSize();
+        List<Holiday> holidays = jdbcTemplate.query("SELECT * FROM holidays LIMIT " + pageSize
+            + " OFFSET " + pageable.getOffset(), holidayMapper);
+        return new PageImpl<Holiday>(holidays, PageRequest.of(pageable.getPageNumber(), pageSize), totalRows);
     }
 
     @Override

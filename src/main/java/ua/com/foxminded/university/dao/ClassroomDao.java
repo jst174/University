@@ -9,6 +9,4 @@ import java.util.Optional;
 public interface ClassroomDao extends Dao<Classroom> {
 
     Optional<Classroom> findByNumber(int number);
-
-    Page<Classroom> getAll(Pageable pageable);
 }

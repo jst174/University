@@ -72,18 +72,11 @@ public class JdbcClassroomDao implements ClassroomDao {
 
     @Override
     public Page<Classroom> getAll(Pageable pageable) {
-        List<Classroom> classrooms = jdbcTemplate.query(SQL_FIND_ALL, classroomMapper);
+        int totalRows = jdbcTemplate.query(SQL_FIND_ALL, classroomMapper).size();
         int pageSize = pageable.getPageSize();
-        int currentPage = pageable.getPageNumber();
-        int startItem = currentPage * pageSize;
-        List<Classroom> list;
-        if (classrooms.size() < startItem) {
-            list = Collections.emptyList();
-        } else {
-            int toIndex = Math.min(startItem + pageSize, classrooms.size());
-            list = classrooms.subList(startItem, toIndex);
-        }
-        return new PageImpl<Classroom>(list, PageRequest.of(currentPage, pageSize), classrooms.size());
+        List<Classroom> classrooms = jdbcTemplate.query("SELECT * FROM classrooms LIMIT " + pageSize
+            + " OFFSET " + pageable.getOffset(), classroomMapper);
+        return new PageImpl<Classroom>(classrooms, PageRequest.of(pageable.getPageNumber(), pageSize), totalRows);
     }
 
     @Override

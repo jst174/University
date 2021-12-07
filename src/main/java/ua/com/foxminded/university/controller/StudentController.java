@@ -35,7 +35,7 @@ public class StudentController {
     }
 
     @GetMapping("/{id}")
-    public String getById(@PathVariable("id") int id, Model model) throws EntityNotFoundException {
+    public String getById(@PathVariable int id, Model model) throws EntityNotFoundException {
         model.addAttribute("student", studentService.getById(id));
         return "students/show";
     }

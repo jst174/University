@@ -15,6 +15,7 @@ import ua.com.foxminded.university.dao.AddressDao;
 import ua.com.foxminded.university.dao.StudentDao;
 import ua.com.foxminded.university.dao.mapper.StudentMapper;
 import ua.com.foxminded.university.model.Classroom;
+import ua.com.foxminded.university.model.Course;
 import ua.com.foxminded.university.model.Student;
 
 import java.sql.PreparedStatement;
@@ -112,17 +113,10 @@ public class JdbcStudentDao implements StudentDao {
 
     @Override
     public Page<Student> getAll(Pageable pageable) {
-        List<Student> students = jdbcTemplate.query(SQL_FIND_ALL, studentMapper);
+        int totalRows = jdbcTemplate.query(SQL_FIND_ALL, studentMapper).size();
         int pageSize = pageable.getPageSize();
-        int currentPage = pageable.getPageNumber();
-        int startItem = currentPage * pageSize;
-        List<Student> list;
-        if (students.size() < startItem) {
-            list = Collections.emptyList();
-        } else {
-            int toIndex = Math.min(startItem + pageSize, students.size());
-            list = students.subList(startItem, toIndex);
-        }
-        return new PageImpl<Student>(list, PageRequest.of(currentPage, pageSize), students.size());
+        List<Student> students = jdbcTemplate.query("SELECT * FROM students LIMIT " + pageSize
+            + " OFFSET " + pageable.getOffset(), studentMapper);
+        return new PageImpl<Student>(students, PageRequest.of(pageable.getPageNumber(), pageSize), totalRows);
     }
 }

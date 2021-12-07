@@ -16,6 +16,4 @@ public interface VacationDao extends Dao<Vacation> {
     Optional<Vacation> getByTeacherAndLessonDate(Teacher teacher, LocalDate lessonDate);
 
     Optional<Vacation> getByTeacherAndVacationDates(Vacation vacation);
-
-    Page<Vacation> getAll(Pageable pageable);
 }

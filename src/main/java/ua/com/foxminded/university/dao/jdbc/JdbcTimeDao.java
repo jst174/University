@@ -1,16 +1,23 @@
 package ua.com.foxminded.university.dao.jdbc;
 
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ua.com.foxminded.university.dao.TimeDao;
 import ua.com.foxminded.university.dao.mapper.TimeMapper;
+import ua.com.foxminded.university.model.Course;
 import ua.com.foxminded.university.model.Time;
+
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.time.LocalTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -66,6 +73,14 @@ public class JdbcTimeDao implements TimeDao {
         return jdbcTemplate.query(SQL_FIND_ALL, timeMapper);
     }
 
+    @Override
+    public Page<Time> getAll(Pageable pageable) {
+        int totalRows = jdbcTemplate.query(SQL_FIND_ALL, timeMapper).size();
+        int pageSize = pageable.getPageSize();
+        List<Time> times = jdbcTemplate.query("SELECT * FROM times LIMIT " + pageSize
+            + " OFFSET " + pageable.getOffset(), timeMapper);
+        return new PageImpl<Time>(times, PageRequest.of(pageable.getPageNumber(), pageSize), totalRows);
+    }
 
     @Override
     public Optional<Time> getByTime(LocalTime start, LocalTime end) {

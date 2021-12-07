@@ -1,6 +1,7 @@
 package ua.com.foxminded.university.model;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Objects;
 
 public class Vacation {
@@ -71,5 +72,38 @@ public class Vacation {
     @Override
     public int hashCode() {
         return Objects.hash(start, end);
+    }
+
+    public static class Builder {
+
+        private Vacation vacation;
+
+        public Builder() {
+            vacation = new Vacation();
+        }
+
+        public Builder setId(int id) {
+            vacation.setId(id);
+            return this;
+        }
+
+        public Builder setStart(LocalDate start) {
+            vacation.setStart(start);
+            return this;
+        }
+
+        public Builder setEnd(LocalDate end) {
+            vacation.setEnd(end);
+            return this;
+        }
+
+        public Builder setTeacher(Teacher teacher) {
+            vacation.setTeacher(teacher);
+            return this;
+        }
+
+        public Vacation build() {
+            return vacation;
+        }
     }
 }

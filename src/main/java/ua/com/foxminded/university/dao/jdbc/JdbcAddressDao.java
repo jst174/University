@@ -1,6 +1,10 @@
 package ua.com.foxminded.university.dao.jdbc;
 
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -8,9 +12,11 @@ import org.springframework.stereotype.Component;
 import ua.com.foxminded.university.dao.AddressDao;
 import ua.com.foxminded.university.dao.mapper.AddressMapper;
 import ua.com.foxminded.university.model.Address;
+import ua.com.foxminded.university.model.Classroom;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -53,7 +59,7 @@ public class JdbcAddressDao implements AddressDao {
         try {
             return Optional.of(jdbcTemplate.queryForObject(SQL_FIND_ADDRESS, addressMapper, id));
         } catch (DataAccessException e) {
-           return Optional.empty();
+            return Optional.empty();
         }
     }
 
@@ -74,5 +80,14 @@ public class JdbcAddressDao implements AddressDao {
     @Override
     public List<Address> getAll() {
         return jdbcTemplate.query(SQL_FIND_ALL, addressMapper);
+    }
+
+    @Override
+    public Page<Address> getAll(Pageable pageable) {
+        int totalRows = jdbcTemplate.query(SQL_FIND_ALL, addressMapper).size();
+        int pageSize = pageable.getPageSize();
+        List<Address> addresses = jdbcTemplate.query("SELECT * FROM addresses LIMIT " + pageSize
+            + " OFFSET " + pageable.getOffset(), addressMapper);
+        return new PageImpl<Address>(addresses, PageRequest.of(pageable.getPageNumber(), pageSize), totalRows);
     }
 }

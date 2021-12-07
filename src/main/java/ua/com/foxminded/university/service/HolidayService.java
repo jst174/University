@@ -2,6 +2,8 @@ package ua.com.foxminded.university.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ua.com.foxminded.university.dao.HolidayDao;
 import ua.com.foxminded.university.exceptions.EntityNotFoundException;
@@ -48,9 +50,9 @@ public class HolidayService {
         holidayDao.delete(id);
     }
 
-    public List<Holiday> getAll() {
+    public Page<Holiday> getAll(Pageable pageable) {
         logger.debug("Getting all holidays");
-        return holidayDao.getAll();
+        return holidayDao.getAll(pageable);
     }
 
     private void verifyDateUniqueness(Holiday holiday) throws NotUniqueDateException {

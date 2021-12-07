@@ -9,6 +9,4 @@ import java.util.Optional;
 public interface TeacherDao extends Dao<Teacher> {
 
     Optional<Teacher> getByName(String firstName, String lastName);
-
-    Page<Teacher> getAll(Pageable pageable);
 }

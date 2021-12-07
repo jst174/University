@@ -13,67 +13,64 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import ua.com.foxminded.university.model.Classroom;
-import ua.com.foxminded.university.service.ClassroomService;
+import ua.com.foxminded.university.model.Lesson;
+import ua.com.foxminded.university.model.Student;
+import ua.com.foxminded.university.service.StudentService;
 
 import java.util.Arrays;
 import java.util.List;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class ClassroomControllerTest {
+public class StudentControllerTest {
 
     private MockMvc mockMvc;
     @Mock
-    private ClassroomService classroomService;
+    private StudentService studentService;
     @InjectMocks
-    private ClassroomController classroomController;
+    private StudentController studentController;
 
     @BeforeAll
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        mockMvc = MockMvcBuilders.standaloneSetup(classroomController)
+        mockMvc = MockMvcBuilders.standaloneSetup(studentController)
             .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
             .build();
     }
 
     @Test
-    public void whenGetAll_thenAddClassroomsToModelAndShowViewWithAllClassrooms() throws Exception {
+    public void whenGetAll_thenAddStudentsToModelAndShowViewWithAllStudents() throws Exception {
         Pageable pageable = PageRequest.of(1, 10);
-        List<Classroom> expectedClassrooms = Arrays.asList(TestData.classroom1, TestData.classroom2);
-        Page<Classroom> classroomPage = new PageImpl<Classroom>(expectedClassrooms, pageable, expectedClassrooms.size());
-        when(classroomService.getAll(pageable)).thenReturn(classroomPage);
-        mockMvc.perform(get("/classrooms")
+        List<Student> expectedStudents = Arrays.asList(TestData.student1, TestData.student2);
+        Page<Student> studentPage = new PageImpl<Student>(expectedStudents, pageable, expectedStudents.size());
+        when(studentService.getAll(pageable)).thenReturn(studentPage);
+        mockMvc.perform(get("/students")
                 .param("size", "10")
                 .param("page", "1"))
             .andExpect(status().isOk())
-            .andExpect(view().name("classrooms/all"))
-            .andExpect(model().attribute("classroomPage", classroomPage));
+            .andExpect(view().name("students/all"))
+            .andExpect(model().attribute("studentPage", studentPage));
     }
 
     @Test
-    public void whenGetById_thenAddClassroomToModelAndShowViewWithClassroom() throws Exception {
-        Classroom expectedClassroom = TestData.classroom1;
-        when(classroomService.getById(1)).thenReturn(expectedClassroom);
-        mockMvc.perform(get("/classrooms/{id}", 1))
+    public void whenGetById_thenAddStudentToModelAndShowViewWithStudent() throws Exception {
+        Student expectedStudent = TestData.student1;
+        when(studentService.getById(1)).thenReturn(expectedStudent);
+        mockMvc.perform(get("/students/{id}", 1))
             .andExpect(status().isOk())
-            .andExpect(view().name("classrooms/show"))
-            .andExpect(model().attribute("classroom", expectedClassroom));
+            .andExpect(view().name("students/show"))
+            .andExpect(model().attribute("student", expectedStudent));
     }
 
     interface TestData {
-        Classroom classroom1 = new Classroom.Builder()
-            .setNumber(102)
-            .setCapacity(30)
+        Student student1 = new Student.Builder()
             .setId(1)
             .build();
-        Classroom classroom2 = new Classroom.Builder()
-            .setNumber(202)
-            .setCapacity(50)
+        Student student2 = new Student.Builder()
             .setId(2)
             .build();
     }

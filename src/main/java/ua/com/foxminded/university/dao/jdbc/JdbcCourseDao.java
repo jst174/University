@@ -86,17 +86,10 @@ public class JdbcCourseDao implements CourseDao {
 
     @Override
     public Page<Course> getAll(Pageable pageable) {
-        List<Course> courses = jdbcTemplate.query(SQL_FIND_ALL, courseMapper);
+        int totalRows = jdbcTemplate.query(SQL_FIND_ALL, courseMapper).size();
         int pageSize = pageable.getPageSize();
-        int currentPage = pageable.getPageNumber();
-        int startItem = currentPage * pageSize;
-        List<Course> list;
-        if (courses.size() < startItem) {
-            list = Collections.emptyList();
-        } else {
-            int toIndex = Math.min(startItem + pageSize, courses.size());
-            list = courses.subList(startItem, toIndex);
-        }
-        return new PageImpl<Course>(list, PageRequest.of(currentPage, pageSize), courses.size());
+        List<Course> courses = jdbcTemplate.query("SELECT * FROM courses LIMIT " + pageSize
+            + " OFFSET " + pageable.getOffset(), courseMapper);
+        return new PageImpl<Course>(courses, PageRequest.of(pageable.getPageNumber(), pageSize), totalRows);
     }
 }

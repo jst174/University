@@ -18,11 +18,22 @@
   </tr>
   </thead>
   <tbody>
-  <tr th:each="holiday : ${holidays}">
+  <tr th:each="holiday : ${holidayPage.content}">
     <td th:text="${holiday.getName()}"/>
     <td th:text="${holiday.getDate()}"/>
   </tr>
   </tbody>
 </table>
+<nav aria-label="page navigation">
+  <ul th:if="${holidayPage.totalPages} > 1" class="pagination">
+    <th:block th:each="pageNumber : ${#numbers.sequence(1, holidayPage.totalPages)}">
+      <li class="page-item" th:classappend="${pageNumber==holidayPage.number + 1} ? active">
+        <a class="page-link"
+           th:href="@{/holidays(size=${holidayPage.size}, page=${pageNumber})}"
+           th:text="${pageNumber}"></a>
+      </li>
+    </th:block>
+  </ul>
+</nav>
 </body>
 </html>

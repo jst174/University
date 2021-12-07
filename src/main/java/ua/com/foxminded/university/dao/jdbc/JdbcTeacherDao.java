@@ -120,18 +120,11 @@ public class JdbcTeacherDao implements TeacherDao {
 
     @Override
     public Page<Teacher> getAll(Pageable pageable) {
-        List<Teacher> teachers = jdbcTemplate.query(SQL_FIND_ALl, teacherMapper);
+        int totalRows = jdbcTemplate.query(SQL_FIND_ALl, teacherMapper).size();
         int pageSize = pageable.getPageSize();
-        int currentPage = pageable.getPageNumber();
-        int startItem = currentPage * pageSize;
-        List<Teacher> list;
-        if (teachers.size() < startItem) {
-            list = Collections.emptyList();
-        } else {
-            int toIndex = Math.min(startItem + pageSize, teachers.size());
-            list = teachers.subList(startItem, toIndex);
-        }
-        return new PageImpl<Teacher>(list, PageRequest.of(currentPage, pageSize), teachers.size());
+        List<Teacher> teachers = jdbcTemplate.query("SELECT * FROM teachers LIMIT " + pageSize
+            + " OFFSET " + pageable.getOffset(), teacherMapper);
+        return new PageImpl<Teacher>(teachers, PageRequest.of(pageable.getPageNumber(), pageSize), totalRows);
     }
 
     private void setCourses(Teacher updatedTeacher, List<Course> courses) {

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import ua.com.foxminded.university.dao.GroupDao;
 import ua.com.foxminded.university.dao.mapper.GroupMapper;
 import ua.com.foxminded.university.model.Classroom;
+import ua.com.foxminded.university.model.Course;
 import ua.com.foxminded.university.model.Group;
 
 import java.sql.PreparedStatement;
@@ -70,7 +71,6 @@ public class JdbcGroupDao implements GroupDao {
         return jdbcTemplate.query(SQL_FIND_ALL, groupMapper);
     }
 
-
     @Override
     public List<Group> getByLessonId(int lessonId) {
         return jdbcTemplate.query(SQL_FIND_LESSON_GROUP, groupMapper, lessonId);
@@ -87,17 +87,10 @@ public class JdbcGroupDao implements GroupDao {
 
     @Override
     public Page<Group> getAll(Pageable pageable) {
-        List<Group> groups = jdbcTemplate.query(SQL_FIND_ALL, groupMapper);
+        int totalRows = jdbcTemplate.query(SQL_FIND_ALL, groupMapper).size();
         int pageSize = pageable.getPageSize();
-        int currentPage = pageable.getPageNumber();
-        int startItem = currentPage * pageSize;
-        List<Group> list;
-        if (groups.size() < startItem) {
-            list = Collections.emptyList();
-        } else {
-            int toIndex = Math.min(startItem + pageSize, groups.size());
-            list = groups.subList(startItem, toIndex);
-        }
-        return new PageImpl<Group>(list, PageRequest.of(currentPage, pageSize), groups.size());
+        List<Group> groups = jdbcTemplate.query("SELECT * FROM groups LIMIT " + pageSize
+            + " OFFSET " + pageable.getOffset(), groupMapper);
+        return new PageImpl<Group>(groups, PageRequest.of(pageable.getPageNumber(), pageSize), totalRows);
     }
 }
