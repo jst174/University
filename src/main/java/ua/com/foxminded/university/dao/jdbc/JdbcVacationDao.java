@@ -38,6 +38,8 @@ public class JdbcVacationDao implements VacationDao {
         "teacher_id = ? and start <= ? and ending >= ?";
     private static final String SQL_GET_BY_TEACHER_AND_VACATION_DATES = "SELECT * FROM vacations WHERE " +
         "teacher_id = ? and start = ? and ending = ?";
+    private static final String SQL_COUNT_ROWS = "SELECT COUNT(*) FROM vacations";
+    private static final String SQL_GET_VACATIONS_PAGE = "SELECT * FROM vacations LIMIT (?) OFFSET (?)";
 
     private VacationMapper vacationMapper;
     private JdbcTemplate jdbcTemplate;
@@ -111,10 +113,9 @@ public class JdbcVacationDao implements VacationDao {
 
     @Override
     public Page<Vacation> getAll(Pageable pageable) {
-        int totalRows = jdbcTemplate.query(SQL_FIND_ALL, vacationMapper).size();
+        int totalRows = jdbcTemplate.queryForObject(SQL_COUNT_ROWS, Integer.class);
         int pageSize = pageable.getPageSize();
-        List<Vacation> vacations = jdbcTemplate.query("SELECT * FROM vacations LIMIT " + pageSize
-            + " OFFSET " + pageable.getOffset(), vacationMapper);
-        return new PageImpl<Vacation>(vacations, PageRequest.of(pageable.getPageNumber(), pageSize), totalRows);
+        List<Vacation> vacations = jdbcTemplate.query(SQL_GET_VACATIONS_PAGE, vacationMapper, pageSize, pageable.getOffset());
+        return new PageImpl<Vacation>(vacations, pageable, totalRows);
     }
 }

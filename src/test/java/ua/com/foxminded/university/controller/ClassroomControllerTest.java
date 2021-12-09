@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import ua.com.foxminded.university.exceptions.EntityNotFoundException;
 import ua.com.foxminded.university.model.Classroom;
 import ua.com.foxminded.university.service.ClassroomService;
 
@@ -57,12 +58,21 @@ public class ClassroomControllerTest {
 
     @Test
     public void whenGetById_thenAddClassroomToModelAndShowViewWithClassroom() throws Exception {
-        Classroom expectedClassroom = TestData.classroom1;
-        when(classroomService.getById(1)).thenReturn(expectedClassroom);
+        when(classroomService.getById(1)).thenReturn(TestData.classroom1);
         mockMvc.perform(get("/classrooms/{id}", 1))
             .andExpect(status().isOk())
             .andExpect(view().name("classrooms/show"))
-            .andExpect(model().attribute("classroom", expectedClassroom));
+            .andExpect(model().attribute("classroom", TestData.classroom1));
+    }
+
+    @Test
+    public void givenIncorrectGetRequest_whenGetById_thenShowExceptionView() throws Exception {
+        String message = "Classroom with id = 1 not found";
+        when(classroomService.getById(1)).thenThrow(new EntityNotFoundException(message));
+        mockMvc.perform(get("/classrooms/1"))
+            .andExpect(view().name("exception/error"))
+            .andExpect(model().attribute("exception", "EntityNotFoundException"))
+            .andExpect(model().attribute("message", message));
     }
 
     interface TestData {

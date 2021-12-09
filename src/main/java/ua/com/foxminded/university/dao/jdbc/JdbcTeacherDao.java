@@ -41,6 +41,8 @@ public class JdbcTeacherDao implements TeacherDao {
     private static final String SQL_FIND_COURSES = "SELECT * FROM teachers_courses WHERE teacher_id = ?";
     private static final String SQL_DELETE_COURSE = "DELETE FROM teachers_courses WHERE teacher_id = ? and course_id = ?";
     private static final String SQL_GET_BY_FULL_NAME = "SELECT * FROM teachers WHERE first_name = ? and last_name = ?";
+    private static final String SQL_COUNT_ROWS = "SELECT COUNT(*) FROM teachers";
+    private static final String SQL_GET_TEACHERS_PAGE = "SELECT * FROM teachers LIMIT (?) OFFSET (?)";
 
     private TeacherMapper teacherMapper;
     private JdbcTemplate jdbcTemplate;
@@ -120,11 +122,10 @@ public class JdbcTeacherDao implements TeacherDao {
 
     @Override
     public Page<Teacher> getAll(Pageable pageable) {
-        int totalRows = jdbcTemplate.query(SQL_FIND_ALl, teacherMapper).size();
+        int totalRows = jdbcTemplate.queryForObject(SQL_COUNT_ROWS, Integer.class);
         int pageSize = pageable.getPageSize();
-        List<Teacher> teachers = jdbcTemplate.query("SELECT * FROM teachers LIMIT " + pageSize
-            + " OFFSET " + pageable.getOffset(), teacherMapper);
-        return new PageImpl<Teacher>(teachers, PageRequest.of(pageable.getPageNumber(), pageSize), totalRows);
+        List<Teacher> teachers = jdbcTemplate.query(SQL_GET_TEACHERS_PAGE, teacherMapper, pageSize, pageable.getOffset());
+        return new PageImpl<Teacher>(teachers, pageable, totalRows);
     }
 
     private void setCourses(Teacher updatedTeacher, List<Course> courses) {

@@ -6,6 +6,10 @@ import static org.springframework.test.jdbc.JdbcTestUtils.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
@@ -83,6 +87,19 @@ public class JdbcHolidayDaoTest {
         List<Holiday> actual = holidayDao.getAll();
 
         assertEquals(expected, actual);
+    }
+
+    @Test
+    public void givenPageable_whenGetAll_thenReturnAllHolidays() {
+        Holiday holiday1 = new Holiday("New Year", LocalDate.of(2021, 12, 31));
+        Holiday holiday2 = new Holiday("Day of knowledge", LocalDate.of(2021, 9, 1));
+        List<Holiday> holidays = new ArrayList<>();
+        holidays.add(holiday1);
+        holidays.add(holiday2);
+        Pageable pageable = PageRequest.of(0, holidays.size());
+        Page<Holiday> holidayPage = new PageImpl<Holiday>(holidays, pageable, holidays.size());
+
+        assertEquals(holidayPage, holidayDao.getAll(pageable));
     }
 
     @Test

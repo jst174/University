@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import ua.com.foxminded.university.exceptions.EntityNotFoundException;
 import ua.com.foxminded.university.model.Course;
 import ua.com.foxminded.university.model.Time;
 import ua.com.foxminded.university.service.TimeService;
@@ -54,12 +55,21 @@ public class TimeControllerTest {
 
     @Test
     public void whenGetById_thenAddTimeToModelAndShowViewWithTime() throws Exception {
-        Time expectedTime = TestData.time1;
-        when(timeService.getById(1)).thenReturn(expectedTime);
+        when(timeService.getById(1)).thenReturn(TestData.time1);
         mockMvc.perform(get("/times/{id}", 1))
             .andExpect(status().isOk())
             .andExpect(view().name("times/show"))
-            .andExpect(model().attribute("time", expectedTime));
+            .andExpect(model().attribute("time", TestData.time1));
+    }
+
+    @Test
+    public void givenIncorrectGetRequest_whenGetById_thenShowExceptionView() throws Exception {
+        String message = "Time with id = 1 not found";
+        when(timeService.getById(1)).thenThrow(new EntityNotFoundException(message));
+        mockMvc.perform(get("/times/1"))
+            .andExpect(view().name("exception/error"))
+            .andExpect(model().attribute("exception", "EntityNotFoundException"))
+            .andExpect(model().attribute("message", message));
     }
 
     interface TestData {

@@ -102,6 +102,11 @@ public class Student extends Person {
             return this;
         }
 
+        public Builder setGroup(Group group) {
+            student.setGroup(group);
+            return this;
+        }
+
         public Builder clone(Student student) {
             Builder builder = new Builder();
             builder.setId(student.getId());
@@ -112,6 +117,7 @@ public class Student extends Person {
             builder.setGender(student.getGender());
             builder.setPhoneNumber(student.getPhoneNumber());
             builder.setEmail(student.getEmail());
+            builder.setGroup(student.getGroup());
             return builder;
         }
 

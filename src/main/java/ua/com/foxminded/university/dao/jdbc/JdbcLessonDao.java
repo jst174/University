@@ -43,6 +43,8 @@ public class JdbcLessonDao implements LessonDao {
     private static final String SQL_FIND_BY_DATE_AND_TIME_AND_TEACHER = "SELECT * FROM lessons WHERE date = ? and time_id = ? and teacher_id = ?";
     private static final String SQL_FIND_BY_DATE_AND_TIME_AND_CLASSROOM = "SELECT * FROM lessons WHERE date = ? and time_id = ? and classroom_id = ?";
     private static final String SQL_FIND_BY_DATE_AND_TIME = "SELECT * FROM lessons WHERE date = ? and time_id = ?";
+    private static final String SQL_COUNT_ROWS = "SELECT COUNT(*) FROM lessons";
+    private static final String SQL_GET_LESSONS_PAGE = "SELECT * FROM lessons LIMIT (?) OFFSET (?)";
 
     private JdbcTemplate jdbcTemplate;
     private LessonMapper lessonMapper;
@@ -136,11 +138,10 @@ public class JdbcLessonDao implements LessonDao {
 
     @Override
     public Page<Lesson> getAll(Pageable pageable) {
-        int totalRows = jdbcTemplate.query(SQL_FIND_ALL, lessonMapper).size();
+        int totalRows = jdbcTemplate.queryForObject(SQL_COUNT_ROWS, Integer.class);
         int pageSize = pageable.getPageSize();
-        List<Lesson> lessons = jdbcTemplate.query("SELECT * FROM lessons LIMIT " + pageSize
-            + " OFFSET " + pageable.getOffset(), lessonMapper);
-        return new PageImpl<Lesson>(lessons, PageRequest.of(pageable.getPageNumber(), pageSize), totalRows);
+        List<Lesson> lessons = jdbcTemplate.query(SQL_GET_LESSONS_PAGE, lessonMapper, pageSize, pageable.getOffset());
+        return new PageImpl<Lesson>(lessons, pageable, totalRows);
     }
 
     private void setGroups(Lesson lesson, List<Group> groups) {

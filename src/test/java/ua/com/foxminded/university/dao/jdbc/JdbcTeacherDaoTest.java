@@ -6,6 +6,10 @@ import static org.springframework.test.jdbc.JdbcTestUtils.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
@@ -17,6 +21,7 @@ import ua.com.foxminded.university.model.*;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -68,22 +73,7 @@ public class JdbcTeacherDaoTest {
 
     @Test
     public void givenId_whenGetById_thenReturn() {
-        Address address = new Address("Russia", "Saint Petersburg", "Nevsky Prospect",
-            "15", "45", "342423");
-        Teacher expected = new Teacher(
-            "Mike",
-            "Miller",
-            LocalDate.of(1977, 5, 13),
-            Gender.MALE,
-            address,
-            "5435345334",
-            "miller97@gmail.com",
-            AcademicDegree.MASTER
-        );
-
-        Optional<Teacher> actual = teacherDao.getById(1);
-
-        assertEquals(expected, actual.get());
+        assertEquals(TestData.teacher1, teacherDao.getById(1).get());
     }
 
     @Test
@@ -131,45 +121,59 @@ public class JdbcTeacherDaoTest {
 
     @Test
     public void whenGetAll_thenReturnAllTeachers() {
-        Address address = new Address("Russia", "Saint Petersburg", "Nevsky Prospect",
-            "15", "45", "342423");
-        address.setId(1);
-        Teacher teacher = new Teacher(
-            "Mike",
-            "Miller",
-            LocalDate.of(1977, 5, 13),
-            Gender.MALE,
-            address,
-            "5435345334",
-            "miller97@gmail.com",
-            AcademicDegree.MASTER
-        );
-        List<Teacher> expected = new ArrayList<>();
-        expected.add(teacher);
+        assertEquals(Arrays.asList(TestData.teacher1, TestData.teacher2), teacherDao.getAll());
+    }
 
-        List<Teacher> actual = teacherDao.getAll();
+    @Test
+    public void givenPageable_whenGetAll_thenReturnAllTeachers() {
+        List<Teacher> teachers = Arrays.asList(TestData.teacher1, TestData.teacher2);
+        Pageable pageable = PageRequest.of(0, teachers.size());
+        Page<Teacher> teacherPage = new PageImpl<Teacher>(teachers, pageable, teachers.size());
 
-        assertEquals(expected, actual);
+        assertEquals(teacherPage, teacherDao.getAll(pageable));
     }
 
     @Test
     public void givenFirstNameAndLastName_whenGetByName_thenReturn() {
-        Address address = new Address("Russia", "Saint Petersburg", "Nevsky Prospect",
-            "15", "45", "342423");
-        Teacher expected = new Teacher(
-            "Mike",
-            "Miller",
-            LocalDate.of(1977, 5, 13),
-            Gender.MALE,
-            address,
-            "5435345334",
-            "miller97@gmail.com",
-            AcademicDegree.MASTER
-        );
+        Teacher expected = TestData.teacher1;
 
         Optional<Teacher> actual = teacherDao.getByName(expected.getFirstName(), expected.getLastName());
 
         assertEquals(expected, actual.get());
+    }
+
+    interface TestData {
+        Address address = new Address.Builder()
+            .setCountry("Russia")
+            .setCity("Saint Petersburg")
+            .setStreet("Nevsky Prospect")
+            .setHouseNumber("15")
+            .setApartmentNumber("45")
+            .setPostcode("342423")
+            .setId(1)
+            .build();
+        Teacher teacher1 = new Teacher.Builder()
+            .setFirstName("Mike")
+            .setLastName("Miller")
+            .setBirtDate(LocalDate.of(1977, 5, 13))
+            .setGender(Gender.MALE)
+            .setAddress(address)
+            .setPhoneNumber("5435345334")
+            .setEmail("miller77@gmail.com")
+            .setAcademicDegree(AcademicDegree.MASTER)
+            .setId(1)
+            .build();
+        Teacher teacher2 = new Teacher.Builder()
+            .setFirstName("Bob")
+            .setLastName("King")
+            .setBirtDate(LocalDate.of(1965, 11, 21))
+            .setGender(Gender.MALE)
+            .setAddress(address)
+            .setPhoneNumber("5345345")
+            .setEmail("king65@gmail.com")
+            .setAcademicDegree(AcademicDegree.DOCTORAL)
+            .setId(2)
+            .build();
     }
 
 }

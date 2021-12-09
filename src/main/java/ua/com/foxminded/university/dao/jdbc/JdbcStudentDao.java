@@ -36,6 +36,8 @@ public class JdbcStudentDao implements StudentDao {
     private static final String SQL_FIND_ALL = "SELECT * FROM students";
     private static final String SQL_GET_BY_GROUP = "SELECT * FROM students WHERE group_id = ?";
     private static final String SQL_GET_BY_FULL_NAME = "SELECT * FROM students WHERE first_name = ? and last_name = ?";
+    private static final String SQL_COUNT_ROWS = "SELECT COUNT(*) FROM students";
+    private static final String SQL_GET_STUDENTS_PAGE = "SELECT * FROM students LIMIT (?) OFFSET (?)";
 
     private StudentMapper studentMapper;
     private JdbcTemplate jdbcTemplate;
@@ -113,10 +115,9 @@ public class JdbcStudentDao implements StudentDao {
 
     @Override
     public Page<Student> getAll(Pageable pageable) {
-        int totalRows = jdbcTemplate.query(SQL_FIND_ALL, studentMapper).size();
+        int totalRows = jdbcTemplate.queryForObject(SQL_COUNT_ROWS, Integer.class);
         int pageSize = pageable.getPageSize();
-        List<Student> students = jdbcTemplate.query("SELECT * FROM students LIMIT " + pageSize
-            + " OFFSET " + pageable.getOffset(), studentMapper);
-        return new PageImpl<Student>(students, PageRequest.of(pageable.getPageNumber(), pageSize), totalRows);
+        List<Student> students = jdbcTemplate.query(SQL_GET_STUDENTS_PAGE, studentMapper, pageSize, pageable.getOffset());
+        return new PageImpl<Student>(students, pageable, totalRows);
     }
 }

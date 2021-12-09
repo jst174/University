@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import ua.com.foxminded.university.exceptions.EntityNotFoundException;
 import ua.com.foxminded.university.model.Student;
 import ua.com.foxminded.university.model.Teacher;
 import ua.com.foxminded.university.service.TeacherService;
@@ -58,12 +59,21 @@ public class TeacherControllerTest {
 
     @Test
     public void whenGetById_thenAddTeacherToModelAndShowViewWithTeacher() throws Exception {
-        Teacher expectedTeacher = TestData.teacher1;
-        when(teacherService.getById(1)).thenReturn(expectedTeacher);
+        when(teacherService.getById(1)).thenReturn(TestData.teacher1);
         mockMvc.perform(get("/teachers/{id}", 1))
             .andExpect(status().isOk())
             .andExpect(view().name("teachers/show"))
-            .andExpect(model().attribute("teacher", expectedTeacher));
+            .andExpect(model().attribute("teacher", TestData.teacher1));
+    }
+
+    @Test
+    public void givenIncorrectGetRequest_whenGetById_thenShowExceptionView() throws Exception {
+        String message = "Teacher with id = 1 not found";
+        when(teacherService.getById(1)).thenThrow(new EntityNotFoundException(message));
+        mockMvc.perform(get("/teachers/1"))
+            .andExpect(view().name("exception/error"))
+            .andExpect(model().attribute("exception", "EntityNotFoundException"))
+            .andExpect(model().attribute("message", message));
     }
 
     interface TestData {

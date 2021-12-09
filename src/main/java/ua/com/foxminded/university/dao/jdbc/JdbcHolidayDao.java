@@ -31,6 +31,8 @@ public class JdbcHolidayDao implements HolidayDao {
     private static final String SQL_DELETE_HOLIDAY = "DELETE FROM holidays WHERE id = ?";
     private static final String SQL_FIND_ALL = "SELECT * FROM holidays";
     private static final String SQL_FIND_BY_DATE = "SELECT * FROM holidays WHERE date = ?";
+    private static final String SQL_COUNT_ROWS = "SELECT COUNT(*) FROM holidays";
+    private static final String SQL_GET_HOLIDAYS_PAGE = "SELECT * FROM holidays LIMIT (?) OFFSET (?)";
 
     private HolidayMapper holidayMapper;
     private JdbcTemplate jdbcTemplate;
@@ -75,11 +77,10 @@ public class JdbcHolidayDao implements HolidayDao {
 
     @Override
     public Page<Holiday> getAll(Pageable pageable) {
-        int totalRows = jdbcTemplate.query(SQL_FIND_ALL, holidayMapper).size();
+        int totalRows = jdbcTemplate.queryForObject(SQL_COUNT_ROWS, Integer.class);
         int pageSize = pageable.getPageSize();
-        List<Holiday> holidays = jdbcTemplate.query("SELECT * FROM holidays LIMIT " + pageSize
-            + " OFFSET " + pageable.getOffset(), holidayMapper);
-        return new PageImpl<Holiday>(holidays, PageRequest.of(pageable.getPageNumber(), pageSize), totalRows);
+        List<Holiday> holidays = jdbcTemplate.query(SQL_GET_HOLIDAYS_PAGE, holidayMapper, pageSize, pageable.getOffset());
+        return new PageImpl<Holiday>(holidays, pageable, totalRows);
     }
 
     @Override

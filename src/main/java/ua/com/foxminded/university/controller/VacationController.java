@@ -35,8 +35,14 @@ public class VacationController {
     }
 
     @GetMapping("/{id}")
-    public String getById(@PathVariable int id, Model model) throws EntityNotFoundException {
-        model.addAttribute("vacation", vacationService.getById(id));
-        return "vacations/show";
+    public String getById(@PathVariable int id, Model model) {
+        try {
+            model.addAttribute("vacation", vacationService.getById(id));
+            return "vacations/show";
+        } catch (EntityNotFoundException e) {
+            model.addAttribute("exception", e.getClass().getSimpleName());
+            model.addAttribute("message", e.getMessage());
+            return "exception/error";
+        }
     }
 }

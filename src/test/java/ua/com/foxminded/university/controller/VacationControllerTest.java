@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import ua.com.foxminded.university.exceptions.EntityNotFoundException;
 import ua.com.foxminded.university.model.Teacher;
 import ua.com.foxminded.university.model.Vacation;
 import ua.com.foxminded.university.service.VacationService;
@@ -58,12 +59,21 @@ public class VacationControllerTest {
 
     @Test
     public void whenGetById_thenAddVacationToModelAndShowViewWithVacation() throws Exception {
-        Vacation expectedVacation = TestData.vacation1;
-        when(vacationService.getById(1)).thenReturn(expectedVacation);
+        when(vacationService.getById(1)).thenReturn(TestData.vacation1);
         mockMvc.perform(get("/vacations/{id}", 1))
             .andExpect(status().isOk())
             .andExpect(view().name("vacations/show"))
-            .andExpect(model().attribute("vacation", expectedVacation));
+            .andExpect(model().attribute("vacation", TestData.vacation1));
+    }
+
+    @Test
+    public void givenIncorrectGetRequest_whenGetById_thenShowExceptionView() throws Exception {
+        String message = "Vacation with id = 1 not found";
+        when(vacationService.getById(1)).thenThrow(new EntityNotFoundException(message));
+        mockMvc.perform(get("/vacations/1"))
+            .andExpect(view().name("exception/error"))
+            .andExpect(model().attribute("exception", "EntityNotFoundException"))
+            .andExpect(model().attribute("message", message));
     }
 
     interface TestData {

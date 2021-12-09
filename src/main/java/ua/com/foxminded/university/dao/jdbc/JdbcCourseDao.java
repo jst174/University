@@ -30,6 +30,8 @@ public class JdbcCourseDao implements CourseDao {
     private static final String SQL_FIND_ALL = "SELECT * FROM courses";
     private static final String SQL_FIND_TEACHER_COURSES = "SELECT id, name, teacher_id FROM courses INNER JOIN teachers_courses ON id = course_id WHERE teacher_id = ?";
     private static final String SQL_FIND_BY_NAME = "SELECT * FROM courses WHERE name = ?";
+    private static final String SQL_COUNT_ROWS = "SELECT COUNT(*) FROM courses";
+    private static final String SQL_GET_COURSES_PAGE = "SELECT * FROM courses LIMIT (?) OFFSET (?)";
 
     private CourseMapper courseMapper;
     private JdbcTemplate jdbcTemplate;
@@ -86,10 +88,9 @@ public class JdbcCourseDao implements CourseDao {
 
     @Override
     public Page<Course> getAll(Pageable pageable) {
-        int totalRows = jdbcTemplate.query(SQL_FIND_ALL, courseMapper).size();
+        int totalRows = jdbcTemplate.queryForObject(SQL_COUNT_ROWS, Integer.class);
         int pageSize = pageable.getPageSize();
-        List<Course> courses = jdbcTemplate.query("SELECT * FROM courses LIMIT " + pageSize
-            + " OFFSET " + pageable.getOffset(), courseMapper);
-        return new PageImpl<Course>(courses, PageRequest.of(pageable.getPageNumber(), pageSize), totalRows);
+        List<Course> courses = jdbcTemplate.query(SQL_GET_COURSES_PAGE, courseMapper, pageSize, pageable.getOffset());
+        return new PageImpl<Course>(courses, pageable, totalRows);
     }
 }

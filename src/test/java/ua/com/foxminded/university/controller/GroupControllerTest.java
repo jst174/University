@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import ua.com.foxminded.university.exceptions.EntityNotFoundException;
 import ua.com.foxminded.university.model.Group;
 import ua.com.foxminded.university.service.GroupService;
 
@@ -56,12 +57,21 @@ public class GroupControllerTest {
 
     @Test
     public void whenGetById_thenAddGroupToModelAndShowViewWithGroup() throws Exception {
-        Group expectedGroups = TestData.group1;
-        when(groupService.getById(1)).thenReturn(expectedGroups);
+        when(groupService.getById(1)).thenReturn(TestData.group1);
         mockMvc.perform(get("/groups/{id}", 1))
             .andExpect(status().isOk())
             .andExpect(view().name("groups/show"))
-            .andExpect(model().attribute("group", expectedGroups));
+            .andExpect(model().attribute("group", TestData.group1));
+    }
+
+    @Test
+    public void givenIncorrectGetRequest_whenGetById_thenShowExceptionView() throws Exception {
+        String message = "Group with id = 1 not found";
+        when(groupService.getById(1)).thenThrow(new EntityNotFoundException(message));
+        mockMvc.perform(get("/groups/1"))
+            .andExpect(view().name("exception/error"))
+            .andExpect(model().attribute("exception", "EntityNotFoundException"))
+            .andExpect(model().attribute("message", message));
     }
 
 

@@ -30,6 +30,8 @@ public class JdbcTimeDao implements TimeDao {
     private static final String SQL_DELETE_TIME = "DELETE FROM times WHERE id = ?";
     private static final String SQL_FIND_ALL = "SELECT * FROM times";
     private static final String SQL_FIND_BY_TIME = "SELECT * FROM times WHERE start = ? and ending = ?";
+    private static final String SQL_COUNT_ROWS = "SELECT COUNT(*) FROM times";
+    private static final String SQL_GET_TIMES_PAGE = "SELECT * FROM times LIMIT (?) OFFSET (?)";
 
     private TimeMapper timeMapper;
     private JdbcTemplate jdbcTemplate;
@@ -75,11 +77,10 @@ public class JdbcTimeDao implements TimeDao {
 
     @Override
     public Page<Time> getAll(Pageable pageable) {
-        int totalRows = jdbcTemplate.query(SQL_FIND_ALL, timeMapper).size();
+        int totalRows = jdbcTemplate.queryForObject(SQL_COUNT_ROWS, Integer.class);
         int pageSize = pageable.getPageSize();
-        List<Time> times = jdbcTemplate.query("SELECT * FROM times LIMIT " + pageSize
-            + " OFFSET " + pageable.getOffset(), timeMapper);
-        return new PageImpl<Time>(times, PageRequest.of(pageable.getPageNumber(), pageSize), totalRows);
+        List<Time> times = jdbcTemplate.query(SQL_GET_TIMES_PAGE, timeMapper, pageSize, pageable.getOffset());
+        return new PageImpl<Time>(times, pageable, totalRows);
     }
 
     @Override

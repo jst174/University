@@ -2,9 +2,14 @@ package ua.com.foxminded.university.dao.jdbc;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.jdbc.JdbcTestUtils.*;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
@@ -71,7 +76,7 @@ public class JdbcTimeDaoTest {
     }
 
     @Test
-    public void whenGetAll_thenReturnAllTimes(){
+    public void whenGetAll_thenReturnAllTimes() {
         Time time1 = new Time(LocalTime.of(8, 00), LocalTime.of(9, 30));
         Time time2 = new Time(LocalTime.of(14, 00), LocalTime.of(15, 30));
         List<Time> expected = new ArrayList<>();
@@ -84,7 +89,20 @@ public class JdbcTimeDaoTest {
     }
 
     @Test
-    public void givenStartAndEndTime_whenGetByTime_thenReturn(){
+    public void givenPageable_whenGetAll_thenReturnAllTimes() {
+        Time time1 = new Time(LocalTime.of(8, 00), LocalTime.of(9, 30));
+        Time time2 = new Time(LocalTime.of(14, 00), LocalTime.of(15, 30));
+        List<Time> times = new ArrayList<>();
+        times.add(time1);
+        times.add(time2);
+        Pageable pageable = PageRequest.of(0, times.size());
+        Page<Time> timePage = new PageImpl<Time>(times, pageable, times.size());
+
+        assertEquals(timePage, timeDao.getAll(pageable));
+    }
+
+    @Test
+    public void givenStartAndEndTime_whenGetByTime_thenReturn() {
         LocalTime start = LocalTime.of(8, 00);
         LocalTime end = LocalTime.of(9, 30);
         Time expected = new Time(start, end);

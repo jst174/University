@@ -81,7 +81,7 @@ public class JdbcClassroomDaoTest {
         List<Classroom> classrooms = new ArrayList<>();
         classrooms.add(classroom2);
         classrooms.add(classroom1);
-        Pageable pageable = PageRequest.of(1, 10);
+        Pageable pageable = PageRequest.of(0, 2);
         Page<Classroom> classroomPage =
             new PageImpl<Classroom>(classrooms, pageable, classrooms.size());
 
@@ -89,7 +89,18 @@ public class JdbcClassroomDaoTest {
     }
 
     @Test
-    public void givenClassroomNumber_whereGetByNumber_thenReturn(){
+    public void whenGetAll_thenReturn() {
+        Classroom classroom1 = new Classroom(203, 60);
+        Classroom classroom2 = new Classroom(102, 30);
+        List<Classroom> classrooms = new ArrayList<>();
+        classrooms.add(classroom2);
+        classrooms.add(classroom1);
+
+        assertEquals(classrooms, classroomDao.getAll());
+    }
+
+    @Test
+    public void givenClassroomNumber_whereGetByNumber_thenReturn() {
         Classroom expected = new Classroom(102, 30);
 
         Optional<Classroom> actual = classroomDao.findByNumber(102);

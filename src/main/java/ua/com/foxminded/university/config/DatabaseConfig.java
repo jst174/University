@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import javax.sql.DataSource;
 
 @Configuration
-@ComponentScan("ua.com.foxminded.university")
+@ComponentScan("ua.com.foxminded.university.dao")
 @PropertySource("classpath:db.properties")
 @EnableTransactionManagement
 public class DatabaseConfig {

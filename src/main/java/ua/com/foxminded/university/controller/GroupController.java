@@ -35,8 +35,14 @@ public class GroupController {
     }
 
     @GetMapping("/{id}")
-    public String getById(@PathVariable int id, Model model) throws EntityNotFoundException {
-        model.addAttribute("group", groupService.getById(id));
-        return "groups/show";
+    public String getById(@PathVariable int id, Model model) {
+        try {
+            model.addAttribute("group", groupService.getById(id));
+            return "groups/show";
+        } catch (EntityNotFoundException e) {
+            model.addAttribute("exception", e.getClass().getSimpleName());
+            model.addAttribute("message", e.getMessage());
+            return "exception/error";
+        }
     }
 }

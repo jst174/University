@@ -6,6 +6,10 @@ import static org.springframework.test.jdbc.JdbcTestUtils.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
@@ -82,6 +86,19 @@ public class JdbcCourseDaoTest {
         List<Course> actual = courseDao.getAll();
 
         assertEquals(expected, actual);
+    }
+
+    @Test
+    public void givenPageable_whenGetAll_thenReturnAllCourses() {
+        Course course1 = new Course("History");
+        Course course2 = new Course("Music");
+        List<Course> courses = new ArrayList<>();
+        courses.add(course1);
+        courses.add(course2);
+        Pageable pageable = PageRequest.of(0, 2);
+        Page<Course> coursePage = new PageImpl<Course>(courses, pageable, courses.size());
+
+        assertEquals(coursePage, courseDao.getAll(pageable));
     }
 
     @Test

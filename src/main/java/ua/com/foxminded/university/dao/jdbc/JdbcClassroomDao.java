@@ -3,7 +3,6 @@ package ua.com.foxminded.university.dao.jdbc;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -15,7 +14,6 @@ import ua.com.foxminded.university.model.Classroom;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,6 +26,8 @@ public class JdbcClassroomDao implements ClassroomDao {
     private static final String SQL_DELETE_CLASSROOM = "DELETE FROM classrooms WHERE id = ?";
     private static final String SQL_FIND_ALL = "SELECT * FROM classrooms";
     private static final String SQL_FIND_BY_NUMBER = "SELECT * FROM classrooms WHERE number = ?";
+    private static final String SQL_COUNT_ROWS = "SELECT COUNT(*) FROM classrooms";
+    private static final String SQL_GET_CLASSROOMS_PAGE = "SELECT * FROM classrooms LIMIT (?) OFFSET (?)";
 
     private ClassroomMapper classroomMapper;
     private JdbcTemplate jdbcTemplate;
@@ -72,11 +72,10 @@ public class JdbcClassroomDao implements ClassroomDao {
 
     @Override
     public Page<Classroom> getAll(Pageable pageable) {
-        int totalRows = jdbcTemplate.query(SQL_FIND_ALL, classroomMapper).size();
+        int totalRows = jdbcTemplate.queryForObject(SQL_COUNT_ROWS, Integer.class);
         int pageSize = pageable.getPageSize();
-        List<Classroom> classrooms = jdbcTemplate.query("SELECT * FROM classrooms LIMIT " + pageSize
-            + " OFFSET " + pageable.getOffset(), classroomMapper);
-        return new PageImpl<Classroom>(classrooms, PageRequest.of(pageable.getPageNumber(), pageSize), totalRows);
+        List<Classroom> classrooms = jdbcTemplate.query(SQL_GET_CLASSROOMS_PAGE, classroomMapper, pageSize, pageable.getOffset());
+        return new PageImpl<Classroom>(classrooms, pageable, totalRows);
     }
 
     @Override

@@ -30,6 +30,8 @@ public class JdbcAddressDao implements AddressDao {
     private static final String SQL_FIND_ADDRESS = "SELECT * FROM addresses WHERE id = ?";
     private static final String SQL_DELETE_ADDRESS = "DELETE FROM addresses WHERE id = ?";
     private static final String SQL_FIND_ALL = "SELECT * FROM addresses";
+    private static final String SQL_COUNT_ROWS = "SELECT COUNT(*) FROM addresses";
+    private static final String SQL_GET_ADDRESSES_PAGE = "SELECT * FROM addresses LIMIT (?) OFFSET (?)";
 
     private JdbcTemplate jdbcTemplate;
     private AddressMapper addressMapper;
@@ -84,10 +86,10 @@ public class JdbcAddressDao implements AddressDao {
 
     @Override
     public Page<Address> getAll(Pageable pageable) {
-        int totalRows = jdbcTemplate.query(SQL_FIND_ALL, addressMapper).size();
+        int totalRows = jdbcTemplate.queryForObject(SQL_COUNT_ROWS, Integer.class);
         int pageSize = pageable.getPageSize();
-        List<Address> addresses = jdbcTemplate.query("SELECT * FROM addresses LIMIT " + pageSize
-            + " OFFSET " + pageable.getOffset(), addressMapper);
-        return new PageImpl<Address>(addresses, PageRequest.of(pageable.getPageNumber(), pageSize), totalRows);
+        List<Address> addresses = jdbcTemplate.query(SQL_GET_ADDRESSES_PAGE, addressMapper,
+            pageSize, pageable.getOffset());
+        return new PageImpl<Address>(addresses, pageable, totalRows);
     }
 }

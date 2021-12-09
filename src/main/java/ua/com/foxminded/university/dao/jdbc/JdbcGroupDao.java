@@ -31,6 +31,8 @@ public class JdbcGroupDao implements GroupDao {
     private static final String SQL_FIND_ALL = "SELECT * FROM groups";
     private static final String SQL_FIND_LESSON_GROUP = "SELECT id, name, lesson_id FROM groups INNER JOIN lessons_groups ON id = group_id  WHERE lesson_id = ?";
     private static final String SQL_FIND_BY_NAME = "SELECT * FROM groups WHERE name = ?";
+    private static final String SQL_COUNT_ROWS = "SELECT COUNT(*) FROM groups";
+    private static final String SQL_GET_GROUPS_PAGE = "SELECT * FROM groups LIMIT (?) OFFSET (?)";
 
     private JdbcTemplate jdbcTemplate;
     private GroupMapper groupMapper;
@@ -87,10 +89,9 @@ public class JdbcGroupDao implements GroupDao {
 
     @Override
     public Page<Group> getAll(Pageable pageable) {
-        int totalRows = jdbcTemplate.query(SQL_FIND_ALL, groupMapper).size();
+        int totalRows = jdbcTemplate.queryForObject(SQL_COUNT_ROWS, Integer.class);
         int pageSize = pageable.getPageSize();
-        List<Group> groups = jdbcTemplate.query("SELECT * FROM groups LIMIT " + pageSize
-            + " OFFSET " + pageable.getOffset(), groupMapper);
-        return new PageImpl<Group>(groups, PageRequest.of(pageable.getPageNumber(), pageSize), totalRows);
+        List<Group> groups = jdbcTemplate.query(SQL_GET_GROUPS_PAGE, groupMapper, pageSize, pageable.getOffset());
+        return new PageImpl<Group>(groups, pageable, totalRows);
     }
 }
