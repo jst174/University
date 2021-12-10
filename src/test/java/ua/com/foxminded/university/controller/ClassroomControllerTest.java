@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import ua.com.foxminded.university.errors.ResponseExceptionHandler;
 import ua.com.foxminded.university.exceptions.EntityNotFoundException;
 import ua.com.foxminded.university.model.Classroom;
 import ua.com.foxminded.university.service.ClassroomService;
@@ -39,6 +40,7 @@ public class ClassroomControllerTest {
         MockitoAnnotations.openMocks(this);
         mockMvc = MockMvcBuilders.standaloneSetup(classroomController)
             .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
+            .setControllerAdvice(new ResponseExceptionHandler())
             .build();
     }
 
@@ -71,7 +73,7 @@ public class ClassroomControllerTest {
         when(classroomService.getById(1)).thenThrow(new EntityNotFoundException(message));
         mockMvc.perform(get("/classrooms/1"))
             .andExpect(view().name("exception/error"))
-            .andExpect(model().attribute("exception", "EntityNotFoundException"))
+            .andExpect(model().attributeExists("exception"))
             .andExpect(model().attribute("message", message));
     }
 

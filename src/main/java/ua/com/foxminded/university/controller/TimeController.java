@@ -1,6 +1,5 @@
 package ua.com.foxminded.university.controller;
 
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,14 +25,8 @@ public class TimeController {
     }
 
     @GetMapping("/{id}")
-    public String getById(@PathVariable int id, Model model) {
-        try {
-            model.addAttribute("time", timeService.getById(id));
-            return "times/show";
-        } catch (EntityNotFoundException e) {
-            model.addAttribute("exception", e.getClass().getSimpleName());
-            model.addAttribute("message", e.getMessage());
-            return "exception/error";
-        }
+    public String getById(@PathVariable int id, Model model) throws EntityNotFoundException {
+        model.addAttribute("time", timeService.getById(id));
+        return "times/show";
     }
 }

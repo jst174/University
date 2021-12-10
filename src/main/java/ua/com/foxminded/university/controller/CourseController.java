@@ -26,14 +26,8 @@ public class CourseController {
     }
 
     @GetMapping("/{id}")
-    public String getById(@PathVariable int id, Model model) {
-        try {
-            model.addAttribute("course", courseService.getById(id));
-            return "courses/show";
-        } catch (EntityNotFoundException e) {
-            model.addAttribute("exception", e.getClass().getSimpleName());
-            model.addAttribute("message", e.getMessage());
-            return "exception/error";
-        }
+    public String getById(@PathVariable int id, Model model) throws EntityNotFoundException {
+        model.addAttribute("course", courseService.getById(id));
+        return "courses/show";
     }
 }

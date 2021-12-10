@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import ua.com.foxminded.university.errors.ResponseExceptionHandler;
 import ua.com.foxminded.university.exceptions.EntityNotFoundException;
 import ua.com.foxminded.university.model.Student;
 import ua.com.foxminded.university.model.Teacher;
@@ -40,6 +41,7 @@ public class TeacherControllerTest {
         MockitoAnnotations.openMocks(this);
         mockMvc = MockMvcBuilders.standaloneSetup(teacherController)
             .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
+            .setControllerAdvice(new ResponseExceptionHandler())
             .build();
     }
 

@@ -1,19 +1,11 @@
 package ua.com.foxminded.university.controller;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ua.com.foxminded.university.exceptions.EntityNotFoundException;
-import ua.com.foxminded.university.model.Classroom;
 import ua.com.foxminded.university.service.ClassroomService;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 @Controller
 @RequestMapping("/classrooms")
@@ -32,14 +24,8 @@ public class ClassroomController {
     }
 
     @GetMapping("/{id}")
-    public String getById(@PathVariable int id, Model model) {
-        try {
-            model.addAttribute("classroom", classroomService.getById(id));
-            return "classrooms/show";
-        } catch (EntityNotFoundException e) {
-            model.addAttribute("exception", e.getClass().getSimpleName());
-            model.addAttribute("message", e.getMessage());
-            return "exception/error";
-        }
+    public String getById(@PathVariable int id, Model model) throws EntityNotFoundException {
+        model.addAttribute("classroom", classroomService.getById(id));
+        return "classrooms/show";
     }
 }
