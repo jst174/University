@@ -1,4 +1,4 @@
-package ua.com.foxminded.university.errors;
+package ua.com.foxminded.university.controller;
 
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -7,7 +7,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import ua.com.foxminded.university.exceptions.EntityNotFoundException;
 
 @ControllerAdvice
-public class ResponseExceptionHandler extends ResponseEntityExceptionHandler {
+public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler({EntityNotFoundException.class})
     public String handleNotFound(EntityNotFoundException exception, Model model) {

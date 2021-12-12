@@ -13,9 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import ua.com.foxminded.university.errors.ResponseExceptionHandler;
 import ua.com.foxminded.university.exceptions.EntityNotFoundException;
-import ua.com.foxminded.university.model.Course;
 import ua.com.foxminded.university.model.Holiday;
 import ua.com.foxminded.university.service.HolidayService;
 
@@ -41,7 +39,7 @@ public class HolidayControllerTest {
         MockitoAnnotations.openMocks(this);
         mockMvc = MockMvcBuilders.standaloneSetup(holidayController)
             .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
-            .setControllerAdvice(new ResponseExceptionHandler())
+            .setControllerAdvice(new ControllerExceptionHandler())
             .build();
     }
 

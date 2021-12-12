@@ -6,16 +6,10 @@ import org.junit.jupiter.api.TestInstance;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import ua.com.foxminded.university.errors.ResponseExceptionHandler;
 import ua.com.foxminded.university.exceptions.EntityNotFoundException;
-import ua.com.foxminded.university.model.Course;
 import ua.com.foxminded.university.model.Time;
 import ua.com.foxminded.university.service.TimeService;
 
@@ -41,7 +35,7 @@ public class TimeControllerTest {
         MockitoAnnotations.openMocks(this);
         mockMvc = MockMvcBuilders.standaloneSetup(timeController)
             .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
-            .setControllerAdvice(new ResponseExceptionHandler())
+            .setControllerAdvice(new ControllerExceptionHandler())
             .build();
     }
 
