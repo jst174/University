@@ -2,6 +2,8 @@ package ua.com.foxminded.university.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ua.com.foxminded.university.dao.*;
 import ua.com.foxminded.university.exceptions.*;
@@ -64,9 +66,9 @@ public class LessonService {
         lessonDao.delete(id);
     }
 
-    public List<Lesson> getAll() {
+    public Page<Lesson> getAll(Pageable pageable) {
         logger.debug("Getting all lessons");
-        return lessonDao.getAll();
+        return lessonDao.getAll(pageable);
     }
 
     private void checkConditions(Lesson lesson) throws NotAvailableDayException, NotAvailableClassroomException, NotAvailableTeacherException, NotAvailableGroupException {

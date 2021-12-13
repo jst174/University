@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<head>
+  <meta charset="UTF-8">
+  <title>Lesson</title>
+</head>
+<body>
+<p> Date: <span th:text="${lesson.getDate()}">value</span></p>
+<p> Time: <span th:text="${lesson.getTime().getStartTime()} + '-'
+    +${lesson.getTime().getEndTime()}">value</span></p>
+<p> Classroom: <span th:text="${lesson.getClassroom().getNumber()}">value</span></p>
+<p> Course: <span th:text="${lesson.getCourse().getName()}">value</span></p>
+<p> Teacher: <span th:text="${lesson.getTeacher().getFirstName()}+' '
++${lesson.getTeacher().getLastName()}">value</span></p>
+
+</body>
+</html>

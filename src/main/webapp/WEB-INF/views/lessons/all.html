@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>List of lessons</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+          integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+          crossorigin="anonymous"></script>
+</head>
+<body>
+<table class="table table-striped">
+  <thead>
+  <tr>
+    <th scope="col">Date</th>
+    <th scope="col">Time</th>
+    <th scope="col">Classroom</th>
+    <th scope="col">Course</th>
+    <th scope="col">Teacher</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr th:each="lesson: ${lessonPage.content}">
+    <td th:text="${lesson.getDate()}"/>
+    <td th:text="${lesson.getTime().getStartTime()} + '-'
+    +${lesson.getTime().getEndTime()}"/>
+    <td th:text="${lesson.getClassroom().getNumber()}"/>
+    <td th:text="${lesson.getCourse().getName()}"/>
+    <td th:text="${lesson.getTeacher().getFirstName()}+' '
+    +${lesson.getTeacher().getLastName()}"/>
+  </tr>
+  </tbody>
+</table>
+<nav aria-label="page navigation">
+  <ul th:if="${lessonPage.totalPages} > 1" class="pagination">
+    <th:block th:each="pageNumber : ${#numbers.sequence(1, lessonPage.totalPages)}">
+      <li class="page-item" th:classappend="${pageNumber==lessonPage.number + 1} ? active">
+        <a class="page-link"
+           th:href="@{/lessons(size=${lessonPage.size}, page=${pageNumber})}"
+           th:text="${pageNumber}"></a>
+      </li>
+    </th:block>
+  </ul>
+</nav>
+</body>
+</html>

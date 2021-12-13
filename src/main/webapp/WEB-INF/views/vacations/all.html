@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>List of vacations</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+          integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+          crossorigin="anonymous"></script>
+</head>
+<body>
+<table class="table table-striped">
+  <thead>
+  <tr>
+    <th scope="col">Teacher</th>
+    <th scope="col">Start</th>
+    <th scope="col">End</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr th:each="vacation: ${vacationPage.content}">
+    <td th:text="${vacation.getTeacher().getFirstName()}+' '
+    +${vacation.getTeacher().getLastName()}"/>
+    <td th:text="${vacation.getStart()}"/>
+    <td th:text="${vacation.getEnd()}"/>
+  </tr>
+  </tbody>
+</table>
+<nav aria-label="page navigation">
+  <ul th:if="${vacationPage.totalPages} > 1" class="pagination">
+    <th:block th:each="pageNumber : ${#numbers.sequence(1, vacationPage.totalPages)}">
+      <li class="page-item" th:classappend="${pageNumber==vacationPage.number + 1} ? active">
+        <a class="page-link"
+           th:href="@{/vacations(size=${vacationPage.size}, page=${pageNumber})}"
+           th:text="${pageNumber}"></a>
+      </li>
+    </th:block>
+  </ul>
+</nav>
+</body>
+</html>

@@ -3,6 +3,10 @@ package ua.com.foxminded.university.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ua.com.foxminded.university.dao.VacationDao;
 import ua.com.foxminded.university.exceptions.EntityNotFoundException;
@@ -11,6 +15,7 @@ import ua.com.foxminded.university.exceptions.NotUniqueVacationDatesException;
 import ua.com.foxminded.university.model.AcademicDegree;
 import ua.com.foxminded.university.model.Vacation;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -58,6 +63,11 @@ public class VacationService {
     public List<Vacation> getByTeacherId(int teacherId) {
         logger.debug("Getting teacher vacations with teacher id = {}", teacherId);
         return vacationDao.getByTeacherId(teacherId);
+    }
+
+    public Page<Vacation> getAll(Pageable pageable) {
+        logger.debug("Getting all vacations");
+        return vacationDao.getAll(pageable);
     }
 
     private void verifyUniqueness(Vacation vacation) throws NotUniqueVacationDatesException {

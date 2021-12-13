@@ -2,6 +2,8 @@ package ua.com.foxminded.university.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ua.com.foxminded.university.dao.GroupDao;
 import ua.com.foxminded.university.dao.LessonDao;
@@ -51,9 +53,9 @@ public class GroupService {
         groupDao.delete(id);
     }
 
-    public List<Group> getAll() {
+    public Page<Group> getAll(Pageable pageable) {
         logger.debug("Getting all group");
-        return groupDao.getAll();
+        return groupDao.getAll(pageable);
     }
 
     public List<Group> getByLessonId(int lessonId) {

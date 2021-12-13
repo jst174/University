@@ -3,6 +3,10 @@ package ua.com.foxminded.university.dao.jdbc;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
@@ -13,6 +17,7 @@ import ua.com.foxminded.university.dao.AddressDao;
 import ua.com.foxminded.university.model.Address;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,7 +39,7 @@ public class JdbcAddressDaoTest {
     public void givenNewAddress_whenCreate_thenCreated() {
         Address address = new Address("Russia", "Saint Petersburg", "Nevsky Prospect",
             "15", "45", "342423");
-        int expectedRows = countRowsInTable(jdbcTemplate,"addresses") + 1;
+        int expectedRows = countRowsInTable(jdbcTemplate, "addresses") + 1;
 
         addressDao.create(address);
 
@@ -76,17 +81,41 @@ public class JdbcAddressDaoTest {
     }
 
     @Test
-    public void whenGetAll_thenReturnAllAddress(){
-        Address address1 = new Address("Russia", "Saint Petersburg", "Nevsky Prospect",
-            "15", "45", "342423");
-        Address address2 = new Address("Russia", "Yekaterinburg", "Lenin Avenue",
-            "34", "432", "34254");
-        List<Address> expected = new ArrayList<>();
-        expected.add(address1);
-        expected.add(address2);
+    public void whenGetAll_thenReturnAllAddress() {
+        List<Address> expected = Arrays.asList(TestData.address1, TestData.address2);
 
         List<Address> actual = addressDao.getAll();
 
         assertEquals(expected, actual);
+    }
+
+    @Test
+    public void givenPageable_whenGetAll_thenReturn() {
+        List<Address> addresses = Arrays.asList(TestData.address1, TestData.address2);
+        Pageable pageable = PageRequest.of(0, 2);
+
+        Page<Address> addressPage = new PageImpl<Address>(addresses, pageable, addresses.size());
+
+        assertEquals(addressPage, addressDao.getAll(pageable));
+    }
+
+    interface TestData {
+        Address address1 = new Address.Builder()
+            .setCountry("Russia")
+            .setCity("Saint Petersburg")
+            .setStreet("Nevsky Prospect")
+            .setHouseNumber("15")
+            .setApartmentNumber("45")
+            .setPostcode("342423")
+            .build();
+
+        Address address2 = new Address.Builder()
+            .setCountry("Russia")
+            .setCity("Yekaterinburg")
+            .setStreet("Lenin Avenue")
+            .setHouseNumber("34")
+            .setApartmentNumber("432")
+            .setPostcode("34254")
+            .build();
     }
 }

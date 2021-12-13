@@ -2,6 +2,10 @@ package ua.com.foxminded.university.dao.jdbc;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -10,9 +14,13 @@ import org.springframework.transaction.annotation.Transactional;
 import ua.com.foxminded.university.dao.AddressDao;
 import ua.com.foxminded.university.dao.StudentDao;
 import ua.com.foxminded.university.dao.mapper.StudentMapper;
+import ua.com.foxminded.university.model.Classroom;
+import ua.com.foxminded.university.model.Course;
 import ua.com.foxminded.university.model.Student;
+
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,6 +36,8 @@ public class JdbcStudentDao implements StudentDao {
     private static final String SQL_FIND_ALL = "SELECT * FROM students";
     private static final String SQL_GET_BY_GROUP = "SELECT * FROM students WHERE group_id = ?";
     private static final String SQL_GET_BY_FULL_NAME = "SELECT * FROM students WHERE first_name = ? and last_name = ?";
+    private static final String SQL_COUNT_ROWS = "SELECT COUNT(*) FROM students";
+    private static final String SQL_GET_STUDENTS_PAGE = "SELECT * FROM students LIMIT (?) OFFSET (?)";
 
     private StudentMapper studentMapper;
     private JdbcTemplate jdbcTemplate;
@@ -101,5 +111,13 @@ public class JdbcStudentDao implements StudentDao {
         } catch (DataAccessException e) {
             return Optional.empty();
         }
+    }
+
+    @Override
+    public Page<Student> getAll(Pageable pageable) {
+        int totalRows = jdbcTemplate.queryForObject(SQL_COUNT_ROWS, Integer.class);
+        int pageSize = pageable.getPageSize();
+        List<Student> students = jdbcTemplate.query(SQL_GET_STUDENTS_PAGE, studentMapper, pageSize, pageable.getOffset());
+        return new PageImpl<Student>(students, pageable, totalRows);
     }
 }

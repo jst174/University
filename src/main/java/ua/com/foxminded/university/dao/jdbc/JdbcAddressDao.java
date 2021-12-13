@@ -1,6 +1,10 @@
 package ua.com.foxminded.university.dao.jdbc;
 
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -8,9 +12,11 @@ import org.springframework.stereotype.Component;
 import ua.com.foxminded.university.dao.AddressDao;
 import ua.com.foxminded.university.dao.mapper.AddressMapper;
 import ua.com.foxminded.university.model.Address;
+import ua.com.foxminded.university.model.Classroom;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,6 +30,8 @@ public class JdbcAddressDao implements AddressDao {
     private static final String SQL_FIND_ADDRESS = "SELECT * FROM addresses WHERE id = ?";
     private static final String SQL_DELETE_ADDRESS = "DELETE FROM addresses WHERE id = ?";
     private static final String SQL_FIND_ALL = "SELECT * FROM addresses";
+    private static final String SQL_COUNT_ROWS = "SELECT COUNT(*) FROM addresses";
+    private static final String SQL_GET_ADDRESSES_PAGE = "SELECT * FROM addresses LIMIT (?) OFFSET (?)";
 
     private JdbcTemplate jdbcTemplate;
     private AddressMapper addressMapper;
@@ -53,7 +61,7 @@ public class JdbcAddressDao implements AddressDao {
         try {
             return Optional.of(jdbcTemplate.queryForObject(SQL_FIND_ADDRESS, addressMapper, id));
         } catch (DataAccessException e) {
-           return Optional.empty();
+            return Optional.empty();
         }
     }
 
@@ -74,5 +82,14 @@ public class JdbcAddressDao implements AddressDao {
     @Override
     public List<Address> getAll() {
         return jdbcTemplate.query(SQL_FIND_ALL, addressMapper);
+    }
+
+    @Override
+    public Page<Address> getAll(Pageable pageable) {
+        int totalRows = jdbcTemplate.queryForObject(SQL_COUNT_ROWS, Integer.class);
+        int pageSize = pageable.getPageSize();
+        List<Address> addresses = jdbcTemplate.query(SQL_GET_ADDRESSES_PAGE, addressMapper,
+            pageSize, pageable.getOffset());
+        return new PageImpl<Address>(addresses, pageable, totalRows);
     }
 }

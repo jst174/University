@@ -1,5 +1,8 @@
 package ua.com.foxminded.university.exceptions;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
+
 public class EntityNotFoundException extends ServiceException {
 
     public EntityNotFoundException() {

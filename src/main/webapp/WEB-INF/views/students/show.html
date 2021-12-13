@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title th:text="${student.getFirstName()}+' '+${student.getLastName()}">Student</title>
+</head>
+<body>
+<p> Name: <span th:text="${student.getFirstName()}+' '+${student.getLastName()}">value</span></p>
+<p> Birthday: <span th:text="${student.getBirthDate()}">value</span></p>
+<p> Gender: <span th:text="${student.getGender()}">value</span></p>
+<p> Group: <span th:text="${student.getGroup().getName()}">value</span></p>
+<p> Phone number: <span th:text="${student.getPhoneNumber()}">value</span></p>
+<p> Email: <span th:text="${student.getEmail()}">value</span></p>
+<p> Address: <span th:text="${student.getAddress().getCountry()}">country</span>,
+  <span th:text="${student.getAddress().getCity()}">city</span>,
+  <span th:text="${student.getAddress().getStreet()}">street</span>,
+  <span th:text="${student.getAddress().getHouseNumber()}">house number</span>,
+  <span th:text="${student.getAddress().getApartmentNumber()}">apartment number</span>,
+  <span th:text="${student.getAddress().getPostcode()}">postcode</span></p>
+</body>
+</html>

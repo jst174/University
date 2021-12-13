@@ -6,6 +6,10 @@ import static org.springframework.test.jdbc.JdbcTestUtils.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
@@ -106,6 +110,22 @@ public class JdbcLessonDaoTest {
         List<Lesson> actual = lessonDao.getAll();
 
         assertEquals(expected, actual);
+    }
+
+    @Test
+    public void givenPageable_whenGetAll_thenReturnAllLessons() {
+        Lesson lesson1 = TestData.lesson;
+        Lesson lesson2 = new Lesson.Builder().clone(lesson1)
+            .setId(2)
+            .setTime(TestData.time2)
+            .build();
+        List<Lesson> lessons = new ArrayList<>();
+        lessons.add(lesson1);
+        lessons.add(lesson2);
+        Pageable pageable = PageRequest.of(0, lessons.size());
+        Page<Lesson> lessonPage = new PageImpl<Lesson>(lessons, pageable, lessons.size());
+
+        assertEquals(lessonPage, lessonDao.getAll(pageable));
     }
 
     @Test

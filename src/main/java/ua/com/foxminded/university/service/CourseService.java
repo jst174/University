@@ -2,6 +2,8 @@ package ua.com.foxminded.university.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ua.com.foxminded.university.dao.CourseDao;
 import ua.com.foxminded.university.exceptions.EntityNotFoundException;
@@ -46,9 +48,9 @@ public class CourseService {
         courseDao.delete(id);
     }
 
-    public List<Course> getAll() {
+    public Page<Course> getAll(Pageable pageable) {
         logger.debug("Getting all course");
-        return courseDao.getAll();
+        return courseDao.getAll(pageable);
     }
 
     public List<Course> getByTeacherId(int teacherId) {

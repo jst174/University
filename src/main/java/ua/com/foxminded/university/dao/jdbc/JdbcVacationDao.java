@@ -1,17 +1,25 @@
 package ua.com.foxminded.university.dao.jdbc;
 
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ua.com.foxminded.university.dao.VacationDao;
 import ua.com.foxminded.university.dao.mapper.VacationMapper;
+import ua.com.foxminded.university.model.Classroom;
+import ua.com.foxminded.university.model.Course;
 import ua.com.foxminded.university.model.Teacher;
 import ua.com.foxminded.university.model.Vacation;
+
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,6 +38,8 @@ public class JdbcVacationDao implements VacationDao {
         "teacher_id = ? and start <= ? and ending >= ?";
     private static final String SQL_GET_BY_TEACHER_AND_VACATION_DATES = "SELECT * FROM vacations WHERE " +
         "teacher_id = ? and start = ? and ending = ?";
+    private static final String SQL_COUNT_ROWS = "SELECT COUNT(*) FROM vacations";
+    private static final String SQL_GET_VACATIONS_PAGE = "SELECT * FROM vacations LIMIT (?) OFFSET (?)";
 
     private VacationMapper vacationMapper;
     private JdbcTemplate jdbcTemplate;
@@ -99,5 +109,13 @@ public class JdbcVacationDao implements VacationDao {
         } catch (DataAccessException e) {
             return Optional.empty();
         }
+    }
+
+    @Override
+    public Page<Vacation> getAll(Pageable pageable) {
+        int totalRows = jdbcTemplate.queryForObject(SQL_COUNT_ROWS, Integer.class);
+        int pageSize = pageable.getPageSize();
+        List<Vacation> vacations = jdbcTemplate.query(SQL_GET_VACATIONS_PAGE, vacationMapper, pageSize, pageable.getOffset());
+        return new PageImpl<Vacation>(vacations, pageable, totalRows);
     }
 }

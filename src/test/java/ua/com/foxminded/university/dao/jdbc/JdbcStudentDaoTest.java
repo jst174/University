@@ -6,6 +6,10 @@ import static org.springframework.test.jdbc.JdbcTestUtils.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
@@ -21,6 +25,7 @@ import ua.com.foxminded.university.model.Student;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,21 +43,11 @@ public class JdbcStudentDaoTest {
 
     @Test
     public void givenNewStudent_whenCreate_thenCreated() throws IOException {
-        Address address = new Address("Russia", "Saint Petersburg", "Nevsky Prospect",
-            "15", "45", "342423");
-        Student student = new Student(
-            "Mike",
-            "King",
-            LocalDate.of(1997, 5, 13),
-            Gender.MALE,
-            address,
-            "3622366",
-            "king97@yandex.ru"
-        );
-        Group group = new Group("MJ-12");
-        group.setId(1);
-        student.setGroup(group);
-        student.setAddress(address);
+        Student student = new Student.Builder().clone(TestData.student1)
+            .setLastName("King")
+            .setEmail("king97@yandex.ru")
+            .setPhoneNumber("3622366")
+            .build();
         int expectedRows = countRowsInTable(jdbcTemplate, "students") + 1;
 
         studentDao.create(student);
@@ -62,23 +57,7 @@ public class JdbcStudentDaoTest {
 
     @Test
     public void givenId_whenGetById_thenReturn() {
-        Address address = new Address("Russia", "Saint Petersburg", "Nevsky Prospect",
-            "15", "45", "342423");
-        Group group = new Group("MJ-12");
-        Student expected = new Student(
-            "Mike",
-            "Miller",
-            LocalDate.of(1997, 5, 13),
-            Gender.MALE,
-            address,
-            "5435345334",
-            "miller97@gmail.com"
-        );
-        expected.setGroup(group);
-
-        Optional<Student> actual = studentDao.getById(1);
-
-        assertEquals(expected, actual.get());
+        assertEquals(TestData.student1, studentDao.getById(1).get());
     }
 
     @Test
@@ -121,90 +100,65 @@ public class JdbcStudentDaoTest {
 
     @Test
     public void whenGetAll_thenReturnAllStudents() {
-        Address address = new Address("Russia", "Saint Petersburg", "Nevsky Prospect",
-            "15", "45", "342423");
-        Student student1 = new Student(
-            "Mike",
-            "Miller",
-            LocalDate.of(1997, 5, 13),
-            Gender.MALE,
-            address,
-            "5435345334",
-            "miller97@gmail.com"
-        );
-        Student student2 = new Student(
-            "Steve",
-            "King",
-            LocalDate.of(1995, 5, 2),
-            Gender.MALE,
-            address,
-            "432423432",
-            "king95@gmail.com"
-        );
-        Group group = new Group("MJ-12");
-        student1.setGroup(group);
-        student2.setGroup(group);
-        List<Student> expected = new ArrayList<>();
-        expected.add(student1);
-        expected.add(student2);
-
-        List<Student> actual = studentDao.getAll();
-
-        assertEquals(expected, actual);
+        assertEquals(Arrays.asList(TestData.student1, TestData.student2), studentDao.getAll());
     }
 
     @Test
-    public void givenGroupId_whenGetByGroupId_thenReturn(){
-        Address address = new Address("Russia", "Saint Petersburg", "Nevsky Prospect",
-            "15", "45", "342423");
-        Student student1 = new Student(
-            "Mike",
-            "Miller",
-            LocalDate.of(1997, 5, 13),
-            Gender.MALE,
-            address,
-            "5435345334",
-            "miller97@gmail.com"
-        );
-        Student student2 = new Student(
-            "Steve",
-            "King",
-            LocalDate.of(1995, 5, 2),
-            Gender.MALE,
-            address,
-            "432423432",
-            "king95@gmail.com"
-        );
-        Group group = new Group("MJ-12");
-        student1.setGroup(group);
-        student2.setGroup(group);
-        List<Student> expected = new ArrayList<>();
-        expected.add(student1);
-        expected.add(student2);
+    public void givenPageable_whenGetAll_thenReturnAllStudents() {
+        List<Student> students = Arrays.asList(TestData.student1, TestData.student2);
+        Pageable pageable = PageRequest.of(0, students.size());
+        Page<Student> studentPage = new PageImpl<Student>(students, pageable, students.size());
 
-        List<Student> actual = studentDao.getByGroupId(1);
+        assertEquals(studentPage, studentDao.getAll(pageable));
+    }
 
-        assertEquals(expected, actual);
+    @Test
+    public void givenGroupId_whenGetByGroupId_thenReturn() {
+        assertEquals(Arrays.asList(TestData.student1, TestData.student2), studentDao.getByGroupId(1));
     }
 
     @Test
     public void givenFirstNameAndLastName_whenGetByName_thenReturn() {
-        Address address = new Address("Russia", "Saint Petersburg", "Nevsky Prospect",
-            "15", "45", "342423");
-        Group group = new Group("MJ-12");
-        Student expected = new Student(
-            "Mike",
-            "Miller",
-            LocalDate.of(1997, 5, 13),
-            Gender.MALE,
-            address,
-            "5435345334",
-            "miller97@gmail.com"
-        );
-        expected.setGroup(group);
+        Student student = TestData.student1;
 
-        Optional<Student> actual = studentDao.getByName(expected.getFirstName(), expected.getLastName());
+        Optional<Student> actual = studentDao.getByName(student.getFirstName(), student.getLastName());
 
-        assertEquals(expected, actual.get());
+        assertEquals(student, actual.get());
+    }
+
+    interface TestData {
+        Address address = new Address.Builder()
+            .setCountry("Russia")
+            .setCity("Saint Petersburg")
+            .setStreet("Nevsky Prospect")
+            .setHouseNumber("15")
+            .setApartmentNumber("45")
+            .setPostcode("342423")
+            .setId(1)
+            .build();
+        Group group = new Group.Builder()
+            .setName("MJ-12")
+            .build();
+        Student student1 = new Student.Builder()
+            .setFirstName("Mike")
+            .setLastName("Miller")
+            .setBirtDate(LocalDate.of(1997, 5, 13))
+            .setGender(Gender.MALE)
+            .setAddress(address)
+            .setPhoneNumber("5435345334")
+            .setEmail("miller97@gmail.com")
+            .setGroup(group)
+            .build();
+        Student student2 = new Student.Builder()
+            .setFirstName("Steve")
+            .setLastName("King")
+            .setBirtDate(LocalDate.of(1995, 5, 2))
+            .setGender(Gender.MALE)
+            .setAddress(address)
+            .setPhoneNumber("432423432")
+            .setEmail("king95@gmail.com")
+            .setGroup(group)
+            .build();
+
     }
 }

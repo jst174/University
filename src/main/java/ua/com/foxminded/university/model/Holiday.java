@@ -1,6 +1,7 @@
 package ua.com.foxminded.university.model;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Objects;
 
 public class Holiday {
@@ -53,5 +54,33 @@ public class Holiday {
     @Override
     public int hashCode() {
         return Objects.hash(name, date);
+    }
+
+    public static class Builder {
+
+        private Holiday holiday;
+
+        public Builder() {
+            holiday = new Holiday();
+        }
+
+        public Builder setId(int id) {
+            holiday.setId(id);
+            return this;
+        }
+
+        public Builder setName(String name) {
+            holiday.setName(name);
+            return this;
+        }
+
+        public Builder setDate(LocalDate date) {
+            holiday.setDate(date);
+            return this;
+        }
+
+        public Holiday build() {
+            return holiday;
+        }
     }
 }

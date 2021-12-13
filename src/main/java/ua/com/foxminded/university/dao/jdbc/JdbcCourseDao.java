@@ -1,16 +1,22 @@
 package ua.com.foxminded.university.dao.jdbc;
 
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ua.com.foxminded.university.dao.CourseDao;
 import ua.com.foxminded.university.dao.mapper.CourseMapper;
+import ua.com.foxminded.university.model.Classroom;
 import ua.com.foxminded.university.model.Course;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,6 +30,8 @@ public class JdbcCourseDao implements CourseDao {
     private static final String SQL_FIND_ALL = "SELECT * FROM courses";
     private static final String SQL_FIND_TEACHER_COURSES = "SELECT id, name, teacher_id FROM courses INNER JOIN teachers_courses ON id = course_id WHERE teacher_id = ?";
     private static final String SQL_FIND_BY_NAME = "SELECT * FROM courses WHERE name = ?";
+    private static final String SQL_COUNT_ROWS = "SELECT COUNT(*) FROM courses";
+    private static final String SQL_GET_COURSES_PAGE = "SELECT * FROM courses LIMIT (?) OFFSET (?)";
 
     private CourseMapper courseMapper;
     private JdbcTemplate jdbcTemplate;
@@ -76,5 +84,13 @@ public class JdbcCourseDao implements CourseDao {
         } catch (DataAccessException e) {
             return Optional.empty();
         }
+    }
+
+    @Override
+    public Page<Course> getAll(Pageable pageable) {
+        int totalRows = jdbcTemplate.queryForObject(SQL_COUNT_ROWS, Integer.class);
+        int pageSize = pageable.getPageSize();
+        List<Course> courses = jdbcTemplate.query(SQL_GET_COURSES_PAGE, courseMapper, pageSize, pageable.getOffset());
+        return new PageImpl<Course>(courses, pageable, totalRows);
     }
 }

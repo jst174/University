@@ -3,6 +3,10 @@ package ua.com.foxminded.university.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ua.com.foxminded.university.dao.StudentDao;
 import ua.com.foxminded.university.exceptions.EntityNotFoundException;
@@ -11,6 +15,7 @@ import ua.com.foxminded.university.exceptions.NotUniqueNameException;
 import ua.com.foxminded.university.model.Group;
 import ua.com.foxminded.university.model.Student;
 
+import java.util.Collections;
 import java.util.List;
 
 import static java.lang.String.format;
@@ -54,12 +59,12 @@ public class StudentService {
         studentDao.delete(id);
     }
 
-    public List<Student> getAll() {
+    public Page<Student> getAll(Pageable pageable) {
         logger.debug("Getting all students");
-        return studentDao.getAll();
+        return studentDao.getAll(pageable);
     }
 
-    public void verifyNameUniqueness(Student student) throws NotUniqueNameException {
+    private void verifyNameUniqueness(Student student) throws NotUniqueNameException {
         if (studentDao.getByName(student.getFirstName(), student.getLastName())
             .filter(s -> s.getId() != student.getId())
             .isPresent()) {

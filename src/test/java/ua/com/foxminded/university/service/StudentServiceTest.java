@@ -6,12 +6,17 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
 import ua.com.foxminded.university.DataSource;
 import ua.com.foxminded.university.dao.StudentDao;
 import ua.com.foxminded.university.exceptions.EntityNotFoundException;
 import ua.com.foxminded.university.exceptions.NotAvailableGroupException;
 import ua.com.foxminded.university.exceptions.NotUniqueNameException;
+import ua.com.foxminded.university.model.Classroom;
 import ua.com.foxminded.university.model.Group;
 import ua.com.foxminded.university.model.Student;
 
@@ -164,9 +169,12 @@ public class StudentServiceTest {
 
     @Test
     public void whenGetAll_thenReturn() {
-        when(studentDao.getAll()).thenReturn(students);
+        Pageable pageable = PageRequest.of(1, 10);
+        Page<Student> studentPage =
+            new PageImpl<Student>(students, pageable, students.size());
+        when(studentDao.getAll(pageable)).thenReturn(studentPage);
 
-        assertEquals(students, studentService.getAll());
+        assertEquals(studentPage, studentService.getAll(pageable));
     }
 
     private List<Student> generateStudents() throws IOException {

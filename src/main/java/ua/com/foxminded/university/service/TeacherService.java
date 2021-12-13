@@ -2,12 +2,17 @@ package ua.com.foxminded.university.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ua.com.foxminded.university.dao.TeacherDao;
 import ua.com.foxminded.university.exceptions.EntityNotFoundException;
 import ua.com.foxminded.university.exceptions.NotUniqueNameException;
 import ua.com.foxminded.university.model.Teacher;
 
+import java.util.Collections;
 import java.util.List;
 
 import static java.lang.String.format;
@@ -46,9 +51,9 @@ public class TeacherService {
         teacherDao.delete(id);
     }
 
-    public List<Teacher> getAll() {
+    public Page<Teacher> getAll(Pageable pageable) {
         logger.debug("Getting all teacher");
-        return teacherDao.getAll();
+        return teacherDao.getAll(pageable);
     }
 
     private void verifyNameUniqueness(Teacher teacher) throws NotUniqueNameException {

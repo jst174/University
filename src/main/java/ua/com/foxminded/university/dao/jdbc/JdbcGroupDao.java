@@ -1,16 +1,23 @@
 package ua.com.foxminded.university.dao.jdbc;
 
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ua.com.foxminded.university.dao.GroupDao;
 import ua.com.foxminded.university.dao.mapper.GroupMapper;
+import ua.com.foxminded.university.model.Classroom;
+import ua.com.foxminded.university.model.Course;
 import ua.com.foxminded.university.model.Group;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,6 +31,8 @@ public class JdbcGroupDao implements GroupDao {
     private static final String SQL_FIND_ALL = "SELECT * FROM groups";
     private static final String SQL_FIND_LESSON_GROUP = "SELECT id, name, lesson_id FROM groups INNER JOIN lessons_groups ON id = group_id  WHERE lesson_id = ?";
     private static final String SQL_FIND_BY_NAME = "SELECT * FROM groups WHERE name = ?";
+    private static final String SQL_COUNT_ROWS = "SELECT COUNT(*) FROM groups";
+    private static final String SQL_GET_GROUPS_PAGE = "SELECT * FROM groups LIMIT (?) OFFSET (?)";
 
     private JdbcTemplate jdbcTemplate;
     private GroupMapper groupMapper;
@@ -64,7 +73,6 @@ public class JdbcGroupDao implements GroupDao {
         return jdbcTemplate.query(SQL_FIND_ALL, groupMapper);
     }
 
-
     @Override
     public List<Group> getByLessonId(int lessonId) {
         return jdbcTemplate.query(SQL_FIND_LESSON_GROUP, groupMapper, lessonId);
@@ -77,5 +85,13 @@ public class JdbcGroupDao implements GroupDao {
         } catch (DataAccessException e) {
             return Optional.empty();
         }
+    }
+
+    @Override
+    public Page<Group> getAll(Pageable pageable) {
+        int totalRows = jdbcTemplate.queryForObject(SQL_COUNT_ROWS, Integer.class);
+        int pageSize = pageable.getPageSize();
+        List<Group> groups = jdbcTemplate.query(SQL_GET_GROUPS_PAGE, groupMapper, pageSize, pageable.getOffset());
+        return new PageImpl<Group>(groups, pageable, totalRows);
     }
 }

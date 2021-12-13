@@ -6,9 +6,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import ua.com.foxminded.university.dao.HolidayDao;
 import ua.com.foxminded.university.exceptions.EntityNotFoundException;
 import ua.com.foxminded.university.exceptions.NotUniqueDateException;
+import ua.com.foxminded.university.model.Group;
 import ua.com.foxminded.university.model.Holiday;
 
 import java.time.LocalDate;
@@ -113,9 +118,11 @@ public class HolidayServiceTest {
 
     @Test
     public void whenGetAll_thenReturn() {
-        when(holidayDao.getAll()).thenReturn(holidays);
+        Pageable pageable = PageRequest.of(1, 10);
+        Page<Holiday> holidayPage = new PageImpl<Holiday>(holidays, pageable, holidays.size());
+        when(holidayDao.getAll(pageable)).thenReturn(holidayPage);
 
-        assertEquals(holidays, holidayService.getAll());
+        assertEquals(holidayPage, holidayService.getAll(pageable));
     }
 
 }
