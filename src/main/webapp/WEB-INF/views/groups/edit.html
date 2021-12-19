@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Editing group</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+          integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+          crossorigin="anonymous"></script>
+</head>
+<body>
+<div class="container h-100">
+  <div class="row h-100 justify-content-center align-items-center">
+    <form th:method="PATCH" th:action="@{/groups/{id}(id=${group.getId()})}" th:object="${group}"
+          class="col-3">
+      <div class="form-group">
+        <label for="name">Enter group name:</label>
+        <input type="text" class="form-control" th:field="*{name}" id="name">
+      </div>
+      <button type="submit" class="btn btn-primary btn-sm btn-block">Update</button>
+    </form>
+  </div>
+</div>
+</body>
+</html>

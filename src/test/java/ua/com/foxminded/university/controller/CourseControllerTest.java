@@ -20,8 +20,9 @@ import ua.com.foxminded.university.service.CourseService;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -63,6 +64,40 @@ public class CourseControllerTest {
             .andExpect(status().isOk())
             .andExpect(view().name("courses/show"))
             .andExpect(model().attribute("course", TestData.course1));
+    }
+
+    @Test
+    public void whenCreate_thenCreatedAndRedirectView() throws Exception {
+        doNothing().when(courseService).create(TestData.course1);
+        mockMvc.perform(get("/courses/new"))
+            .andExpect(status().isOk())
+            .andExpect(model().attributeExists("course"))
+            .andExpect(view().name("courses/new"));
+        mockMvc.perform(post("/courses"))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(model().attributeExists("course"))
+            .andExpect(view().name("redirect:/courses"));
+    }
+
+    @Test
+    public void whenUpdate_thenUpdateAndRedirectView() throws Exception {
+        when(courseService.getById(1)).thenReturn(TestData.course1);
+        doNothing().when(courseService).update(TestData.course1);
+        mockMvc.perform(get("/courses/1/edit"))
+            .andExpect(status().isOk())
+            .andExpect(view().name("courses/edit"))
+            .andExpect(model().attribute("course", TestData.course1));
+        mockMvc.perform(patch("/courses/1"))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(view().name("redirect:/courses"));
+    }
+
+    @Test
+    public void whenDelete_thenDeleteClassroomAndRedirectView() throws Exception {
+        doNothing().when(courseService).delete(1);
+        mockMvc.perform(delete("/courses/1"))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(view().name("redirect:/courses"));
     }
 
     @Test

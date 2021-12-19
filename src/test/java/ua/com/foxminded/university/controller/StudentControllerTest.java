@@ -14,14 +14,18 @@ import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ua.com.foxminded.university.exceptions.EntityNotFoundException;
+import ua.com.foxminded.university.model.Group;
 import ua.com.foxminded.university.model.Student;
+import ua.com.foxminded.university.service.GroupService;
 import ua.com.foxminded.university.service.StudentService;
 
 import java.util.Arrays;
 import java.util.List;
 
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 
@@ -31,6 +35,8 @@ public class StudentControllerTest {
     private MockMvc mockMvc;
     @Mock
     private StudentService studentService;
+    @Mock
+    private GroupService groupService;
     @InjectMocks
     private StudentController studentController;
 
@@ -64,6 +70,40 @@ public class StudentControllerTest {
             .andExpect(status().isOk())
             .andExpect(view().name("students/show"))
             .andExpect(model().attribute("student", TestData.student1));
+    }
+
+    @Test
+    public void whenCreate_thenCreatedAndRedirectView() throws Exception {
+        doNothing().when(studentService).create(TestData.student1);
+        mockMvc.perform(get("/students/new"))
+            .andExpect(status().isOk())
+            .andExpect(model().attributeExists("student"))
+            .andExpect(view().name("students/new"));
+        mockMvc.perform(post("/students"))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(model().attributeExists("student"))
+            .andExpect(view().name("redirect:/students"));
+    }
+
+    @Test
+    public void whenUpdate_thenUpdateAndRedirectView() throws Exception {
+        when(studentService.getById(1)).thenReturn(TestData.student1);
+        doNothing().when(studentService).update(TestData.student1);
+        mockMvc.perform(get("/students/1/edit"))
+            .andExpect(status().isOk())
+            .andExpect(view().name("students/edit"))
+            .andExpect(model().attribute("student", TestData.student1));
+        mockMvc.perform(patch("/students/1"))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(view().name("redirect:/students"));
+    }
+
+    @Test
+    public void whenDelete_thenDeleteClassroomAndRedirectView() throws Exception {
+        doNothing().when(studentService).delete(1);
+        mockMvc.perform(delete("/students/1"))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(view().name("redirect:/students"));
     }
 
     @Test

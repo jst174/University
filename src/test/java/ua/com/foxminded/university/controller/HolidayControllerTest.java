@@ -20,8 +20,10 @@ import ua.com.foxminded.university.service.HolidayService;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 
@@ -64,6 +66,40 @@ public class HolidayControllerTest {
             .andExpect(status().isOk())
             .andExpect(view().name("holidays/show"))
             .andExpect(model().attribute("holiday", TestData.holiday1));
+    }
+
+    @Test
+    public void whenCreate_thenCreatedAndRedirectView() throws Exception {
+        doNothing().when(holidayService).create(TestData.holiday1);
+        mockMvc.perform(get("/holidays/new"))
+            .andExpect(status().isOk())
+            .andExpect(model().attributeExists("holiday"))
+            .andExpect(view().name("holidays/new"));
+        mockMvc.perform(post("/holidays"))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(model().attributeExists("holiday"))
+            .andExpect(view().name("redirect:/holidays"));
+    }
+
+    @Test
+    public void whenUpdate_thenUpdateAndRedirectView() throws Exception {
+        when(holidayService.getById(1)).thenReturn(TestData.holiday1);
+        doNothing().when(holidayService).update(TestData.holiday1);
+        mockMvc.perform(get("/holidays/1/edit"))
+            .andExpect(status().isOk())
+            .andExpect(view().name("holidays/edit"))
+            .andExpect(model().attribute("holiday", TestData.holiday1));
+        mockMvc.perform(patch("/holidays/1"))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(view().name("redirect:/holidays"));
+    }
+
+    @Test
+    public void whenDelete_thenDeleteClassroomAndRedirectView() throws Exception {
+        doNothing().when(holidayService).delete(1);
+        mockMvc.perform(delete("/holidays/1"))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(view().name("redirect:/holidays"));
     }
 
     @Test

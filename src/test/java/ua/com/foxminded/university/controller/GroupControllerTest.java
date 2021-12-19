@@ -20,8 +20,9 @@ import ua.com.foxminded.university.service.GroupService;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -63,6 +64,40 @@ public class GroupControllerTest {
             .andExpect(status().isOk())
             .andExpect(view().name("groups/show"))
             .andExpect(model().attribute("group", TestData.group1));
+    }
+
+    @Test
+    public void whenCreate_thenCreatedAndRedirectView() throws Exception {
+        doNothing().when(groupService).create(TestData.group1);
+        mockMvc.perform(get("/groups/new"))
+            .andExpect(status().isOk())
+            .andExpect(model().attributeExists("group"))
+            .andExpect(view().name("groups/new"));
+        mockMvc.perform(post("/groups"))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(model().attributeExists("group"))
+            .andExpect(view().name("redirect:/groups"));
+    }
+
+    @Test
+    public void whenUpdate_thenUpdateAndRedirectView() throws Exception {
+        when(groupService.getById(1)).thenReturn(TestData.group1);
+        doNothing().when(groupService).update(TestData.group1);
+        mockMvc.perform(get("/groups/1/edit"))
+            .andExpect(status().isOk())
+            .andExpect(view().name("groups/edit"))
+            .andExpect(model().attribute("group", TestData.group1));
+        mockMvc.perform(patch("/groups/1"))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(view().name("redirect:/groups"));
+    }
+
+    @Test
+    public void whenDelete_thenDeleteClassroomAndRedirectView() throws Exception {
+        doNothing().when(groupService).delete(1);
+        mockMvc.perform(delete("/groups/1"))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(view().name("redirect:/groups"));
     }
 
     @Test

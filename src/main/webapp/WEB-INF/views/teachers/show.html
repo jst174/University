@@ -24,7 +24,7 @@
   </tr>
   </thead>
   <tbody>
-  <tr th:each="course: ${teacher.getCourses()}">
+  <tr th:each="course: ${courses}">
     <td th:text="${course.getName()}"/>
   </tr>
   </tbody>

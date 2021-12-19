@@ -1,5 +1,7 @@
 package ua.com.foxminded.university.model;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import java.time.LocalDate;
 import java.util.Objects;
 
@@ -7,6 +9,7 @@ public abstract class Person {
 
     private String firstName;
     private String lastName;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate birthDate;
     private Gender gender;
     private Address address;

@@ -631,8 +631,8 @@ public class Menu {
 	private Gender getGender(String inputGender) {
 		if (inputGender.equals(Gender.MALE.toString())) {
 			return Gender.MALE;
-		} else if (inputGender.equals(Gender.FAMALE.toString())) {
-			return Gender.FAMALE;
+		} else if (inputGender.equals(Gender.FEMALE.toString())) {
+			return Gender.FEMALE;
 		} else {
 			throw new IllegalArgumentException("gender is incorrect");
 		}

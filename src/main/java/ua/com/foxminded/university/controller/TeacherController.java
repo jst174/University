@@ -3,10 +3,11 @@ package ua.com.foxminded.university.controller;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import ua.com.foxminded.university.exceptions.EntityNotFoundException;
+import ua.com.foxminded.university.exceptions.NotUniqueNameException;
+import ua.com.foxminded.university.model.Teacher;
+import ua.com.foxminded.university.service.CourseService;
 import ua.com.foxminded.university.service.TeacherService;
 
 @Controller
@@ -14,9 +15,11 @@ import ua.com.foxminded.university.service.TeacherService;
 public class TeacherController {
 
     private final TeacherService teacherService;
+    private final CourseService courseService;
 
-    public TeacherController(TeacherService teacherService) {
+    public TeacherController(TeacherService teacherService, CourseService courseService) {
         this.teacherService = teacherService;
+        this.courseService = courseService;
     }
 
     @GetMapping
@@ -29,5 +32,36 @@ public class TeacherController {
     public String getById(@PathVariable int id, Model model) throws EntityNotFoundException {
         model.addAttribute("teacher", teacherService.getById(id));
         return "teachers/show";
+    }
+
+    @GetMapping("/new")
+    public String newTeacher(@ModelAttribute Teacher teacher, Model model, Pageable pageable) {
+        model.addAttribute("courses", courseService.getAll(pageable));
+        return "teachers/new";
+    }
+
+    @PostMapping
+    public String create(@ModelAttribute Teacher teacher) throws NotUniqueNameException {
+        teacherService.create(teacher);
+        return "redirect:/teachers";
+    }
+
+    @GetMapping("/{id}/edit")
+    public String edit(@PathVariable int id, Model model, Pageable pageable) throws EntityNotFoundException {
+        model.addAttribute("teacher", teacherService.getById(id));
+        model.addAttribute("courses", courseService.getAll(pageable));
+        return "teachers/edit";
+    }
+
+    @PatchMapping("/{id}")
+    public String update(@ModelAttribute Teacher teacher) throws NotUniqueNameException {
+        teacherService.update(teacher);
+        return "redirect:/teachers";
+    }
+
+    @DeleteMapping("/{id}")
+    public String delete(@PathVariable int id) {
+        teacherService.delete(id);
+        return "redirect:/teachers";
     }
 }

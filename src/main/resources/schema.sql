@@ -36,8 +36,8 @@ CREATE TABLE students
   phone_number VARCHAR,
   email        VARCHAR,
   group_id     INTEGER,
-  FOREIGN KEY (address_id) REFERENCES addresses (id) ON DELETE SET NULL,
-  FOREIGN KEY (group_id) REFERENCES groups (id) ON DELETE SET NULL
+  FOREIGN KEY (address_id) REFERENCES addresses (id) ON UPDATE CASCADE ON DELETE CASCADE,
+  FOREIGN KEY (group_id) REFERENCES groups (id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 DROP TABLE IF EXISTS teachers CASCADE;

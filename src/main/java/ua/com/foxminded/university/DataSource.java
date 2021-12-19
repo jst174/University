@@ -136,7 +136,7 @@ public class DataSource {
 		if (random == 0) {
 			return Gender.MALE;
 		} else {
-			return Gender.FAMALE;
+			return Gender.FEMALE;
 		}
 	}
 

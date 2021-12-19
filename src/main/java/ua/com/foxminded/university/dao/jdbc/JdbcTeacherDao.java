@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -15,13 +14,12 @@ import ua.com.foxminded.university.dao.AddressDao;
 import ua.com.foxminded.university.dao.CourseDao;
 import ua.com.foxminded.university.dao.TeacherDao;
 import ua.com.foxminded.university.dao.mapper.TeacherMapper;
-import ua.com.foxminded.university.model.Classroom;
+import ua.com.foxminded.university.model.Address;
 import ua.com.foxminded.university.model.Course;
 import ua.com.foxminded.university.model.Teacher;
 
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,6 +41,8 @@ public class JdbcTeacherDao implements TeacherDao {
     private static final String SQL_GET_BY_FULL_NAME = "SELECT * FROM teachers WHERE first_name = ? and last_name = ?";
     private static final String SQL_COUNT_ROWS = "SELECT COUNT(*) FROM teachers";
     private static final String SQL_GET_TEACHERS_PAGE = "SELECT * FROM teachers LIMIT (?) OFFSET (?)";
+    private static final String SQL_CHECK_ADDRESS_EXIST = "SELECT exists (SELECT 1 from addresses WHERE country=? and city=? and street=? and house_number=? and" +
+        " apartment_number=? and postcode=?)";
 
     private TeacherMapper teacherMapper;
     private JdbcTemplate jdbcTemplate;
@@ -86,6 +86,11 @@ public class JdbcTeacherDao implements TeacherDao {
 
     @Transactional
     public void update(Teacher teacher) {
+        Address address = teacher.getAddress();
+        if (!jdbcTemplate.queryForObject(SQL_CHECK_ADDRESS_EXIST, Boolean.class, address.getCountry(), address.getCity(), address.getStreet(),
+            address.getHouseNumber(), address.getApartmentNumber(), address.getPostcode())) {
+            addressDao.create(address);
+        }
         jdbcTemplate.update(SQL_UPDATE_TEACHER,
             teacher.getFirstName(),
             teacher.getLastName(),

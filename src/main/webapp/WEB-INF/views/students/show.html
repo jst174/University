@@ -3,19 +3,66 @@
 <head>
   <meta charset="UTF-8">
   <title th:text="${student.getFirstName()}+' '+${student.getLastName()}">Student</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+          integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+          crossorigin="anonymous"></script>
 </head>
 <body>
-<p> Name: <span th:text="${student.getFirstName()}+' '+${student.getLastName()}">value</span></p>
-<p> Birthday: <span th:text="${student.getBirthDate()}">value</span></p>
-<p> Gender: <span th:text="${student.getGender()}">value</span></p>
-<p> Group: <span th:text="${student.getGroup().getName()}">value</span></p>
-<p> Phone number: <span th:text="${student.getPhoneNumber()}">value</span></p>
-<p> Email: <span th:text="${student.getEmail()}">value</span></p>
-<p> Address: <span th:text="${student.getAddress().getCountry()}">country</span>,
-  <span th:text="${student.getAddress().getCity()}">city</span>,
-  <span th:text="${student.getAddress().getStreet()}">street</span>,
-  <span th:text="${student.getAddress().getHouseNumber()}">house number</span>,
-  <span th:text="${student.getAddress().getApartmentNumber()}">apartment number</span>,
-  <span th:text="${student.getAddress().getPostcode()}">postcode</span></p>
+<div class="row justify-content-center">
+  <div class="col-auto">
+    <table class="table table-responsive">
+      <tbody>
+      <tr>
+        <td>First Name:</td>
+        <td th:text="${student.getFirstName()}"/>
+      </tr>
+      <tr>
+        <td>Last Name:</td>
+        <td th:text="${student.getLastName()}"/>
+      </tr>
+      <tr>
+        <td>Birthday:</td>
+        <td th:text="${student.getBirthDate()}"/>
+      </tr>
+      <tr>
+        <td>Number of phone:</td>
+        <td th:text="${student.getPhoneNumber()}"/>
+      </tr>
+      <tr>
+        <td>Email:</td>
+        <td th:text="${student.getEmail()}"/>
+      </tr>
+      <tr>
+        <td>Gender:</td>
+        <td th:text="${student.getGender()}"/>
+      </tr>
+      <tr>
+        <td>Group:</td>
+        <td th:text="${student.getGroup()}"/>
+      </tr>
+      <tr>
+        <td>Address:</td>
+        <td><span th:text="${student.getAddress().getCountry()}">country</span>,
+          <span th:text="${student.getAddress().getCity()}">city</span>,
+          <span th:text="${student.getAddress().getStreet()}">street</span>,
+          <span th:text="${student.getAddress().getHouseNumber()}">house number</span>,
+          <span th:text="${student.getAddress().getApartmentNumber()}">apartment number</span>,
+          <span th:text="${student.getAddress().getPostcode()}">postcode</span></td>
+      </tr>
+      </tbody>
+    </table>
+    <div class="btn-group" role="group">
+      <a th:href="@{/students}" class="btn btn-primary btn-sm" role="button"
+         aria-pressed="true">Back</a>
+      <a th:href="@{/students/{id}/edit(id=${student.getId()})}" class="btn btn-warning btn-sm" role="button"
+         aria-pressed="true">Edit</a>
+      <form th:method="DELETE" th:action="@{/students/{id}(id=${student.getId()})}">
+        <input type="submit" class="btn btn-danger btn-sm" value="Delete">
+      </form>
+    </div>
+  </div>
+</div>
 </body>
 </html>
