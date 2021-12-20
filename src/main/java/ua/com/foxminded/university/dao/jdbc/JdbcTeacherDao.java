@@ -41,8 +41,6 @@ public class JdbcTeacherDao implements TeacherDao {
     private static final String SQL_GET_BY_FULL_NAME = "SELECT * FROM teachers WHERE first_name = ? and last_name = ?";
     private static final String SQL_COUNT_ROWS = "SELECT COUNT(*) FROM teachers";
     private static final String SQL_GET_TEACHERS_PAGE = "SELECT * FROM teachers LIMIT (?) OFFSET (?)";
-    private static final String SQL_CHECK_ADDRESS_EXIST = "SELECT exists (SELECT 1 from addresses WHERE country=? and city=? and street=? and house_number=? and" +
-        " apartment_number=? and postcode=?)";
 
     private TeacherMapper teacherMapper;
     private JdbcTemplate jdbcTemplate;
@@ -86,11 +84,6 @@ public class JdbcTeacherDao implements TeacherDao {
 
     @Transactional
     public void update(Teacher teacher) {
-        Address address = teacher.getAddress();
-        if (!jdbcTemplate.queryForObject(SQL_CHECK_ADDRESS_EXIST, Boolean.class, address.getCountry(), address.getCity(), address.getStreet(),
-            address.getHouseNumber(), address.getApartmentNumber(), address.getPostcode())) {
-            addressDao.create(address);
-        }
         jdbcTemplate.update(SQL_UPDATE_TEACHER,
             teacher.getFirstName(),
             teacher.getLastName(),
