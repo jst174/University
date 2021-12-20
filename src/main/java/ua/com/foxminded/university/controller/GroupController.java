@@ -32,7 +32,7 @@ public class GroupController {
     }
 
     @GetMapping("/new")
-    public String newGroup(@ModelAttribute Group group) {
+    public String showCreationForm(@ModelAttribute Group group) {
         return "groups/new";
     }
 

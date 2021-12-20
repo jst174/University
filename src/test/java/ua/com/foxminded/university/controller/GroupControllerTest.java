@@ -20,8 +20,7 @@ import ua.com.foxminded.university.service.GroupService;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -67,44 +66,52 @@ public class GroupControllerTest {
     }
 
     @Test
-    public void whenCreate_thenCreatedAndRedirectView() throws Exception {
-        doNothing().when(groupService).create(TestData.group1);
+    public void whenShowCreatingForm_thenShowCreatingForm() throws Exception {
         mockMvc.perform(get("/groups/new"))
             .andExpect(status().isOk())
             .andExpect(model().attributeExists("group"))
             .andExpect(view().name("groups/new"));
+    }
+
+    @Test
+    public void whenCreate_thenCreatedAndRedirectView() throws Exception {
         mockMvc.perform(post("/groups"))
             .andExpect(status().is3xxRedirection())
             .andExpect(model().attributeExists("group"))
             .andExpect(view().name("redirect:/groups"));
+        verify(groupService).create(TestData.group1);
+    }
+
+    @Test
+    public void whenEdit_thenShowEditingForm() throws Exception {
+        when(groupService.getById(1)).thenReturn(TestData.group1);
+        mockMvc.perform(get("/groups/{id}/edit", 1))
+            .andExpect(status().isOk())
+            .andExpect(view().name("groups/edit"))
+            .andExpect(model().attribute("group", TestData.group1));
     }
 
     @Test
     public void whenUpdate_thenUpdateAndRedirectView() throws Exception {
-        when(groupService.getById(1)).thenReturn(TestData.group1);
-        doNothing().when(groupService).update(TestData.group1);
-        mockMvc.perform(get("/groups/1/edit"))
-            .andExpect(status().isOk())
-            .andExpect(view().name("groups/edit"))
-            .andExpect(model().attribute("group", TestData.group1));
-        mockMvc.perform(patch("/groups/1"))
+        mockMvc.perform(patch("/groups/{id}", 1))
             .andExpect(status().is3xxRedirection())
             .andExpect(view().name("redirect:/groups"));
+        verify(groupService).update(TestData.group1);
     }
 
     @Test
     public void whenDelete_thenDeleteClassroomAndRedirectView() throws Exception {
-        doNothing().when(groupService).delete(1);
-        mockMvc.perform(delete("/groups/1"))
+        mockMvc.perform(delete("/groups/{id}", 1))
             .andExpect(status().is3xxRedirection())
             .andExpect(view().name("redirect:/groups"));
+        verify(groupService).delete(1);
     }
 
     @Test
     public void givenIncorrectGetRequest_whenGetById_thenShowExceptionView() throws Exception {
         String message = "Group with id = 1 not found";
         when(groupService.getById(1)).thenThrow(new EntityNotFoundException(message));
-        mockMvc.perform(get("/groups/1"))
+        mockMvc.perform(get("/groups/{id}", 1))
             .andExpect(view().name("exception/error"))
             .andExpect(model().attribute("exception", "EntityNotFoundException"))
             .andExpect(model().attribute("message", message));
@@ -113,11 +120,9 @@ public class GroupControllerTest {
 
     interface TestData {
         Group group1 = new Group.Builder()
-            .setName("GL-12")
             .setId(1)
             .build();
         Group group2 = new Group.Builder()
-            .setName("FE-34")
             .setId(2)
             .build();
     }

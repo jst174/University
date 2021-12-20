@@ -35,7 +35,7 @@ public class TeacherController {
     }
 
     @GetMapping("/new")
-    public String newTeacher(@ModelAttribute Teacher teacher, Model model, Pageable pageable) {
+    public String showCreationForm(@ModelAttribute Teacher teacher, Model model, Pageable pageable) {
         model.addAttribute("courses", courseService.getAll(pageable));
         return "teachers/new";
     }

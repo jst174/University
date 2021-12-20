@@ -37,7 +37,7 @@ public class StudentController {
     }
 
     @GetMapping("/new")
-    public String newStudent(@ModelAttribute Student student, Model model, Pageable pageable) {
+    public String showCreationForm(@ModelAttribute Student student, Model model, Pageable pageable) {
         model.addAttribute("groups", groupService.getAll(pageable));
         return "students/new";
     }
@@ -56,7 +56,7 @@ public class StudentController {
     }
 
     @PatchMapping("/{id}")
-    public String update(@ModelAttribute Student student) throws NotAvailableGroupException, NotUniqueNameException {
+    public String update(@ModelAttribute Student student) throws NotAvailableGroupException, NotUniqueNameException, EntityNotFoundException {
         studentService.update(student);
         return "redirect:/students";
     }

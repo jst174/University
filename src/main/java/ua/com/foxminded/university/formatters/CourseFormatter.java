@@ -1,12 +1,12 @@
-package ua.com.foxminded.university.controller;
+package ua.com.foxminded.university.formatters;
 
 import org.springframework.format.Formatter;
 import ua.com.foxminded.university.model.Course;
 
-import java.text.ParseException;
 import java.util.Locale;
 
 public class CourseFormatter implements Formatter<Course> {
+    
     @Override
     public Course parse(String text, Locale locale){
         Course course = new Course();

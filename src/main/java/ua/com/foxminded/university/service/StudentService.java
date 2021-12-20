@@ -8,10 +8,12 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import ua.com.foxminded.university.dao.AddressDao;
 import ua.com.foxminded.university.dao.StudentDao;
 import ua.com.foxminded.university.exceptions.EntityNotFoundException;
 import ua.com.foxminded.university.exceptions.NotAvailableGroupException;
 import ua.com.foxminded.university.exceptions.NotUniqueNameException;
+import ua.com.foxminded.university.model.Address;
 import ua.com.foxminded.university.model.Group;
 import ua.com.foxminded.university.model.Student;
 
@@ -26,11 +28,13 @@ public class StudentService {
     private static final Logger logger = LoggerFactory.getLogger(StudentService.class);
 
     private StudentDao studentDao;
+    private AddressDao addressDao;
     @Value("${max.group.size}")
     private int maxGroupSize;
 
-    public StudentService(StudentDao studentDao) {
+    public StudentService(StudentDao studentDao, AddressDao addressDao) {
         this.studentDao = studentDao;
+        this.addressDao = addressDao;
     }
 
     public void create(Student student) throws NotUniqueNameException, NotAvailableGroupException {
@@ -47,11 +51,12 @@ public class StudentService {
             new EntityNotFoundException(format("Student with id = %s not found", id)));
     }
 
-    public void update(Student student) throws NotUniqueNameException, NotAvailableGroupException {
-        logger.debug("Updating student with id = {}", student.getId());
-        verifyNameUniqueness(student);
-        verifyGroupAvailability(student.getGroup());
-        studentDao.update(student);
+    public void update(Student updatedStudent) throws NotUniqueNameException, NotAvailableGroupException, EntityNotFoundException {
+        logger.debug("Updating student with id = {}", updatedStudent.getId());
+        verifyNameUniqueness(updatedStudent);
+        verifyGroupAvailability(updatedStudent.getGroup());
+        verifyAddress(updatedStudent);
+        studentDao.update(updatedStudent);
     }
 
     public void delete(int id) {
@@ -78,6 +83,16 @@ public class StudentService {
         if (groupSize >= maxGroupSize) {
             throw new NotAvailableGroupException(format("Group with name %s not available. " +
                 "Max group size = %s has already been reached", group.getName(), groupSize));
+        }
+    }
+
+    private void verifyAddress(Student updatedStudent) throws EntityNotFoundException {
+        Student student = getById(updatedStudent.getId());
+        Address address = student.getAddress();
+        if (!address.equals(updatedStudent.getAddress())) {
+            addressDao.create(updatedStudent.getAddress());
+        } else {
+            updatedStudent.setAddress(address);
         }
     }
 

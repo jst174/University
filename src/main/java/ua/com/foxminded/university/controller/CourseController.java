@@ -32,7 +32,7 @@ public class CourseController {
     }
 
     @GetMapping("/new")
-    public String newCourse(@ModelAttribute Course course) {
+    public String showCreationForm(@ModelAttribute Course course) {
         return "courses/new";
     }
 

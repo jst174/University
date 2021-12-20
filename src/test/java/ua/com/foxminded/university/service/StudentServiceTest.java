@@ -121,7 +121,7 @@ public class StudentServiceTest {
     }
 
     @Test
-    public void givenExistentStudent_whenUpdate_thenUpdated() throws NotAvailableGroupException, NotUniqueNameException {
+    public void givenExistentStudent_whenUpdate_thenUpdated() throws NotAvailableGroupException, NotUniqueNameException, EntityNotFoundException {
         Student student = students.get(0);
         when(studentDao.getByName(student.getFirstName(), student.getLastName())).thenReturn(Optional.of(student));
         when(studentDao.getByGroupId(1)).thenReturn(students);

@@ -67,44 +67,52 @@ public class ClassroomControllerTest {
     }
 
     @Test
-    public void whenCreate_thenCreatedAndRedirectView() throws Exception {
-        doNothing().when(classroomService).createClassroom(TestData.classroom1);
+    public void whenShowCreationForm_thenShowCreationForm() throws Exception {
         mockMvc.perform(get("/classrooms/new"))
             .andExpect(status().isOk())
             .andExpect(model().attributeExists("classroom"))
             .andExpect(view().name("classrooms/new"));
+    }
+
+    @Test
+    public void whenCreate_thenCreatedAndRedirectView() throws Exception {
         mockMvc.perform(post("/classrooms"))
             .andExpect(status().is3xxRedirection())
             .andExpect(model().attributeExists("classroom"))
             .andExpect(view().name("redirect:/classrooms"));
+        verify(classroomService).createClassroom(TestData.classroom1);
+    }
+
+    @Test
+    public void whenEdit_thenShowEditingForm() throws Exception {
+        when(classroomService.getById(1)).thenReturn(TestData.classroom1);
+        mockMvc.perform(get("/classrooms/{id}/edit", 1))
+            .andExpect(status().isOk())
+            .andExpect(view().name("classrooms/edit"))
+            .andExpect(model().attribute("classroom", TestData.classroom1));
     }
 
     @Test
     public void whenUpdate_thenUpdateAndRedirectView() throws Exception {
-        when(classroomService.getById(1)).thenReturn(TestData.classroom1);
-        doNothing().when(classroomService).update(TestData.classroom1);
-        mockMvc.perform(get("/classrooms/1/edit"))
-            .andExpect(status().isOk())
-            .andExpect(view().name("classrooms/edit"))
-            .andExpect(model().attribute("classroom", TestData.classroom1));
-        mockMvc.perform(patch("/classrooms/1"))
+        mockMvc.perform(patch("/classrooms/{id}", 1))
             .andExpect(status().is3xxRedirection())
             .andExpect(view().name("redirect:/classrooms"));
+        verify(classroomService).update(TestData.classroom1);
     }
 
     @Test
     public void whenDelete_thenDeleteClassroomAndRedirectView() throws Exception {
-        doNothing().when(classroomService).delete(1);
-        mockMvc.perform(delete("/classrooms/1"))
+        mockMvc.perform(delete("/classrooms/{id}", 1))
             .andExpect(status().is3xxRedirection())
             .andExpect(view().name("redirect:/classrooms"));
+        verify(classroomService).delete(1);
     }
 
     @Test
     public void givenIncorrectGetRequest_whenGetById_thenShowExceptionView() throws Exception {
         String message = "Classroom with id = 1 not found";
         when(classroomService.getById(1)).thenThrow(new EntityNotFoundException(message));
-        mockMvc.perform(get("/classrooms/1"))
+        mockMvc.perform(get("/classrooms/{id}", 1))
             .andExpect(view().name("exception/error"))
             .andExpect(model().attributeExists("exception"))
             .andExpect(model().attribute("message", message));
@@ -112,13 +120,9 @@ public class ClassroomControllerTest {
 
     interface TestData {
         Classroom classroom1 = new Classroom.Builder()
-            .setNumber(102)
-            .setCapacity(30)
             .setId(1)
             .build();
         Classroom classroom2 = new Classroom.Builder()
-            .setNumber(202)
-            .setCapacity(50)
             .setId(2)
             .build();
     }

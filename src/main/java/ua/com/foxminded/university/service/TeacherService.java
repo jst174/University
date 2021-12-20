@@ -7,9 +7,12 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import ua.com.foxminded.university.dao.AddressDao;
 import ua.com.foxminded.university.dao.TeacherDao;
 import ua.com.foxminded.university.exceptions.EntityNotFoundException;
 import ua.com.foxminded.university.exceptions.NotUniqueNameException;
+import ua.com.foxminded.university.model.Address;
+import ua.com.foxminded.university.model.Student;
 import ua.com.foxminded.university.model.Teacher;
 
 import java.util.Collections;
@@ -23,9 +26,11 @@ public class TeacherService {
     private static final Logger logger = LoggerFactory.getLogger(TeacherService.class);
 
     private TeacherDao teacherDao;
+    private AddressDao addressDao;
 
-    public TeacherService(TeacherDao teacherDao) {
+    public TeacherService(TeacherDao teacherDao, AddressDao addressDao) {
         this.teacherDao = teacherDao;
+        this.addressDao = addressDao;
     }
 
     public void create(Teacher teacher) throws NotUniqueNameException {
@@ -40,10 +45,11 @@ public class TeacherService {
             new EntityNotFoundException(format("Teacher with id = %s not found", id)));
     }
 
-    public void update(Teacher teacher) throws NotUniqueNameException {
-        logger.debug("Updating teacher with id = {}", teacher.getId());
-        verifyNameUniqueness(teacher);
-        teacherDao.update(teacher);
+    public void update(Teacher updatedTeacher) throws NotUniqueNameException, EntityNotFoundException {
+        logger.debug("Updating teacher with id = {}", updatedTeacher.getId());
+        verifyNameUniqueness(updatedTeacher);
+        verifyAddress(updatedTeacher);
+        teacherDao.update(updatedTeacher);
     }
 
     public void delete(int id) {
@@ -62,6 +68,16 @@ public class TeacherService {
             .isPresent()) {
             throw new NotUniqueNameException(format("Teacher with name %s %s already exist",
                 teacher.getFirstName(), teacher.getLastName()));
+        }
+    }
+
+    private void verifyAddress(Teacher updatedTeacher) throws EntityNotFoundException {
+        Teacher teacher = getById(updatedTeacher.getId());
+        Address address = teacher.getAddress();
+        if (!address.equals(updatedTeacher.getAddress())) {
+            addressDao.create(updatedTeacher.getAddress());
+        } else {
+            updatedTeacher.setAddress(address);
         }
     }
 }

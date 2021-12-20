@@ -70,7 +70,7 @@ public class TeacherControllerTest {
     public void givenIncorrectGetRequest_whenGetById_thenShowExceptionView() throws Exception {
         String message = "Teacher with id = 1 not found";
         when(teacherService.getById(1)).thenThrow(new EntityNotFoundException(message));
-        mockMvc.perform(get("/teachers/1"))
+        mockMvc.perform(get("/teachers/{id}", 1))
             .andExpect(view().name("exception/error"))
             .andExpect(model().attribute("exception", "EntityNotFoundException"))
             .andExpect(model().attribute("message", message));

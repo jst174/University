@@ -32,7 +32,7 @@ public class HolidayController {
     }
 
     @GetMapping("/new")
-    public String newHoliday(@ModelAttribute Holiday holiday) {
+    public String showCreationForm(@ModelAttribute Holiday holiday) {
         return "holidays/new";
     }
 
