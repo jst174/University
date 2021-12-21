@@ -48,7 +48,7 @@ public class TeacherService {
     public void update(Teacher updatedTeacher) throws NotUniqueNameException, EntityNotFoundException {
         logger.debug("Updating teacher with id = {}", updatedTeacher.getId());
         verifyNameUniqueness(updatedTeacher);
-        verifyAddress(updatedTeacher);
+        updateAddress(updatedTeacher);
         teacherDao.update(updatedTeacher);
     }
 
@@ -71,13 +71,11 @@ public class TeacherService {
         }
     }
 
-    private void verifyAddress(Teacher updatedTeacher) throws EntityNotFoundException {
+    private void updateAddress(Teacher updatedTeacher) throws EntityNotFoundException {
         Teacher teacher = getById(updatedTeacher.getId());
         Address address = teacher.getAddress();
-        if (!address.equals(updatedTeacher.getAddress())) {
-            addressDao.create(updatedTeacher.getAddress());
-        } else {
-            updatedTeacher.setAddress(address);
-        }
+        Address updatedAddress = updatedTeacher.getAddress();
+        updatedAddress.setId(address.getId());
+        addressDao.update(updatedAddress);
     }
 }

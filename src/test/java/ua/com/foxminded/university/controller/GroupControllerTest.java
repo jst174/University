@@ -75,6 +75,7 @@ public class GroupControllerTest {
 
     @Test
     public void whenCreate_thenCreatedAndRedirectView() throws Exception {
+        groupService.create(TestData.group1);
         mockMvc.perform(post("/groups"))
             .andExpect(status().is3xxRedirection())
             .andExpect(model().attributeExists("group"))
@@ -93,6 +94,7 @@ public class GroupControllerTest {
 
     @Test
     public void whenUpdate_thenUpdateAndRedirectView() throws Exception {
+        groupService.update(TestData.group1);
         mockMvc.perform(patch("/groups/{id}", 1))
             .andExpect(status().is3xxRedirection())
             .andExpect(view().name("redirect:/groups"));
@@ -120,9 +122,11 @@ public class GroupControllerTest {
 
     interface TestData {
         Group group1 = new Group.Builder()
+            .setName("GD-12")
             .setId(1)
             .build();
         Group group2 = new Group.Builder()
+            .setName("GS-14")
             .setId(2)
             .build();
     }

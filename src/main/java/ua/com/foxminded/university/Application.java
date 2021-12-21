@@ -19,9 +19,6 @@ public class Application {
         university.getStudents().addAll(dataSource.getStudents());
         university.getCourses().addAll(dataSource.getCourses("courses.txt"));
         university.getTimes().addAll(dataSource.getTime());
-
-		Menu menu = new Menu();
-		menu.getMenu(university);
     }
 
 }

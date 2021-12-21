@@ -58,6 +58,11 @@ public class GroupService {
         return groupDao.getAll(pageable);
     }
 
+    public List<Group> getAll() {
+        logger.debug("Getting all group");
+        return groupDao.getAll();
+    }
+
     public List<Group> getByLessonId(int lessonId) {
         logger.debug("Getting groups by lesson with id = {}", lessonId);
         return groupDao.getByLessonId(lessonId);

@@ -53,6 +53,11 @@ public class CourseService {
         return courseDao.getAll(pageable);
     }
 
+    public List<Course> getAll() {
+        logger.debug("Getting all course");
+        return courseDao.getAll();
+    }
+
     public List<Course> getByTeacherId(int teacherId) {
         logger.debug("Getting courses by teacher with id = {}", teacherId);
         return courseDao.getByTeacherId(teacherId);

@@ -37,8 +37,8 @@ public class StudentController {
     }
 
     @GetMapping("/new")
-    public String showCreationForm(@ModelAttribute Student student, Model model, Pageable pageable) {
-        model.addAttribute("groups", groupService.getAll(pageable));
+    public String showCreationForm(@ModelAttribute Student student, Model model) {
+        model.addAttribute("groups", groupService.getAll());
         return "students/new";
     }
 
@@ -49,9 +49,9 @@ public class StudentController {
     }
 
     @GetMapping("/{id}/edit")
-    public String edit(@PathVariable int id, Model model, Pageable pageable) throws EntityNotFoundException {
+    public String edit(@PathVariable int id, Model model) throws EntityNotFoundException {
         model.addAttribute("student", studentService.getById(id));
-        model.addAttribute("groups", groupService.getAll(pageable));
+        model.addAttribute("groups", groupService.getAll());
         return "students/edit";
     }
 

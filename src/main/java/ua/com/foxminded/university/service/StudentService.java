@@ -4,8 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ua.com.foxminded.university.dao.AddressDao;
@@ -16,9 +14,6 @@ import ua.com.foxminded.university.exceptions.NotUniqueNameException;
 import ua.com.foxminded.university.model.Address;
 import ua.com.foxminded.university.model.Group;
 import ua.com.foxminded.university.model.Student;
-
-import java.util.Collections;
-import java.util.List;
 
 import static java.lang.String.format;
 
@@ -55,7 +50,7 @@ public class StudentService {
         logger.debug("Updating student with id = {}", updatedStudent.getId());
         verifyNameUniqueness(updatedStudent);
         verifyGroupAvailability(updatedStudent.getGroup());
-        verifyAddress(updatedStudent);
+        updateAddress(updatedStudent);
         studentDao.update(updatedStudent);
     }
 
@@ -86,14 +81,11 @@ public class StudentService {
         }
     }
 
-    private void verifyAddress(Student updatedStudent) throws EntityNotFoundException {
+    private void updateAddress(Student updatedStudent) throws EntityNotFoundException {
         Student student = getById(updatedStudent.getId());
         Address address = student.getAddress();
-        if (!address.equals(updatedStudent.getAddress())) {
-            addressDao.create(updatedStudent.getAddress());
-        } else {
-            updatedStudent.setAddress(address);
-        }
+        Address updatedAddress = updatedStudent.getAddress();
+        updatedAddress.setId(address.getId());
+        addressDao.update(updatedAddress);
     }
-
 }

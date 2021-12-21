@@ -35,8 +35,8 @@ public class TeacherController {
     }
 
     @GetMapping("/new")
-    public String showCreationForm(@ModelAttribute Teacher teacher, Model model, Pageable pageable) {
-        model.addAttribute("courses", courseService.getAll(pageable));
+    public String showCreationForm(@ModelAttribute Teacher teacher, Model model) {
+        model.addAttribute("courses", courseService.getAll());
         return "teachers/new";
     }
 
@@ -47,14 +47,14 @@ public class TeacherController {
     }
 
     @GetMapping("/{id}/edit")
-    public String edit(@PathVariable int id, Model model, Pageable pageable) throws EntityNotFoundException {
+    public String edit(@PathVariable int id, Model model) throws EntityNotFoundException {
         model.addAttribute("teacher", teacherService.getById(id));
-        model.addAttribute("courses", courseService.getAll(pageable));
+        model.addAttribute("courses", courseService.getAll());
         return "teachers/edit";
     }
 
     @PatchMapping("/{id}")
-    public String update(@ModelAttribute Teacher teacher) throws NotUniqueNameException {
+    public String update(@ModelAttribute Teacher teacher) throws NotUniqueNameException, EntityNotFoundException {
         teacherService.update(teacher);
         return "redirect:/teachers";
     }

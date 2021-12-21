@@ -93,7 +93,7 @@ public class TeacherServiceTest {
     }
 
     @Test
-    public void givenExistentTime_whenUpdate_thenUpdated() throws NotUniqueNameException {
+    public void givenExistentTime_whenUpdate_thenUpdated() throws NotUniqueNameException, EntityNotFoundException {
         Teacher teacher = teachers.get(0);
         when(teacherDao.getByName(teacher.getFirstName(), teacher.getLastName()))
             .thenReturn(Optional.of(teacher));

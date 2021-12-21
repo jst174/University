@@ -11,6 +11,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ua.com.foxminded.university.exceptions.EntityNotFoundException;
@@ -20,6 +21,7 @@ import ua.com.foxminded.university.service.ClassroomService;
 import java.util.Arrays;
 import java.util.List;
 
+import static net.bytebuddy.matcher.ElementMatchers.is;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -76,6 +78,7 @@ public class ClassroomControllerTest {
 
     @Test
     public void whenCreate_thenCreatedAndRedirectView() throws Exception {
+        classroomService.createClassroom(TestData.classroom1);
         mockMvc.perform(post("/classrooms"))
             .andExpect(status().is3xxRedirection())
             .andExpect(model().attributeExists("classroom"))
@@ -94,6 +97,7 @@ public class ClassroomControllerTest {
 
     @Test
     public void whenUpdate_thenUpdateAndRedirectView() throws Exception {
+        classroomService.update(TestData.classroom1);
         mockMvc.perform(patch("/classrooms/{id}", 1))
             .andExpect(status().is3xxRedirection())
             .andExpect(view().name("redirect:/classrooms"));
@@ -120,9 +124,13 @@ public class ClassroomControllerTest {
 
     interface TestData {
         Classroom classroom1 = new Classroom.Builder()
+            .setNumber(101)
+            .setCapacity(30)
             .setId(1)
             .build();
         Classroom classroom2 = new Classroom.Builder()
+            .setNumber(202)
+            .setCapacity(50)
             .setId(2)
             .build();
     }
