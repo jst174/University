@@ -11,14 +11,12 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
-import ua.com.foxminded.university.DataSource;
-import ua.com.foxminded.university.dao.TeacherDao;
 import ua.com.foxminded.university.dao.VacationDao;
 import ua.com.foxminded.university.exceptions.EntityNotFoundException;
 import ua.com.foxminded.university.exceptions.NotAvailablePeriodException;
 import ua.com.foxminded.university.exceptions.NotUniqueVacationDatesException;
 import ua.com.foxminded.university.model.AcademicDegree;
-import ua.com.foxminded.university.model.Classroom;
+import ua.com.foxminded.university.model.Gender;
 import ua.com.foxminded.university.model.Teacher;
 import ua.com.foxminded.university.model.Vacation;
 
@@ -35,14 +33,11 @@ public class VacationServiceTest {
     @Mock
     private VacationDao vacationDao;
     @Mock
-    private TeacherDao teacherDao;
+    private TeacherService teacherService;
     @InjectMocks
     private VacationService vacationService;
-    private List<Vacation> vacations;
-    private List<Teacher> teachers;
-    private DataSource dataSource;
-    private Teacher teacher;
     private Map<AcademicDegree, Integer> maxPeriodsVacation;
+    private List<Vacation> vacations;
 
 
     @BeforeEach
@@ -52,41 +47,17 @@ public class VacationServiceTest {
         maxPeriodsVacation.put(AcademicDegree.BACHELOR, 20);
         maxPeriodsVacation.put(AcademicDegree.MASTER, 25);
         maxPeriodsVacation.put(AcademicDegree.DOCTORAL, 30);
-
         ReflectionTestUtils.setField(vacationService, "maxPeriodsVacation", maxPeriodsVacation);
-        dataSource = new DataSource();
-        vacations = new ArrayList<>();
-        teacher = dataSource.generateTeacher();
-        teacher.setAcademicDegree(AcademicDegree.DOCTORAL);
-        teacher.setId(1);
-        Vacation vacation1 = new Vacation(
-            LocalDate.of(2021, 11, 5),
-            LocalDate.of(2021, 11, 10),
-            teacher);
-        vacation1.setId(1);
-        Vacation vacation2 = new Vacation(
-            LocalDate.of(2021, 5, 5),
-            LocalDate.of(2021, 5, 10),
-            teacher
-        );
-        vacation2.setId(2);
-        vacations.add(vacation1);
-        vacations.add(vacation2);
-
-        teachers = new ArrayList<>();
-        Teacher teacher2 = dataSource.generateTeacher();
-        teacher2.setAcademicDegree(AcademicDegree.MASTER);
-        teacher2.setId(2);
-        teachers.add(teacher);
-        teachers.add(teacher2);
+        vacations = new ArrayList<>(Arrays.asList(TestData.vacation1, TestData.vacation2));
     }
 
     @Test
-    public void givenNewVacation_whenCreate_thenCreated() throws NotAvailablePeriodException, NotUniqueVacationDatesException {
+    public void givenNewVacation_whenCreate_thenCreated() throws NotAvailablePeriodException, NotUniqueVacationDatesException, EntityNotFoundException {
         Vacation vacation = new Vacation(
             LocalDate.of(2021, 3, 1),
             LocalDate.of(2021, 3, 10),
-            teacher);
+            TestData.teacher1);
+        when(teacherService.getById(vacation.getTeacher().getId())).thenReturn(TestData.teacher1);
         when(vacationDao.getByTeacherAndVacationDates(vacation)).thenReturn(Optional.empty());
         when(vacationDao.getByTeacherId(vacation.getTeacher().getId())).thenReturn(vacations);
 
@@ -96,11 +67,12 @@ public class VacationServiceTest {
     }
 
     @Test
-    public void givenNewVacationWithNotAcceptablePeriod_whenCreate_thenNotAvailablePeriodExceptionThrow() {
+    public void givenNewVacationWithNotAcceptablePeriod_whenCreate_thenNotAvailablePeriodExceptionThrow() throws EntityNotFoundException {
         Vacation vacation = new Vacation(
             LocalDate.of(2021, 3, 1),
             LocalDate.of(2021, 4, 30),
-            teacher);
+            TestData.teacher1);
+        when(teacherService.getById(vacation.getTeacher().getId())).thenReturn(TestData.teacher1);
         when(vacationDao.getByTeacherAndVacationDates(vacation)).thenReturn(Optional.empty());
         when(vacationDao.getByTeacherId(vacation.getTeacher().getId())).thenReturn(vacations);
 
@@ -113,12 +85,12 @@ public class VacationServiceTest {
     }
 
     @Test
-    public void givenExistentVacation_whenCreate_thenNotUniqueVacationDatesExceptionThrow() {
+    public void givenExistentVacation_whenCreate_thenNotUniqueVacationDatesExceptionThrow() throws EntityNotFoundException {
         Vacation vacation = new Vacation();
-        vacation.setStart(vacations.get(0).getStart());
-        vacation.setEnd(vacations.get(0).getEnd());
-        vacation.setTeacher(vacations.get(0).getTeacher());
-        when(vacationDao.getByTeacherAndVacationDates(vacation)).thenReturn(Optional.of(vacations.get(0)));
+        vacation.setStart(TestData.vacation1.getStart());
+        vacation.setEnd(TestData.vacation1.getEnd());
+        vacation.setTeacher(TestData.vacation1.getTeacher());
+        when(vacationDao.getByTeacherAndVacationDates(vacation)).thenReturn(Optional.of(TestData.vacation1));
 
         Exception exception = assertThrows(NotUniqueVacationDatesException.class, () -> vacationService.create(vacation));
 
@@ -129,10 +101,9 @@ public class VacationServiceTest {
 
     @Test
     public void givenExistentId_whenGetById_thenReturn() throws EntityNotFoundException {
-        Vacation vacation = vacations.get(0);
-        when(vacationDao.getById(1)).thenReturn(Optional.of(vacation));
+        when(vacationDao.getById(1)).thenReturn(Optional.of(TestData.vacation1));
 
-        assertEquals(vacation, vacationService.getById(1));
+        assertEquals(TestData.vacation1, vacationService.getById(1));
     }
 
     @Test
@@ -146,44 +117,41 @@ public class VacationServiceTest {
     }
 
     @Test
-    public void givenExistentVacation_whenUpdate_thenUpdated() throws NotAvailablePeriodException, NotUniqueVacationDatesException {
-        Vacation vacation = vacations.get(0);
-        when(vacationDao.getByTeacherAndVacationDates(vacation)).thenReturn(Optional.of(vacation));
-        when(vacationDao.getByTeacherId(vacation.getTeacher().getId())).thenReturn(vacations);
+    public void givenExistentVacation_whenUpdate_thenUpdated() throws NotAvailablePeriodException, NotUniqueVacationDatesException, EntityNotFoundException {
+        when(vacationDao.getByTeacherAndVacationDates(TestData.vacation1)).thenReturn(Optional.of(TestData.vacation1));
+        when(vacationDao.getByTeacherId(TestData.vacation1.getTeacher().getId())).thenReturn(vacations);
+        when(teacherService.getById(TestData.vacation1.getTeacher().getId())).thenReturn(TestData.teacher1);
 
-        vacationService.update(vacation);
+        vacationService.update(TestData.vacation1);
 
-        verify(vacationDao).update(vacation);
+        verify(vacationDao).update(TestData.vacation1);
     }
 
     @Test
     public void givenVacationWithOtherVacationTeacherAndVacationDates_whenUpdate_thenNotUniqueVacationDatesExceptionThrow() {
-        Vacation vacation1 = vacations.get(0);
-        Vacation vacation2 = vacations.get(1);
-        vacation1.setTeacher(vacation2.getTeacher());
-        vacation1.setStart(vacation2.getStart());
-        vacation1.setEnd(vacation2.getEnd());
-        when(vacationDao.getByTeacherAndVacationDates(vacation1)).thenReturn(Optional.of(vacation2));
+        when(vacationDao.getByTeacherAndVacationDates(TestData.vacation2)).thenReturn(Optional.of(TestData.vacation1));
 
-        Exception exception = assertThrows(NotUniqueVacationDatesException.class, () -> vacationService.update(vacation1));
+        Exception exception = assertThrows(NotUniqueVacationDatesException.class, () -> vacationService.update(TestData.vacation2));
 
         String expectedMessage = "Teacher's vacation with start = 2021-05-05 and end = 2021-05-10 already exist";
-        verify(vacationDao, never()).update(vacation1);
+        verify(vacationDao, never()).update(TestData.vacation2);
         assertEquals(expectedMessage, exception.getMessage());
     }
 
     @Test
-    public void givenVacationWithNotAcceptablePeriod_whenUpdate_thenNotAvailablePeriodExceptionThrow() {
-        Vacation vacation = vacations.get(0);
+    public void givenVacationWithNotAcceptablePeriod_whenUpdate_thenNotAvailablePeriodExceptionThrow() throws EntityNotFoundException {
+        Vacation vacation = new Vacation();
         vacation.setStart(LocalDate.of(2021, 1, 1));
         vacation.setEnd(LocalDate.of(2021, 1, 26));
+        vacation.setTeacher(TestData.teacher1);
         when(vacationDao.getByTeacherAndVacationDates(vacation)).thenReturn(Optional.of(vacation));
         when(vacationDao.getByTeacherId(1)).thenReturn(vacations);
+        when(teacherService.getById(vacation.getTeacher().getId())).thenReturn(TestData.teacher1);
 
         Exception exception = assertThrows(NotAvailablePeriodException.class, () -> vacationService.update(vacation));
 
         String expectedMessage = "Vacation with period = 25 days not available. " +
-            "The sum of all vacations = 55 is longer than the maximum allowed = 30";
+            "The sum of all vacations = 35 is longer than the maximum allowed = 30";
         verify(vacationDao, never()).update(vacation);
         assertEquals(expectedMessage, exception.getMessage());
     }
@@ -210,5 +178,28 @@ public class VacationServiceTest {
         when(vacationDao.getAll(pageable)).thenReturn(vacationPage);
 
         assertEquals(vacationPage, vacationService.getAll(pageable));
+    }
+
+    interface TestData {
+        Teacher teacher1 = new Teacher.Builder()
+            .setFirstName("Mike")
+            .setLastName("Miller")
+            .setGender(Gender.MALE)
+            .setBirtDate(LocalDate.of(1994, 11, 12))
+            .setAcademicDegree(AcademicDegree.DOCTORAL)
+            .setId(1)
+            .build();
+        Vacation vacation1 = new Vacation.Builder()
+            .setStart(LocalDate.of(2021, 11, 5))
+            .setEnd(LocalDate.of(2021, 11, 10))
+            .setTeacher(teacher1)
+            .setId(1)
+            .build();
+        Vacation vacation2 = new Vacation.Builder()
+            .setStart(LocalDate.of(2021, 5, 5))
+            .setEnd(LocalDate.of(2021, 5, 10))
+            .setTeacher(teacher1)
+            .setId(2)
+            .build();
     }
 }

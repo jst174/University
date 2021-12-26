@@ -13,7 +13,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import ua.com.foxminded.university.DataSource;
 import ua.com.foxminded.university.dao.GroupDao;
 import ua.com.foxminded.university.dao.LessonDao;
 import ua.com.foxminded.university.exceptions.EntityNotFoundException;
@@ -24,6 +23,7 @@ import ua.com.foxminded.university.model.Lesson;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,32 +32,8 @@ public class GroupServiceTest {
 
     @Mock
     private GroupDao groupDao;
-    @Mock
-    private LessonDao lessonDao;
     @InjectMocks
     private GroupService groupService;
-    private List<Group> groups;
-    private List<Lesson> lessons;
-    private DataSource dataSource;
-
-    @BeforeEach
-    public void setUp() throws IOException {
-        groups = new ArrayList<>();
-        Group group1 = new Group("ND-12");
-        group1.setId(1);
-        Group group2 = new Group("FR-32");
-        group2.setId(2);
-        groups.add(group1);
-        groups.add(group2);
-        lessons = new ArrayList<>();
-        DataSource dataSource = new DataSource();
-        Lesson lesson1 = dataSource.generateLesson(LocalDate.of(2021, 12, 01), groups);
-        lesson1.setId(1);
-        Lesson lesson2 = dataSource.generateLesson(LocalDate.of(2021, 12, 04), dataSource.getGroups());
-        lesson2.setId(2);
-        lessons.add(lesson1);
-        lessons.add(lesson2);
-    }
 
     @Test
     public void givenNewGroup_whenCreate_thenCreated() throws NotUniqueNameException {
@@ -71,8 +47,8 @@ public class GroupServiceTest {
 
     @Test
     public void givenGroupWithExistentName_whenCreate_thenNotUniqueNameExceptionThrow() {
-        Group group = new Group(groups.get(0).getName());
-        when(groupDao.getByName(group.getName())).thenReturn(Optional.of(groups.get(0)));
+        Group group = new Group(TestData.group1.getName());
+        when(groupDao.getByName(group.getName())).thenReturn(Optional.of(TestData.group1));
 
         Exception exception = assertThrows(NotUniqueNameException.class, () -> groupService.create(group));
 
@@ -83,11 +59,9 @@ public class GroupServiceTest {
 
     @Test
     public void givenExistentGroupId_whenGetById_thenReturn() throws EntityNotFoundException {
-        Group group = groups.get(0);
+        when(groupDao.getById(1)).thenReturn(Optional.of(TestData.group1));
 
-        when(groupDao.getById(1)).thenReturn(Optional.of(group));
-
-        assertEquals(group, groupService.getById(1));
+        assertEquals(TestData.group1, groupService.getById(1));
     }
 
     @Test
@@ -102,25 +76,21 @@ public class GroupServiceTest {
 
     @Test
     public void givenExistentGroup_whenUpdate_thenUpdated() throws NotUniqueNameException {
-        Group group = groups.get(0);
-        when(groupDao.getByName(group.getName())).thenReturn(Optional.of(group));
+        when(groupDao.getByName(TestData.group1.getName())).thenReturn(Optional.of(TestData.group1));
 
-        groupService.update(group);
+        groupService.update(TestData.group1);
 
-        verify(groupDao).update(group);
+        verify(groupDao).update(TestData.group1);
     }
 
     @Test
     public void givenGroupWithOtherGroupName_whenUpdate_thenNotUniqueNameExceptionThrow() {
-        Group group1 = groups.get(0);
-        Group group2 = groups.get(1);
-        group1.setName(group2.getName());
-        when(groupDao.getByName(group1.getName())).thenReturn(Optional.of(group2));
+        when(groupDao.getByName(TestData.group2.getName())).thenReturn(Optional.of(TestData.group1));
 
-        Exception exception = assertThrows(NotUniqueNameException.class, () -> groupService.update(group1));
+        Exception exception = assertThrows(NotUniqueNameException.class, () -> groupService.update(TestData.group2));
 
         String expectedMessage = "Group with name = FR-32 already exist";
-        verify(groupDao, never()).update(group1);
+        verify(groupDao, never()).update(TestData.group2);
         assertEquals(expectedMessage, exception.getMessage());
     }
 
@@ -132,7 +102,8 @@ public class GroupServiceTest {
     }
 
     @Test
-    public void whenGetAll_thenReturn() {
+    public void givenPageable_whenGetAll_thenReturn() {
+        List<Group> groups = Arrays.asList(TestData.group1, TestData.group2);
         Pageable pageable = PageRequest.of(1, 10);
         Page<Group> groupPage = new PageImpl<Group>(groups, pageable, groups.size());
         when(groupDao.getAll(pageable)).thenReturn(groupPage);
@@ -141,10 +112,30 @@ public class GroupServiceTest {
     }
 
     @Test
+    public void whenGetAll_thenReturn() {
+        List<Group> groups = Arrays.asList(TestData.group1, TestData.group2);
+        when(groupDao.getAll()).thenReturn(groups);
+
+        assertEquals(groups, groupService.getAll());
+    }
+
+    @Test
     public void givenExistentLessonId_whenGetByLessonId_thenReturn() {
+        List<Group> groups = Arrays.asList(TestData.group1, TestData.group2);
         when(groupDao.getByLessonId(1)).thenReturn(groups);
 
         assertEquals(groups, groupService.getByLessonId(1));
+    }
+
+    interface TestData {
+        Group group1 = new Group.Builder()
+            .setName("ND-12")
+            .setId(1)
+            .build();
+        Group group2 = new Group.Builder()
+            .setName("FR-32")
+            .setId(2)
+            .build();
     }
 
 }

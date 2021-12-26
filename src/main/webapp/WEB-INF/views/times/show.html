@@ -10,7 +10,30 @@
           crossorigin="anonymous"></script>
 </head>
 <body>
-<p> Start: <span th:text="${time.getStartTime()}">value</span></p>
-<p> End: <span th:text="${time.getEndTime()}">value</span></p>
+<div class="row justify-content-center">
+  <div class="col-auto">
+    <table class="table table-responsive">
+      <tbody>
+      <tr>
+        <td>Start:</td>
+        <td th:text="${time.getStartTime()}"/>
+      </tr>
+      <tr>
+        <td>End:</td>
+        <td th:text="${time.getEndTime()}"/>
+      </tr>
+      </tbody>
+    </table>
+    <div class="btn-group" role="group">
+      <a th:href="@{/times}" class="btn btn-primary btn-sm" role="button"
+         aria-pressed="true">Back</a>
+      <a th:href="@{/times/{id}/edit(id=${time.getId()})}" class="btn btn-warning btn-sm" role="button"
+         aria-pressed="true">Edit</a>
+      <form th:method="DELETE" th:action="@{/times/{id}(id=${time.getId()})}">
+        <input type="submit" class="btn btn-danger btn-sm" value="Delete">
+      </form>
+    </div>
+  </div>
+</div>
 </body>
 </html>

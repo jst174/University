@@ -1,12 +1,18 @@
 package ua.com.foxminded.university.model;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import java.time.LocalTime;
 import java.util.Objects;
+
+import static org.springframework.format.annotation.DateTimeFormat.ISO.TIME;
 
 public class Time {
 
     private int id;
+    @DateTimeFormat(iso = TIME)
     private LocalTime startTime;
+    @DateTimeFormat(iso = TIME)
     private LocalTime endTime;
 
     public Time() {

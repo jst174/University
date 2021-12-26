@@ -60,6 +60,14 @@ public class Holiday {
         return Objects.hash(name, date);
     }
 
+    @Override
+    public String toString() {
+        return "Holiday{" +
+            "name='" + name + '\'' +
+            ", date=" + date +
+            '}';
+    }
+
     public static class Builder {
 
         private Holiday holiday;

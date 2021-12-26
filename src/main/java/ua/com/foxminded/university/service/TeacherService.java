@@ -26,11 +26,9 @@ public class TeacherService {
     private static final Logger logger = LoggerFactory.getLogger(TeacherService.class);
 
     private TeacherDao teacherDao;
-    private AddressDao addressDao;
 
-    public TeacherService(TeacherDao teacherDao, AddressDao addressDao) {
+    public TeacherService(TeacherDao teacherDao) {
         this.teacherDao = teacherDao;
-        this.addressDao = addressDao;
     }
 
     public void create(Teacher teacher) throws NotUniqueNameException {
@@ -48,7 +46,6 @@ public class TeacherService {
     public void update(Teacher updatedTeacher) throws NotUniqueNameException, EntityNotFoundException {
         logger.debug("Updating teacher with id = {}", updatedTeacher.getId());
         verifyNameUniqueness(updatedTeacher);
-        updateAddress(updatedTeacher);
         teacherDao.update(updatedTeacher);
     }
 
@@ -62,6 +59,11 @@ public class TeacherService {
         return teacherDao.getAll(pageable);
     }
 
+    public List<Teacher> getAll() {
+        logger.debug("Getting all teacher");
+        return teacherDao.getAll();
+    }
+
     private void verifyNameUniqueness(Teacher teacher) throws NotUniqueNameException {
         if (teacherDao.getByName(teacher.getFirstName(), teacher.getLastName())
             .filter(t -> t.getId() != teacher.getId())
@@ -69,13 +71,5 @@ public class TeacherService {
             throw new NotUniqueNameException(format("Teacher with name %s %s already exist",
                 teacher.getFirstName(), teacher.getLastName()));
         }
-    }
-
-    private void updateAddress(Teacher updatedTeacher) throws EntityNotFoundException {
-        Teacher teacher = getById(updatedTeacher.getId());
-        Address address = teacher.getAddress();
-        Address updatedAddress = updatedTeacher.getAddress();
-        updatedAddress.setId(address.getId());
-        addressDao.update(updatedAddress);
     }
 }

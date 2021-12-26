@@ -75,8 +75,8 @@ public class CourseControllerTest {
 
     @Test
     public void whenCreate_thenCreatedAndRedirectView() throws Exception {
-        courseService.create(TestData.course1);
-        mockMvc.perform(post("/courses"))
+        mockMvc.perform(post("/courses")
+                .param("name", "History"))
             .andExpect(status().is3xxRedirection())
             .andExpect(model().attributeExists("course"))
             .andExpect(view().name("redirect:/courses"));
@@ -94,8 +94,8 @@ public class CourseControllerTest {
 
     @Test
     public void whenUpdate_thenUpdateAndRedirectView() throws Exception {
-        courseService.update(TestData.course1);
-        mockMvc.perform(patch("/courses/{id}", 1))
+        mockMvc.perform(patch("/courses/{id}", 1)
+                .param("name", "History"))
             .andExpect(status().is3xxRedirection())
             .andExpect(view().name("redirect:/courses"));
         verify(courseService).update(TestData.course1);

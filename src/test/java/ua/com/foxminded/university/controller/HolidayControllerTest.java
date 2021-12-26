@@ -17,6 +17,7 @@ import ua.com.foxminded.university.exceptions.EntityNotFoundException;
 import ua.com.foxminded.university.model.Holiday;
 import ua.com.foxminded.university.service.HolidayService;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
@@ -77,7 +78,9 @@ public class HolidayControllerTest {
 
     @Test
     public void whenCreate_thenCreatedAndRedirectView() throws Exception {
-        mockMvc.perform(post("/holidays"))
+        mockMvc.perform(post("/holidays")
+                .param("name", "New Year")
+                .param("date", "2022-01-01"))
             .andExpect(status().is3xxRedirection())
             .andExpect(model().attributeExists("holiday"))
             .andExpect(view().name("redirect:/holidays"));
@@ -95,7 +98,9 @@ public class HolidayControllerTest {
 
     @Test
     public void whenUpdate_thenUpdateAndRedirectView() throws Exception {
-        mockMvc.perform(patch("/holidays/{id}", 1))
+        mockMvc.perform(patch("/holidays/{id}", 1)
+                .param("name","New Year")
+                .param("date","2022-01-01"))
             .andExpect(status().is3xxRedirection())
             .andExpect(view().name("redirect:/holidays"));
         verify(holidayService).update(TestData.holiday1);
@@ -121,9 +126,13 @@ public class HolidayControllerTest {
 
     interface TestData {
         Holiday holiday1 = new Holiday.Builder()
+            .setName("New Year")
+            .setDate(LocalDate.of(2022, 1, 1))
             .setId(1)
             .build();
         Holiday holiday2 = new Holiday.Builder()
+            .setName("Christmas")
+            .setDate(LocalDate.of(2022, 1, 7))
             .setId(2)
             .build();
     }

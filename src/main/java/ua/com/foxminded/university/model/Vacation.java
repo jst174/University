@@ -1,13 +1,19 @@
 package ua.com.foxminded.university.model;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Objects;
 
+import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE;
+
 public class Vacation {
 
     private int id;
+    @DateTimeFormat(iso = DATE)
     private LocalDate start;
+    @DateTimeFormat(iso = DATE)
     private LocalDate end;
     private Teacher teacher;
 
@@ -100,6 +106,15 @@ public class Vacation {
         public Builder setTeacher(Teacher teacher) {
             vacation.setTeacher(teacher);
             return this;
+        }
+
+        public Builder clone(Vacation vacation) {
+            Builder builder = new Builder();
+            builder.setId(vacation.getId());
+            builder.setStart(vacation.getStart());
+            builder.setEnd(vacation.getEnd());
+            builder.setTeacher(vacation.getTeacher());
+            return builder;
         }
 
         public Vacation build() {

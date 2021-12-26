@@ -14,6 +14,7 @@ import ua.com.foxminded.university.dao.AddressDao;
 import ua.com.foxminded.university.dao.CourseDao;
 import ua.com.foxminded.university.dao.TeacherDao;
 import ua.com.foxminded.university.dao.mapper.TeacherMapper;
+import ua.com.foxminded.university.exceptions.EntityNotFoundException;
 import ua.com.foxminded.university.model.Address;
 import ua.com.foxminded.university.model.Course;
 import ua.com.foxminded.university.model.Teacher;
@@ -83,20 +84,21 @@ public class JdbcTeacherDao implements TeacherDao {
     }
 
     @Transactional
-    public void update(Teacher teacher) {
+    public void update(Teacher updatedTeacher) {
+        updateAddress(updatedTeacher);
         jdbcTemplate.update(SQL_UPDATE_TEACHER,
-            teacher.getFirstName(),
-            teacher.getLastName(),
-            teacher.getBirthDate(),
-            teacher.getGender().toString(),
-            teacher.getAddress().getId(),
-            teacher.getPhoneNumber(),
-            teacher.getEmail(),
-            teacher.getAcademicDegree().toString(),
-            teacher.getId());
-        List<Course> savedCourses = courseDao.getByTeacherId(teacher.getId());
-        deleteCourses(teacher, savedCourses);
-        setCourses(teacher, savedCourses);
+            updatedTeacher.getFirstName(),
+            updatedTeacher.getLastName(),
+            updatedTeacher.getBirthDate(),
+            updatedTeacher.getGender().toString(),
+            updatedTeacher.getAddress().getId(),
+            updatedTeacher.getPhoneNumber(),
+            updatedTeacher.getEmail(),
+            updatedTeacher.getAcademicDegree().toString(),
+            updatedTeacher.getId());
+        List<Course> savedCourses = courseDao.getByTeacherId(updatedTeacher.getId());
+        deleteCourses(updatedTeacher, savedCourses);
+        setCourses(updatedTeacher, savedCourses);
     }
 
     public void delete(int id) {
@@ -136,5 +138,15 @@ public class JdbcTeacherDao implements TeacherDao {
         savedCourses.stream().
             filter(course -> !teacher.getCourses().contains(course))
             .forEach(course -> jdbcTemplate.update(SQL_DELETE_COURSE, teacher.getId(), course.getId()));
+    }
+
+    private void updateAddress(Teacher updatedTeacher) {
+        Teacher teacher = jdbcTemplate.queryForObject(SQL_FIND_TEACHER, teacherMapper, updatedTeacher.getId());
+        if (teacher != null) {
+            Address address = teacher.getAddress();
+            Address updatedAddress = updatedTeacher.getAddress();
+            updatedAddress.setId(address.getId());
+            addressDao.update(updatedAddress);
+        }
     }
 }

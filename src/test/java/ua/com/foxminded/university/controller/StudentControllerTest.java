@@ -14,11 +14,13 @@ import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ua.com.foxminded.university.exceptions.EntityNotFoundException;
+import ua.com.foxminded.university.model.Gender;
 import ua.com.foxminded.university.model.Group;
 import ua.com.foxminded.university.model.Student;
 import ua.com.foxminded.university.service.GroupService;
 import ua.com.foxminded.university.service.StudentService;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
@@ -81,7 +83,11 @@ public class StudentControllerTest {
 
     @Test
     public void whenCreate_thenCreatedAndRedirectView() throws Exception {
-        mockMvc.perform(post("/students"))
+        mockMvc.perform(post("/students")
+                .param("firstName", "Mike")
+                .param("lastName", "Miller")
+                .param("gender", "MALE")
+                .param("birthDate", "1994-11-12"))
             .andExpect(status().is3xxRedirection())
             .andExpect(model().attributeExists("student"))
             .andExpect(view().name("redirect:/students"));
@@ -99,7 +105,11 @@ public class StudentControllerTest {
 
     @Test
     public void whenUpdate_thenUpdateAndRedirectView() throws Exception {
-        mockMvc.perform(patch("/students/{id}", 1))
+        mockMvc.perform(patch("/students/{id}", 1)
+                .param("firstName", "Mike")
+                .param("lastName", "Miller")
+                .param("gender", "MALE")
+                .param("birthDate", "1994-11-12"))
             .andExpect(status().is3xxRedirection())
             .andExpect(view().name("redirect:/students"));
         verify(studentService).update(TestData.student1);
@@ -125,9 +135,17 @@ public class StudentControllerTest {
 
     interface TestData {
         Student student1 = new Student.Builder()
+            .setFirstName("Mike")
+            .setLastName("Miller")
+            .setGender(Gender.MALE)
+            .setBirtDate(LocalDate.of(1994, 11, 12))
             .setId(1)
             .build();
         Student student2 = new Student.Builder()
+            .setFirstName("Tom")
+            .setLastName("Price")
+            .setGender(Gender.MALE)
+            .setBirtDate(LocalDate.of(1995, 10, 11))
             .setId(2)
             .build();
     }

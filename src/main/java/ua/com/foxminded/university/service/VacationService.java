@@ -8,11 +8,13 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import ua.com.foxminded.university.dao.TeacherDao;
 import ua.com.foxminded.university.dao.VacationDao;
 import ua.com.foxminded.university.exceptions.EntityNotFoundException;
 import ua.com.foxminded.university.exceptions.NotAvailablePeriodException;
 import ua.com.foxminded.university.exceptions.NotUniqueVacationDatesException;
 import ua.com.foxminded.university.model.AcademicDegree;
+import ua.com.foxminded.university.model.Teacher;
 import ua.com.foxminded.university.model.Vacation;
 
 import java.util.Collections;
@@ -28,14 +30,16 @@ public class VacationService {
     private static final Logger logger = LoggerFactory.getLogger(VacationService.class);
 
     private VacationDao vacationDao;
+    private TeacherService teacherService;
     @Value("#{${maxPeriodsVacation}}")
     private Map<AcademicDegree, Integer> maxPeriodsVacation;
 
-    public VacationService(VacationDao vacationDao) {
+    public VacationService(VacationDao vacationDao, TeacherService teacherService) {
         this.vacationDao = vacationDao;
+        this.teacherService = teacherService;
     }
 
-    public void create(Vacation vacation) throws NotUniqueVacationDatesException, NotAvailablePeriodException {
+    public void create(Vacation vacation) throws NotUniqueVacationDatesException, NotAvailablePeriodException, EntityNotFoundException {
         logger.debug("Creating vacation where start = {} and end = {}", vacation.getStart(), vacation.getEnd());
         verifyUniqueness(vacation);
         verifyPeriodAvailability(vacation);
@@ -48,7 +52,7 @@ public class VacationService {
             new EntityNotFoundException(format("Vacation with id = %s not not found", id)));
     }
 
-    public void update(Vacation vacation) throws NotUniqueVacationDatesException, NotAvailablePeriodException {
+    public void update(Vacation vacation) throws NotUniqueVacationDatesException, NotAvailablePeriodException, EntityNotFoundException {
         logger.debug("Updating vacation with id = {}", vacation.getId());
         verifyUniqueness(vacation);
         verifyPeriodAvailability(vacation);
@@ -79,10 +83,11 @@ public class VacationService {
         }
     }
 
-    private void verifyPeriodAvailability(Vacation vacation) throws NotAvailablePeriodException {
+    private void verifyPeriodAvailability(Vacation vacation) throws NotAvailablePeriodException, EntityNotFoundException {
         List<Vacation> vacations = vacationDao.getByTeacherId(vacation.getTeacher().getId());
         vacations.add(vacation);
-        int maxVacationPeriod = maxPeriodsVacation.get(vacation.getTeacher().getAcademicDegree());
+        Teacher teacher = teacherService.getById(vacation.getTeacher().getId());
+        int maxVacationPeriod = maxPeriodsVacation.get(teacher.getAcademicDegree());
         int sumVacations = vacations.stream()
             .mapToInt(v -> (int) DAYS.between(v.getStart(), v.getEnd()))
             .sum();

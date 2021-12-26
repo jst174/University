@@ -23,13 +23,11 @@ public class StudentService {
     private static final Logger logger = LoggerFactory.getLogger(StudentService.class);
 
     private StudentDao studentDao;
-    private AddressDao addressDao;
     @Value("${max.group.size}")
     private int maxGroupSize;
 
-    public StudentService(StudentDao studentDao, AddressDao addressDao) {
+    public StudentService(StudentDao studentDao) {
         this.studentDao = studentDao;
-        this.addressDao = addressDao;
     }
 
     public void create(Student student) throws NotUniqueNameException, NotAvailableGroupException {
@@ -50,7 +48,6 @@ public class StudentService {
         logger.debug("Updating student with id = {}", updatedStudent.getId());
         verifyNameUniqueness(updatedStudent);
         verifyGroupAvailability(updatedStudent.getGroup());
-        updateAddress(updatedStudent);
         studentDao.update(updatedStudent);
     }
 
@@ -79,13 +76,5 @@ public class StudentService {
             throw new NotAvailableGroupException(format("Group with name %s not available. " +
                 "Max group size = %s has already been reached", group.getName(), groupSize));
         }
-    }
-
-    private void updateAddress(Student updatedStudent) throws EntityNotFoundException {
-        Student student = getById(updatedStudent.getId());
-        Address address = student.getAddress();
-        Address updatedAddress = updatedStudent.getAddress();
-        updatedAddress.setId(address.getId());
-        addressDao.update(updatedAddress);
     }
 }

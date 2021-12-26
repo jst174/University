@@ -11,17 +11,18 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
-import ua.com.foxminded.university.DataSource;
 import ua.com.foxminded.university.dao.StudentDao;
 import ua.com.foxminded.university.exceptions.EntityNotFoundException;
 import ua.com.foxminded.university.exceptions.NotAvailableGroupException;
 import ua.com.foxminded.university.exceptions.NotUniqueNameException;
-import ua.com.foxminded.university.model.Classroom;
+import ua.com.foxminded.university.model.Gender;
 import ua.com.foxminded.university.model.Group;
 import ua.com.foxminded.university.model.Student;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,47 +40,31 @@ public class StudentServiceTest {
     @InjectMocks
     private StudentService studentService;
     private List<Student> students;
-    private DataSource dataSource;
-    private Group group;
-
 
     @BeforeEach
     public void setUp() throws IOException {
         ReflectionTestUtils.setField(studentService, "maxGroupSize", maxGroupSize);
-        students = new ArrayList<>();
-        dataSource = new DataSource();
-        group = new Group("NG-12");
-        group.setId(1);
-        Student student1 = dataSource.generateStudent();
-        student1.setId(1);
-        student1.setGroup(group);
-        Student student2 = dataSource.generateStudent();
-        student2.setId(2);
-        student2.setGroup(group);
-        students.add(student1);
-        students.add(student2);
+        students = Arrays.asList(TestData.student1, TestData.student2);
     }
 
     @Test
-    public void givenNewStudent_whenCreate_thenCreated() throws IOException, NotAvailableGroupException, NotUniqueNameException {
-        Student student = dataSource.generateStudent();
-        student.setGroup(group);
+    public void givenNewStudent_whenCreate_thenCreated() throws NotAvailableGroupException, NotUniqueNameException {
         when(studentDao.getByGroupId(1)).thenReturn(students);
-        when(studentDao.getByName(student.getFirstName(), student.getLastName())).thenReturn(Optional.empty());
+        when(studentDao.getByName(TestData.student1.getFirstName(), TestData.student1.getLastName())).thenReturn(Optional.empty());
 
-        studentService.create(student);
+        studentService.create(TestData.student1);
 
-        verify(studentDao).create(student);
+        verify(studentDao).create(TestData.student1);
     }
 
     @Test
     public void givenExistentStudent_whenCreate_thenNotUniqueNameExceptionThrow() {
         Student student = new Student();
-        student.setFirstName(students.get(0).getFirstName());
-        student.setLastName(students.get(0).getLastName());
-        when(studentDao.getByName(student.getFirstName(), student.getLastName())).thenReturn(Optional.of(student));
+        student.setFirstName(TestData.student1.getFirstName());
+        student.setLastName(TestData.student1.getLastName());
+        when(studentDao.getByName(student.getFirstName(), student.getLastName())).thenReturn(Optional.of(TestData.student1));
 
-        Exception exception = assertThrows(NotUniqueNameException.class, () -> studentService.create(students.get(0)));
+        Exception exception = assertThrows(NotUniqueNameException.class, () -> studentService.create(student));
 
         String expectedMessage = format("Student with name %s %s already exist",
             student.getFirstName(), student.getLastName());
@@ -88,26 +73,22 @@ public class StudentServiceTest {
     }
 
     @Test
-    public void givenNotAvailableGroup_whenCreate_thenNotAvailableGroupExceptionThrow() throws IOException {
-        Student student = dataSource.generateStudent();
-        student.setGroup(group);
-        when(studentDao.getByName(student.getFirstName(), student.getLastName())).thenReturn(Optional.empty());
+    public void givenNotAvailableGroup_whenCreate_thenNotAvailableGroupExceptionThrow() {
+        when(studentDao.getByName(TestData.student1.getFirstName(), TestData.student1.getLastName())).thenReturn(Optional.empty());
         when(studentDao.getByGroupId(1)).thenReturn(generateStudents());
 
-        Exception exception = assertThrows(NotAvailableGroupException.class, () -> studentService.create(student));
+        Exception exception = assertThrows(NotAvailableGroupException.class, () -> studentService.create(TestData.student1));
 
         String expectedMessage = "Group with name NG-12 not available. Max group size = 30 has already been reached";
-        verify(studentDao, never()).create(student);
+        verify(studentDao, never()).create(TestData.student1);
         assertEquals(expectedMessage, exception.getMessage());
     }
 
     @Test
     public void givenExistentStudentId_whenGetById_thenReturn() throws EntityNotFoundException {
-        Student student = students.get(0);
+        when(studentDao.getById(1)).thenReturn(Optional.of(TestData.student1));
 
-        when(studentDao.getById(1)).thenReturn(Optional.of(student));
-
-        assertEquals(student, studentService.getById(1));
+        assertEquals(TestData.student1, studentService.getById(1));
     }
 
     @Test
@@ -122,41 +103,35 @@ public class StudentServiceTest {
 
     @Test
     public void givenExistentStudent_whenUpdate_thenUpdated() throws NotAvailableGroupException, NotUniqueNameException, EntityNotFoundException {
-        Student student = students.get(0);
-        when(studentDao.getByName(student.getFirstName(), student.getLastName())).thenReturn(Optional.of(student));
+        when(studentDao.getByName(TestData.student1.getFirstName(), TestData.student1.getLastName())).thenReturn(Optional.of(TestData.student1));
         when(studentDao.getByGroupId(1)).thenReturn(students);
 
-        studentService.update(student);
+        studentService.update(TestData.student1);
 
-        verify(studentDao).update(student);
+        verify(studentDao).update(TestData.student1);
     }
 
     @Test
     public void givenStudentWithOtherStudentName_whenUpdate_thenNotUniqueNameExceptionThrow() {
-        Student student1 = students.get(0);
-        Student student2 = students.get(1);
-        student1.setFirstName(student2.getFirstName());
-        student1.setLastName(student2.getLastName());
-        when(studentDao.getByName(student1.getFirstName(), student1.getLastName())).thenReturn(Optional.of(student2));
+        when(studentDao.getByName(TestData.student2.getFirstName(), TestData.student2.getLastName())).thenReturn(Optional.of(TestData.student1));
 
-        Exception exception = assertThrows(NotUniqueNameException.class, () -> studentService.update(student1));
+        Exception exception = assertThrows(NotUniqueNameException.class, () -> studentService.update(TestData.student2));
 
         String expectedMessage = format("Student with name %s %s already exist",
-            student1.getFirstName(), student1.getLastName());
-        verify(studentDao, never()).update(student1);
+            TestData.student2.getFirstName(), TestData.student2.getLastName());
+        verify(studentDao, never()).update(TestData.student2);
         assertEquals(expectedMessage, exception.getMessage());
     }
 
     @Test
-    public void givenNotAvailableGroup_whenUpdate_thenNotAvailableGroupExceptionThrow() throws IOException {
-        Student student = students.get(0);
-        when(studentDao.getByName(student.getFirstName(), student.getLastName())).thenReturn(Optional.of(student));
+    public void givenNotAvailableGroup_whenUpdate_thenNotAvailableGroupExceptionThrow() {
+        when(studentDao.getByName(TestData.student1.getFirstName(), TestData.student1.getLastName())).thenReturn(Optional.of(TestData.student1));
         when(studentDao.getByGroupId(1)).thenReturn(generateStudents());
 
-        Exception exception = assertThrows(NotAvailableGroupException.class, () -> studentService.update(student));
+        Exception exception = assertThrows(NotAvailableGroupException.class, () -> studentService.update(TestData.student1));
 
         String expectedMessage = "Group with name NG-12 not available. Max group size = 30 has already been reached";
-        verify(studentDao, never()).update(student);
+        verify(studentDao, never()).update(TestData.student1);
         assertEquals(expectedMessage, exception.getMessage());
     }
 
@@ -177,11 +152,34 @@ public class StudentServiceTest {
         assertEquals(studentPage, studentService.getAll(pageable));
     }
 
-    private List<Student> generateStudents() throws IOException {
+    private List<Student> generateStudents() {
         List<Student> students = new ArrayList<>();
         for (int i = 0; i < maxGroupSize; i++) {
-            students.add(dataSource.generateStudent());
+            students.add(TestData.student1);
         }
         return students;
+    }
+
+    interface TestData {
+        Group group1 = new Group.Builder()
+            .setName("NG-12")
+            .setId(1)
+            .build();
+        Student student1 = new Student.Builder()
+            .setFirstName("Mike")
+            .setLastName("Miller")
+            .setGender(Gender.MALE)
+            .setBirtDate(LocalDate.of(1994, 11, 12))
+            .setGroup(group1)
+            .setId(1)
+            .build();
+        Student student2 = new Student.Builder()
+            .setFirstName("Tom")
+            .setLastName("Price")
+            .setGender(Gender.MALE)
+            .setBirtDate(LocalDate.of(1995, 10, 11))
+            .setGroup(group1)
+            .setId(2)
+            .build();
     }
 }

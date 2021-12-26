@@ -14,14 +14,19 @@ import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ua.com.foxminded.university.exceptions.EntityNotFoundException;
+import ua.com.foxminded.university.model.Gender;
 import ua.com.foxminded.university.model.Teacher;
+import ua.com.foxminded.university.service.CourseService;
 import ua.com.foxminded.university.service.TeacherService;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 
@@ -31,6 +36,8 @@ public class TeacherControllerTest {
     private MockMvc mockMvc;
     @Mock
     private TeacherService teacherService;
+    @Mock
+    private CourseService courseService;
     @InjectMocks
     private TeacherController teacherController;
 
@@ -67,6 +74,56 @@ public class TeacherControllerTest {
     }
 
     @Test
+    public void whenShowCreatingFrom_thenShowCreatingForm() throws Exception {
+        mockMvc.perform(get("/teachers/new"))
+            .andExpect(status().isOk())
+            .andExpect(model().attributeExists("teacher"))
+            .andExpect(view().name("teachers/new"));
+    }
+
+    @Test
+    public void whenCreate_thenCreatedAndRedirectView() throws Exception {
+        mockMvc.perform(post("/teachers")
+                .param("firstName", "Mike")
+                .param("lastName", "Miller")
+                .param("gender", "MALE")
+                .param("birthDate", "1994-11-12"))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(model().attributeExists("teacher"))
+            .andExpect(view().name("redirect:/teachers"));
+        verify(teacherService).create(TestData.teacher1);
+    }
+
+    @Test
+    public void whenEdit_thenShowEditingForm() throws Exception {
+        when(teacherService.getById(1)).thenReturn(TestData.teacher1);
+        mockMvc.perform(get("/teachers/{id}/edit", 1))
+            .andExpect(status().isOk())
+            .andExpect(view().name("teachers/edit"))
+            .andExpect(model().attribute("teacher", TestData.teacher1));
+    }
+
+    @Test
+    public void whenUpdate_thenUpdateAndRedirectView() throws Exception {
+        mockMvc.perform(patch("/teachers/{id}", 1)
+                .param("firstName", "Mike")
+                .param("lastName", "Miller")
+                .param("gender", "MALE")
+                .param("birthDate", "1994-11-12"))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(view().name("redirect:/teachers"));
+        verify(teacherService).update(TestData.teacher1);
+    }
+
+    @Test
+    public void whenDelete_thenDeleteClassroomAndRedirectView() throws Exception {
+        mockMvc.perform(delete("/teachers/{id}", 1))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(view().name("redirect:/teachers"));
+        verify(teacherService).delete(1);
+    }
+
+    @Test
     public void givenIncorrectGetRequest_whenGetById_thenShowExceptionView() throws Exception {
         String message = "Teacher with id = 1 not found";
         when(teacherService.getById(1)).thenThrow(new EntityNotFoundException(message));
@@ -78,10 +135,18 @@ public class TeacherControllerTest {
 
     interface TestData {
         Teacher teacher1 = new Teacher.Builder()
+            .setFirstName("Mike")
+            .setLastName("Miller")
+            .setGender(Gender.MALE)
+            .setBirtDate(LocalDate.of(1994, 11, 12))
             .setId(1)
             .build();
         Teacher teacher2 = new Teacher.Builder()
-            .setId(1)
+            .setFirstName("Tom")
+            .setLastName("Price")
+            .setGender(Gender.MALE)
+            .setBirtDate(LocalDate.of(1995, 10, 11))
+            .setId(2)
             .build();
     }
 }
