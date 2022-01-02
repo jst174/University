@@ -15,6 +15,8 @@ import ua.com.foxminded.university.model.Address;
 import ua.com.foxminded.university.model.Group;
 import ua.com.foxminded.university.model.Student;
 
+import java.util.List;
+
 import static java.lang.String.format;
 
 @Service
@@ -59,6 +61,11 @@ public class StudentService {
     public Page<Student> getAll(Pageable pageable) {
         logger.debug("Getting all students");
         return studentDao.getAll(pageable);
+    }
+
+    public List<Student> getByGroupId(int groupId) {
+        logger.debug("Getting students with group id = {}", groupId);
+        return studentDao.getByGroupId(groupId);
     }
 
     private void verifyNameUniqueness(Student student) throws NotUniqueNameException {

@@ -7,12 +7,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ua.com.foxminded.university.dao.*;
 import ua.com.foxminded.university.exceptions.*;
-import ua.com.foxminded.university.model.Group;
-import ua.com.foxminded.university.model.Lesson;
+import ua.com.foxminded.university.model.*;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 
@@ -22,25 +23,19 @@ public class LessonService {
     private static final Logger logger = LoggerFactory.getLogger(LessonService.class);
 
     private LessonDao lessonDao;
-    private TeacherDao teacherDao;
     private VacationDao vacationDao;
     private CourseDao courseDao;
     private HolidayDao holidayDao;
-    private GroupDao groupDao;
 
     public LessonService(
         LessonDao lessonDao,
-        TeacherDao teacherDao,
         VacationDao vacationDao,
         CourseDao courseDao,
-        HolidayDao holidayDao,
-        GroupDao groupDao) {
+        HolidayDao holidayDao) {
         this.lessonDao = lessonDao;
-        this.teacherDao = teacherDao;
         this.vacationDao = vacationDao;
         this.courseDao = courseDao;
         this.holidayDao = holidayDao;
-        this.groupDao = groupDao;
     }
 
     public void create(Lesson lesson) throws NotAvailableTeacherException, NotAvailableGroupException, NotAvailableClassroomException, NotAvailableDayException {
@@ -90,9 +85,12 @@ public class LessonService {
     }
 
     private void verifyTeacherMatchWithCourse(Lesson lesson) throws NotAvailableTeacherException {
-        if (!lesson.getTeacher().getCourses().contains(lesson.getCourse())) {
+        Teacher teacher = lesson.getTeacher();
+        List<Course> teacherCourses = courseDao.getByTeacherId(teacher.getId());
+        teacher.setCourses(teacherCourses);
+        if (!teacher.getCourses().contains(lesson.getCourse())) {
             throw new NotAvailableTeacherException(format("Teacher %s %s cannot teach %s",
-                lesson.getTeacher().getFirstName(), lesson.getTeacher().getLastName(),
+                teacher.getFirstName(), teacher.getLastName(),
                 lesson.getCourse().getName()));
         }
     }
@@ -129,9 +127,8 @@ public class LessonService {
     }
 
     private void verifyClassroomCapacity(Lesson lesson) throws NotAvailableClassroomException {
-        List<Group> groups = lesson.getGroups();
         int classroomCapacity = lesson.getClassroom().getCapacity();
-        int numberOfStudents = groups.stream().mapToInt(group -> group.getStudents().size()).reduce(Integer::sum).orElse(0);
+        int numberOfStudents = lesson.getGroups().stream().mapToInt(group -> group.getStudents().size()).reduce(Integer::sum).orElse(0);
         if (numberOfStudents > classroomCapacity) {
             throw new NotAvailableClassroomException(format("Classroom %s is not available. " +
                     "Classroom capacity = %s is less than the number of students = %s",
@@ -142,7 +139,8 @@ public class LessonService {
     private void verifyGroupBusyness(Lesson newLesson) throws NotAvailableGroupException {
         if (lessonDao.getByDateAndTime(newLesson.getDate(), newLesson.getTime())
             .stream().filter(l -> l.getId() != newLesson.getId())
-            .noneMatch(l -> l.getGroups().retainAll(newLesson.getGroups()))) {
+            .map(Lesson::getGroups)
+            .anyMatch(groups1 -> groups1.stream().anyMatch(newLesson.getGroups()::contains))) {
             throw new NotAvailableGroupException("One of the groups already has a lesson at this time");
         }
     }

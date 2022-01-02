@@ -35,6 +35,8 @@ public class LessonServiceTest {
     private VacationDao vacationDao;
     @Mock
     private HolidayDao holidayDao;
+    @Mock
+    private CourseDao courseDao;
     @InjectMocks
     private LessonService lessonService;
     private List<Lesson> lessons;
@@ -215,6 +217,7 @@ public class LessonServiceTest {
             .thenReturn(Optional.empty());
         when(lessonDao.getByDateAndTime(lesson.getDate(), lesson.getTime()))
             .thenReturn(lessons);
+        when(courseDao.getByTeacherId(lesson.getTeacher().getId())).thenReturn(TestData.teacher1.getCourses());
 
         Exception exception = assertThrows(NotAvailableGroupException.class, () -> lessonService.create(lesson));
 
@@ -474,7 +477,7 @@ public class LessonServiceTest {
             .setLastName("Miller")
             .setGender(Gender.MALE)
             .setBirtDate(LocalDate.of(1994, 11, 12))
-            .setCourses(Arrays.asList(course1, course2))
+            .setCourses(new ArrayList<>(Arrays.asList(course1, course2)))
             .setId(1)
             .build();
         Teacher teacher2 = new Teacher.Builder()

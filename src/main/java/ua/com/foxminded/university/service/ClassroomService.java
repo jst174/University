@@ -11,6 +11,8 @@ import ua.com.foxminded.university.model.Classroom;
 
 import org.slf4j.Logger;
 
+import java.util.List;
+
 import static java.lang.String.format;
 
 @Service
@@ -50,6 +52,11 @@ public class ClassroomService {
     public Page<Classroom> getAll(Pageable pageable) {
         logger.debug("Getting all classrooms");
         return classroomDao.getAll(pageable);
+    }
+
+    public List<Classroom> getAll() {
+        logger.debug("Getting all classrooms");
+        return classroomDao.getAll();
     }
 
     private void verifyNameUniqueness(Classroom classroom) throws NotUniqueNameException {

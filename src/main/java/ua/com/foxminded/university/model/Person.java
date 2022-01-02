@@ -5,11 +5,13 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDate;
 import java.util.Objects;
 
+import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE;
+
 public abstract class Person {
 
     private String firstName;
     private String lastName;
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @DateTimeFormat(iso = DATE)
     private LocalDate birthDate;
     private Gender gender;
     private Address address;

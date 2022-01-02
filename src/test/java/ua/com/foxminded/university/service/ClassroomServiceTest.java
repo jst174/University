@@ -116,13 +116,20 @@ public class ClassroomServiceTest {
     }
 
     @Test
-    public void whenGetAll_thenReturn() {
+    public void givenPageable_whenGetAll_thenReturn() {
         Pageable pageable = PageRequest.of(1, 10);
         Page<Classroom> classroomPage =
             new PageImpl<Classroom>(classrooms, pageable, classrooms.size());
         when(classroomDao.getAll(pageable)).thenReturn(classroomPage);
 
         assertEquals(classroomPage, classroomService.getAll(pageable));
+    }
+
+    @Test
+    public void whenGetAll_thenReturn() {
+        when(classroomDao.getAll()).thenReturn(classrooms);
+
+        assertEquals(classrooms, classroomService.getAll());
     }
 
 }

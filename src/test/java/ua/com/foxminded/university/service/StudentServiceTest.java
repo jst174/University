@@ -152,6 +152,13 @@ public class StudentServiceTest {
         assertEquals(studentPage, studentService.getAll(pageable));
     }
 
+    @Test
+    public void givenGroupId_whenGetByGroupId_thenReturn() {
+        when(studentDao.getByGroupId(1)).thenReturn(students);
+
+        assertEquals(students, studentService.getByGroupId(1));
+    }
+
     private List<Student> generateStudents() {
         List<Student> students = new ArrayList<>();
         for (int i = 0; i < maxGroupSize; i++) {

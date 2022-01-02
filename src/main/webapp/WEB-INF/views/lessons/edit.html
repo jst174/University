@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Creating new lesson</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+          integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+          crossorigin="anonymous"></script>
+</head>
+<body>
+<div class="container h-100">
+  <div class="row h-100 justify-content-center align-items-center">
+    <form th:method="PATCH" th:action="@{/lessons/{id}(id=${lesson.getId()})}" th:object="${lesson}"
+          class="col-3">
+      <div class="form-group">
+        <label for="date" class="form-label">Date:</label>
+        <input type="date" class="form-control" th:field="*{date}" id="date">
+      </div>
+      <div class="form-group">
+        <label for="time">Time:</label>
+        <select class="form-select" id="time" th:field="*{time.id}">
+          <option th:each="time:${times}" th:value="${time.id}" th:text="${time.startTime} + '-' + ${time.endTime}"></option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="classroom">Classroom:</label>
+        <select class="form-select" id="classroom"  th:field="*{classroom.id}">
+          <option th:each="classroom:${classrooms}" th:value="${classroom.id}" th:text="${classroom.number}"></option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="course">Course:</label>
+        <select class="form-select" id="course" th:field="*{course.id}">
+          <option th:each="course:${courses}" th:value="${course.id}" th:text="${course.name}"></option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="teacher">Teacher:</label>
+        <select class="form-select" id="teacher" th:field="*{teacher.id}">
+          <option th:each="teacher:${teachers}" th:value="${teacher.id}" th:text="${teacher.firstName} + ' ' +
+          ${teacher.lastName}"></option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="groups">Groups:</label>
+        <select class="form-control" id="groups" name="groups" multiple="multiple">
+          <option th:each="group:${groups}" th:value="${group.id}" th:text="${group.name}"></option>
+        </select>
+      </div>
+      <button type="submit" class="btn btn-primary btn-sm btn-block">Create</button>
+    </form>
+  </div>
+</div>
+</body>
+</html>

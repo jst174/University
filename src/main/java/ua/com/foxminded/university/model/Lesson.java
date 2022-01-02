@@ -1,8 +1,12 @@
 package ua.com.foxminded.university.model;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
+
+import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE;
 
 public class Lesson {
 
@@ -11,6 +15,7 @@ public class Lesson {
     private Course course;
     private Classroom classroom;
     private Teacher teacher;
+    @DateTimeFormat(iso = DATE)
     private LocalDate date;
     private Time time;
 

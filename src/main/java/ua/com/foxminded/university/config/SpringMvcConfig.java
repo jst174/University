@@ -10,12 +10,14 @@ import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 import org.thymeleaf.spring5.templateresolver.SpringResourceTemplateResolver;
 import org.thymeleaf.spring5.view.ThymeleafViewResolver;
 import ua.com.foxminded.university.formatters.CourseFormatter;
+import ua.com.foxminded.university.formatters.GroupFormatter;
 
 import java.util.List;
 
@@ -31,6 +33,7 @@ public class SpringMvcConfig implements WebMvcConfigurer {
     @Override
     public void addFormatters(FormatterRegistry registry) {
         registry.addFormatter(new CourseFormatter());
+        registry.addFormatter(new GroupFormatter());
     }
 
     @Bean
@@ -63,4 +66,12 @@ public class SpringMvcConfig implements WebMvcConfigurer {
         resolver.setFallbackPageable(PageRequest.of(0, pageSize));
         resolvers.add(resolver);
     }
+
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry
+            .addResourceHandler("/static/**")
+            .addResourceLocations("/static/");
+    }
+
 }
