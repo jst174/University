@@ -11,7 +11,9 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ua.com.foxminded.university.exceptions.EntityNotFoundException;
 import ua.com.foxminded.university.model.*;
@@ -45,8 +47,6 @@ public class LessonControllerTest {
     private TimeService timeService;
     @Mock
     private ClassroomService classroomService;
-    @Mock
-    private StudentService studentService;
     @InjectMocks
     private LessonController lessonController;
 
@@ -103,12 +103,15 @@ public class LessonControllerTest {
     @Test
     public void whenCreate_thenCreatedAndRedirectView() throws Exception {
         when(groupService.getById(1)).thenReturn(TestData.group1);
-        when(studentService.getByGroupId(1)).thenReturn(new ArrayList<>(Arrays.asList(TestData.student1, TestData.student2)));
+        when(groupService.getById(2)).thenReturn(TestData.group2);
         when(classroomService.getById(1)).thenReturn(TestData.classroom1);
         when(timeService.getById(1)).thenReturn(TestData.time1);
         when(teacherService.getById(1)).thenReturn(TestData.teacher1);
         when(courseService.getById(1)).thenReturn(TestData.course1);
-        mockMvc.perform(post("/lessons"))
+        mockMvc.perform(post("/lessons")
+                .flashAttr("lesson", TestData.lesson1)
+            )
+            .andDo(MockMvcResultHandlers.print())
             .andExpect(status().is3xxRedirection())
             .andExpect(model().attributeExists("lesson"))
             .andExpect(view().name("redirect:/lessons"));
@@ -131,14 +134,16 @@ public class LessonControllerTest {
 
     @Test
     public void whenUpdate_thenUpdateAndRedirectView() throws Exception {
-        when(lessonService.getById(1)).thenReturn(TestData.lesson1);
         when(groupService.getById(1)).thenReturn(TestData.group1);
-        when(studentService.getByGroupId(1)).thenReturn(Arrays.asList(TestData.student1, TestData.student2));
+        when(groupService.getById(2)).thenReturn(TestData.group2);
         when(classroomService.getById(1)).thenReturn(TestData.classroom1);
         when(timeService.getById(1)).thenReturn(TestData.time1);
         when(teacherService.getById(1)).thenReturn(TestData.teacher1);
         when(courseService.getById(1)).thenReturn(TestData.course1);
-        mockMvc.perform(post("/lessons"))
+        mockMvc.perform(patch("/lessons/{id}",1)
+                .flashAttr("lesson", TestData.lesson1)
+            )
+            .andDo(MockMvcResultHandlers.print())
             .andExpect(status().is3xxRedirection())
             .andExpect(model().attributeExists("lesson"))
             .andExpect(view().name("redirect:/lessons"));
@@ -154,20 +159,6 @@ public class LessonControllerTest {
     }
 
     interface TestData {
-        Student student1 = new Student.Builder()
-            .setFirstName("Mike")
-            .setLastName("Miller")
-            .setGender(Gender.MALE)
-            .setBirtDate(LocalDate.of(1994, 11, 12))
-            .setId(1)
-            .build();
-        Student student2 = new Student.Builder()
-            .setFirstName("Tom")
-            .setLastName("Price")
-            .setGender(Gender.MALE)
-            .setBirtDate(LocalDate.of(1995, 10, 11))
-            .setId(2)
-            .build();
         Group group1 = new Group.Builder()
             .setName("GD-12")
             .setId(1)
@@ -176,11 +167,23 @@ public class LessonControllerTest {
             .setName("GS-14")
             .setId(2)
             .build();
+        Course course1 = new Course.Builder()
+            .setName("History")
+            .setId(1)
+            .build();
+        Course course2 = new Course.Builder()
+            .setName("Math")
+            .setId(2)
+            .build();
         Teacher teacher1 = new Teacher.Builder()
             .setFirstName("Mike")
             .setLastName("Miller")
             .setGender(Gender.MALE)
             .setBirtDate(LocalDate.of(1994, 11, 12))
+            .setCourses(Arrays.asList(course1, course2))
+            .setAcademicDegree(AcademicDegree.MASTER)
+            .setEmail("miller@gmail.com")
+            .setPhoneNumber("3934234")
             .setId(1)
             .build();
         Teacher teacher2 = new Teacher.Builder()
@@ -188,14 +191,6 @@ public class LessonControllerTest {
             .setLastName("Price")
             .setGender(Gender.MALE)
             .setBirtDate(LocalDate.of(1995, 10, 11))
-            .setId(2)
-            .build();
-        Course course1 = new Course.Builder()
-            .setName("History")
-            .setId(1)
-            .build();
-        Course course2 = new Course.Builder()
-            .setName("Math")
             .setId(2)
             .build();
         Time time1 = new Time.Builder()
@@ -231,8 +226,9 @@ public class LessonControllerTest {
             .setDate(LocalDate.of(2021, 12, 13))
             .setTime(time2)
             .setClassroom(classroom2)
-            .setTeacher(teacher2)
+            .setTeacher(teacher1)
             .setCourse(course2)
+            .setGroups(new ArrayList<>(Arrays.asList(TestData.group1, TestData.group2)))
             .setId(2)
             .build();
     }

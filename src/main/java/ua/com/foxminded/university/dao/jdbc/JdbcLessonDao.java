@@ -45,6 +45,7 @@ public class JdbcLessonDao implements LessonDao {
     private static final String SQL_FIND_BY_DATE_AND_TIME = "SELECT * FROM lessons WHERE date = ? and time_id = ?";
     private static final String SQL_COUNT_ROWS = "SELECT COUNT(*) FROM lessons";
     private static final String SQL_GET_LESSONS_PAGE = "SELECT * FROM lessons LIMIT (?) OFFSET (?)";
+    private static final String SQL_GET_BY_GROUP = "SELECT * FROM lessons INNER JOIN lessons_groups lg ON lessons.id = lg.lesson_id WHERE lg.group_id = ?";
 
     private JdbcTemplate jdbcTemplate;
     private LessonMapper lessonMapper;
@@ -138,6 +139,11 @@ public class JdbcLessonDao implements LessonDao {
     public List<Lesson> getByDateAndTime(LocalDate date, Time time) {
         return jdbcTemplate.query(SQL_FIND_BY_DATE_AND_TIME, lessonMapper, date,
             time.getId());
+    }
+
+    @Override
+    public List<Lesson> getByGroupId(int groupId) {
+        return jdbcTemplate.query(SQL_GET_BY_GROUP, lessonMapper, groupId);
     }
 
     @Override

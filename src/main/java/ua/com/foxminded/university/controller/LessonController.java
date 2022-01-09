@@ -22,17 +22,17 @@ public class LessonController {
     private final GroupService groupService;
     private final ClassroomService classroomService;
     private final TimeService timeService;
-    private final StudentService studentService;
 
 
-    public LessonController(LessonService lessonService, CourseService courseService, TeacherService teacherService, GroupService groupService, ClassroomService classroomService, TimeService timeService, StudentService studentService) {
+    public LessonController(LessonService lessonService, CourseService courseService,
+                            TeacherService teacherService, GroupService groupService,
+                            ClassroomService classroomService, TimeService timeService) {
         this.lessonService = lessonService;
         this.courseService = courseService;
         this.teacherService = teacherService;
         this.groupService = groupService;
         this.classroomService = classroomService;
         this.timeService = timeService;
-        this.studentService = studentService;
     }
 
     @GetMapping
@@ -62,7 +62,6 @@ public class LessonController {
         List<Group> groups = new ArrayList<>();
         for (Group group : lesson.getGroups()) {
             group = groupService.getById(group.getId());
-            group.setStudents(studentService.getByGroupId(group.getId()));
             groups.add(group);
         }
         lesson.setClassroom(classroomService.getById(lesson.getClassroom().getId()));
@@ -86,11 +85,10 @@ public class LessonController {
     }
 
     @PatchMapping("/{id}")
-    public String update(@ModelAttribute Lesson lesson) throws ServiceException {
+    public String update(@ModelAttribute Lesson lesson, @PathVariable int id) throws ServiceException {
         List<Group> groups = new ArrayList<>();
         for (Group group : lesson.getGroups()) {
             group = groupService.getById(group.getId());
-            group.setStudents(studentService.getByGroupId(group.getId()));
             groups.add(group);
         }
         lesson.setClassroom(classroomService.getById(lesson.getClassroom().getId()));
@@ -106,10 +104,5 @@ public class LessonController {
     public String delete(@PathVariable int id) {
         lessonService.delete(id);
         return "redirect:/lessons";
-    }
-
-    @GetMapping("/schedule")
-    public String showSchedule() {
-        return "lessons/schedule";
     }
 }

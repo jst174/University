@@ -66,6 +66,21 @@ public class LessonService {
         return lessonDao.getAll(pageable);
     }
 
+    public List<Lesson> getAll() {
+        logger.debug("Getting all lessons");
+        return lessonDao.getAll();
+    }
+
+    public List<Lesson> getByGroupId(int groupId){
+        logger.debug("Getting lessons where group_id = {}", groupId);
+        return lessonDao.getByGroupId(groupId);
+    }
+
+    public List<Lesson> getByTeacherId(int teacherId){
+        logger.debug("Getting lessons where teacher_id = {}", teacherId);
+        return lessonDao.getByTeacherId(teacherId);
+    }
+
     private void checkConditions(Lesson lesson) throws NotAvailableDayException, NotAvailableClassroomException, NotAvailableTeacherException, NotAvailableGroupException {
         verifyHoliday(lesson);
         verifyWeekend(lesson);

@@ -2,21 +2,72 @@
 <html lang="en" xmlns:th="http://thymeleaf.org" xmlns="http://www.w3.org/1999/html">
 <head>
   <meta charset="UTF-8">
-  <title th:text="${teacher.getFirstName()}+' '+${teacher.getLastName()}">Student</title>
+  <title th:text="${teacher.getFirstName()}+' '+${teacher.getLastName()}">Teacher</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link rel="stylesheet" href="/static/fullcalendar5/lib/main.css">
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+          integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+          crossorigin="anonymous"></script>
+  <script src="https://code.jquery.com/jquery.min.js"></script>
+  <script src="/static/fullcalendar5/lib/main.js"></script>
+  <script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function () {
+      var id = [[${id}]];
+      var calendarEl = document.getElementById('calendar');
+      var calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        timeZone: 'UTC',
+        events: 'http://localhost:8080/teachers/'+id+'/getLessons'
+      });
+      calendar.render();
+    });
+  </script>
 </head>
 <body>
-<p> Name: <span th:text="${teacher.getFirstName()}+' '+${teacher.getLastName()}">value</span></p>
-<p> Birthday: <span th:text="${teacher.getBirthDate()}">value</span></p>
-<p> Gender: <span th:text="${teacher.getGender()}">value</span></p>
-<p> Academic degree: <span th:text="${teacher.getAcademicDegree()}">value</span></p>
-<p> Phone number: <span th:text="${teacher.getPhoneNumber()}">value</span></p>
-<p> Email: <span th:text="${teacher.getEmail()}">value</span></p>
-<p> Address: <span th:text="${teacher.getAddress().getCountry()}">country</span>,
-  <span th:text="${teacher.getAddress().getCity()}">city</span>,
-  <span th:text="${teacher.getAddress().getStreet()}">street</span>,
-  <span th:text="${teacher.getAddress().getHouseNumber()}">house number</span>,
-  <span th:text="${teacher.getAddress().getApartmentNumber()}">apartment number</span>,
-  <span th:text="${teacher.getAddress().getPostcode()}">postcode</span></p>
+<div class="row justify-content-center">
+  <div class="col-auto">
+    <table class="table table-responsive">
+      <tbody>
+      <tr>
+        <td>First Name:</td>
+        <td th:text="${teacher.getFirstName()}"/>
+      </tr>
+      <tr>
+        <td>Last Name:</td>
+        <td th:text="${teacher.getLastName()}"/>
+      </tr>
+      <tr>
+        <td>Birthday:</td>
+        <td th:text="${teacher.getBirthDate()}"/>
+      </tr>
+      <tr>
+        <td>Number of phone:</td>
+        <td th:text="${teacher.getPhoneNumber()}"/>
+      </tr>
+      <tr>
+        <td>Email:</td>
+        <td th:text="${teacher.getEmail()}"/>
+      </tr>
+      <tr>
+        <td>Gender:</td>
+        <td th:text="${teacher.getGender()}"/>
+      </tr>
+      <tr>
+        <td>Academic degree:</td>
+        <td th:text="${teacher.getAcademicDegree()}"/>
+      </tr>
+      <tr>
+        <td>Address:</td>
+        <td><span th:text="${teacher.getAddress().getCountry()}">country</span>,
+          <span th:text="${teacher.getAddress().getCity()}">city</span>,
+          <span th:text="${teacher.getAddress().getStreet()}">street</span>,
+          <span th:text="${teacher.getAddress().getHouseNumber()}">house number</span>,
+          <span th:text="${teacher.getAddress().getApartmentNumber()}">apartment number</span>,
+          <span th:text="${teacher.getAddress().getPostcode()}">postcode</span></td>
+      </tr>
+      </tbody>
+    </table>
 <table class="table table-striped">
   <thead>
   <tr>
@@ -24,10 +75,11 @@
   </tr>
   </thead>
   <tbody>
-  <tr th:each="course: ${courses}">
+  <tr th:each="course: ${teacher.getCourses()}">
     <td th:text="${course.getName()}"/>
   </tr>
   </tbody>
 </table>
+<div id="calendar"></div>
 </body>
 </html>

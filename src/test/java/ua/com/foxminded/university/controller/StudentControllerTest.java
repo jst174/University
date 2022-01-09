@@ -12,6 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ua.com.foxminded.university.exceptions.EntityNotFoundException;
 import ua.com.foxminded.university.model.Gender;
@@ -87,8 +88,10 @@ public class StudentControllerTest {
                 .param("firstName", "Mike")
                 .param("lastName", "Miller")
                 .param("gender", "MALE")
-                .param("birthDate", "1994-11-12"))
+                .param("birthDate", "1994-11-12")
+            )
             .andExpect(status().is3xxRedirection())
+            .andDo(MockMvcResultHandlers.print())
             .andExpect(model().attributeExists("student"))
             .andExpect(view().name("redirect:/students"));
         verify(studentService).create(TestData.student1);

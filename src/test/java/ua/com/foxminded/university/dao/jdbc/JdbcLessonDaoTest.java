@@ -193,6 +193,15 @@ public class JdbcLessonDaoTest {
         assertEquals(expected, actual.get());
     }
 
+    @Test
+    public void givenGroupId_whenGetByGroupId_thenReturn() {
+        List<Lesson> expected = Arrays.asList(TestData.lesson, new Lesson.Builder().clone(TestData.lesson).setId(2).setTime(TestData.time2).build());
+
+        List<Lesson> actual = lessonDao.getByGroupId(1);
+
+        assertEquals(expected, actual);
+    }
+
     interface TestData {
         Address address = new Address.Builder()
             .setCountry("Russia")

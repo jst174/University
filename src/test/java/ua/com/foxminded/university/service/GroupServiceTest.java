@@ -3,7 +3,6 @@ package ua.com.foxminded.university.service;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -14,15 +13,14 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import ua.com.foxminded.university.dao.GroupDao;
-import ua.com.foxminded.university.dao.LessonDao;
+import ua.com.foxminded.university.dao.StudentDao;
 import ua.com.foxminded.university.exceptions.EntityNotFoundException;
 import ua.com.foxminded.university.exceptions.NotUniqueNameException;
+import ua.com.foxminded.university.model.Gender;
 import ua.com.foxminded.university.model.Group;
-import ua.com.foxminded.university.model.Lesson;
+import ua.com.foxminded.university.model.Student;
 
-import java.io.IOException;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -32,6 +30,8 @@ public class GroupServiceTest {
 
     @Mock
     private GroupDao groupDao;
+    @Mock
+    private StudentDao studentDao;
     @InjectMocks
     private GroupService groupService;
 
@@ -60,6 +60,7 @@ public class GroupServiceTest {
     @Test
     public void givenExistentGroupId_whenGetById_thenReturn() throws EntityNotFoundException {
         when(groupDao.getById(1)).thenReturn(Optional.of(TestData.group1));
+        when(studentDao.getByGroupId(1)).thenReturn(Arrays.asList(TestData.student1, TestData.student2));
 
         assertEquals(TestData.group1, groupService.getById(1));
     }
@@ -134,6 +135,23 @@ public class GroupServiceTest {
             .build();
         Group group2 = new Group.Builder()
             .setName("FR-32")
+            .setId(2)
+            .build();
+
+        Student student1 = new Student.Builder()
+            .setFirstName("Mike")
+            .setLastName("Miller")
+            .setGender(Gender.MALE)
+            .setBirtDate(LocalDate.of(1994, 11, 12))
+            .setGroup(group1)
+            .setId(1)
+            .build();
+        Student student2 = new Student.Builder()
+            .setFirstName("Tom")
+            .setLastName("Price")
+            .setGender(Gender.MALE)
+            .setBirtDate(LocalDate.of(1995, 10, 11))
+            .setGroup(group1)
             .setId(2)
             .build();
     }

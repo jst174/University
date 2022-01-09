@@ -1,5 +1,7 @@
 package ua.com.foxminded.university.controller;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -14,12 +16,14 @@ import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ua.com.foxminded.university.exceptions.EntityNotFoundException;
-import ua.com.foxminded.university.model.Gender;
-import ua.com.foxminded.university.model.Teacher;
+import ua.com.foxminded.university.model.*;
 import ua.com.foxminded.university.service.CourseService;
+import ua.com.foxminded.university.service.LessonService;
 import ua.com.foxminded.university.service.TeacherService;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -38,6 +42,8 @@ public class TeacherControllerTest {
     private TeacherService teacherService;
     @Mock
     private CourseService courseService;
+    @Mock
+    private LessonService lessonService;
     @InjectMocks
     private TeacherController teacherController;
 
@@ -133,6 +139,24 @@ public class TeacherControllerTest {
             .andExpect(model().attribute("message", message));
     }
 
+    @Test
+    public void whenGetLesson_thenShowViewWithJson() throws Exception {
+        List<Lesson> lessons = Arrays.asList(TestData.lesson1, TestData.lesson2);
+        when(lessonService.getByTeacherId(1)).thenReturn(lessons);
+        JSONArray jsonArray = new JSONArray();
+        for (Lesson lesson : lessons) {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("title", lesson.getCourse().getName() + " " + lesson.getTime().getStartTime().toString() + "-" +
+                lesson.getTime().getEndTime().toString());
+            jsonObject.put("start", lesson.getDate().toString());
+            jsonObject.put("end", lesson.getDate().toString());
+            jsonArray.add(jsonObject);
+        }
+        mockMvc.perform(get("/teachers/{id}/getLessons", 1))
+            .andExpect(status().isOk())
+            .andExpect(content().string(jsonArray.toString()));
+    }
+
     interface TestData {
         Teacher teacher1 = new Teacher.Builder()
             .setFirstName("Mike")
@@ -146,6 +170,52 @@ public class TeacherControllerTest {
             .setLastName("Price")
             .setGender(Gender.MALE)
             .setBirtDate(LocalDate.of(1995, 10, 11))
+            .setId(2)
+            .build();
+        Time time1 = new Time.Builder()
+            .setStartTime(LocalTime.of(8, 0))
+            .setEndTime(LocalTime.of(9, 30))
+            .setId(1)
+            .build();
+        Time time2 = new Time.Builder()
+            .setStartTime(LocalTime.of(12, 0))
+            .setEndTime(LocalTime.of(13, 30))
+            .setId(2)
+            .build();
+        Classroom classroom1 = new Classroom.Builder()
+            .setNumber(101)
+            .setCapacity(30)
+            .setId(1)
+            .build();
+        Classroom classroom2 = new Classroom.Builder()
+            .setNumber(202)
+            .setCapacity(50)
+            .setId(2)
+            .build();
+        Course course1 = new Course.Builder()
+            .setName("History")
+            .setId(1)
+            .build();
+        Course course2 = new Course.Builder()
+            .setName("Math")
+            .setId(2)
+            .build();
+        Lesson lesson1 = new Lesson.Builder()
+            .setDate(LocalDate.of(2021, 12, 12))
+            .setTime(time1)
+            .setClassroom(classroom1)
+            .setCourse(course1)
+            .setTeacher(teacher1)
+            .setGroups(new ArrayList<>(Arrays.asList(LessonControllerTest.TestData.group1, LessonControllerTest.TestData.group2)))
+            .setId(1)
+            .build();
+        Lesson lesson2 = new Lesson.Builder()
+            .setDate(LocalDate.of(2021, 12, 13))
+            .setTime(time2)
+            .setClassroom(classroom2)
+            .setTeacher(teacher1)
+            .setCourse(course2)
+            .setGroups(new ArrayList<>(Arrays.asList(LessonControllerTest.TestData.group1, LessonControllerTest.TestData.group2)))
             .setId(2)
             .build();
     }

@@ -6,7 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ua.com.foxminded.university.dao.GroupDao;
-import ua.com.foxminded.university.dao.LessonDao;
+import ua.com.foxminded.university.dao.StudentDao;
 import ua.com.foxminded.university.exceptions.EntityNotFoundException;
 import ua.com.foxminded.university.exceptions.NotUniqueNameException;
 import ua.com.foxminded.university.model.Group;
@@ -21,11 +21,11 @@ public class GroupService {
     private static final Logger logger = LoggerFactory.getLogger(GroupService.class);
 
     private GroupDao groupDao;
-    private LessonDao lessonDao;
+    private StudentDao studentDao;
 
-    public GroupService(GroupDao groupDao, LessonDao lessonDao) {
+    public GroupService(GroupDao groupDao, StudentDao studentDao) {
         this.groupDao = groupDao;
-        this.lessonDao = lessonDao;
+        this.studentDao = studentDao;
     }
 
     public void create(Group group) throws NotUniqueNameException {
@@ -37,8 +37,10 @@ public class GroupService {
 
     public Group getById(int id) throws EntityNotFoundException {
         logger.debug("Getting group with id = {}", id);
-        return groupDao.getById(id).orElseThrow(() ->
+        Group group = groupDao.getById(id).orElseThrow(() ->
             new EntityNotFoundException(format("Group with id = %s not found", id)));
+        group.setStudents(studentDao.getByGroupId(id));
+        return group;
     }
 
     public void update(Group group) throws NotUniqueNameException {

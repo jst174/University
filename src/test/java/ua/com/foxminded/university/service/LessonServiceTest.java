@@ -434,6 +434,20 @@ public class LessonServiceTest {
         assertEquals(lessonPage, lessonService.getAll(pageable));
     }
 
+    @Test
+    public void givenTeacherId_whenGetByTeacherId_thenReturn() {
+        when(lessonDao.getByTeacherId(1)).thenReturn(lessons);
+
+        assertEquals(lessons, lessonService.getByTeacherId(1));
+    }
+
+    @Test
+    public void givenGroupId_whenGetByGroupId_thenReturn() {
+        when(lessonDao.getByGroupId(1)).thenReturn(lessons);
+
+        assertEquals(lessons, lessonService.getByGroupId(1));
+    }
+
     private void addStudentToGroup(Group group, int numberOfStudent) throws IOException {
         List<Student> students = new ArrayList<>();
         for (int i = 0; i < numberOfStudent; i++) {

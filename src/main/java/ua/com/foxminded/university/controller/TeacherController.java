@@ -1,14 +1,20 @@
 package ua.com.foxminded.university.controller;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ua.com.foxminded.university.exceptions.EntityNotFoundException;
 import ua.com.foxminded.university.exceptions.NotUniqueNameException;
+import ua.com.foxminded.university.model.Lesson;
 import ua.com.foxminded.university.model.Teacher;
 import ua.com.foxminded.university.service.CourseService;
+import ua.com.foxminded.university.service.LessonService;
 import ua.com.foxminded.university.service.TeacherService;
+
+import java.util.List;
 
 @Controller
 @RequestMapping("/teachers")
@@ -16,10 +22,12 @@ public class TeacherController {
 
     private final TeacherService teacherService;
     private final CourseService courseService;
+    private final LessonService lessonService;
 
-    public TeacherController(TeacherService teacherService, CourseService courseService) {
+    public TeacherController(TeacherService teacherService, CourseService courseService, LessonService lessonService) {
         this.teacherService = teacherService;
         this.courseService = courseService;
+        this.lessonService = lessonService;
     }
 
     @GetMapping
@@ -63,5 +71,21 @@ public class TeacherController {
     public String delete(@PathVariable int id) {
         teacherService.delete(id);
         return "redirect:/teachers";
+    }
+
+    @GetMapping("/{id}/getLessons")
+    @ResponseBody
+    public JSONArray getLessons(@PathVariable int id){
+        List<Lesson> lessons = lessonService.getByTeacherId(id);
+        JSONArray jsonArray = new JSONArray();
+        for (Lesson lesson : lessons) {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("title", lesson.getCourse().getName() + " " + lesson.getTime().getStartTime().toString() + "-" +
+                lesson.getTime().getEndTime().toString());
+            jsonObject.put("start", lesson.getDate().toString());
+            jsonObject.put("end", lesson.getDate().toString());
+            jsonArray.add(jsonObject);
+        }
+        return jsonArray;
     }
 }
