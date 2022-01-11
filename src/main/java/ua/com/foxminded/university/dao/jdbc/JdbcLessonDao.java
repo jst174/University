@@ -46,15 +46,19 @@ public class JdbcLessonDao implements LessonDao {
     private static final String SQL_COUNT_ROWS = "SELECT COUNT(*) FROM lessons";
     private static final String SQL_GET_LESSONS_PAGE = "SELECT * FROM lessons LIMIT (?) OFFSET (?)";
     private static final String SQL_GET_BY_GROUP = "SELECT * FROM lessons INNER JOIN lessons_groups lg ON lessons.id = lg.lesson_id WHERE lg.group_id = ?";
+    private static final String SQL_GET_BY_GROUP_BETWEEN_DATES = "SELECT * FROM lessons " +
+        "INNER JOIN lessons_groups lg ON lessons.id = lg.lesson_id WHERE lg.group_id = ? " +
+        "AND date BETWEEN ? AND ?";
+    private static final String SQL_GET_BY_TEACHER_BETWEEN_DATES = "SELECT * FROM lessons WHERE teacher_id = ? AND date BETWEEN ? AND ?";
 
     private JdbcTemplate jdbcTemplate;
     private LessonMapper lessonMapper;
-    @Autowired
     private GroupDao groupDao;
 
-    public JdbcLessonDao(JdbcTemplate jdbcTemplate, LessonMapper lessonMapper) {
+    public JdbcLessonDao(JdbcTemplate jdbcTemplate, LessonMapper lessonMapper, GroupDao groupDao) {
         this.jdbcTemplate = jdbcTemplate;
         this.lessonMapper = lessonMapper;
+        this.groupDao = groupDao;
     }
 
     @Transactional
@@ -144,6 +148,16 @@ public class JdbcLessonDao implements LessonDao {
     @Override
     public List<Lesson> getByGroupId(int groupId) {
         return jdbcTemplate.query(SQL_GET_BY_GROUP, lessonMapper, groupId);
+    }
+
+    @Override
+    public List<Lesson> getByGroupIdBetweenDates(int groupId, LocalDate date1, LocalDate date2) {
+        return jdbcTemplate.query(SQL_GET_BY_GROUP_BETWEEN_DATES, lessonMapper, groupId, date1, date2);
+    }
+
+    @Override
+    public List<Lesson> getByTeacherIdBetweenDates(int teacherId, LocalDate date1, LocalDate date2) {
+        return jdbcTemplate.query(SQL_GET_BY_TEACHER_BETWEEN_DATES, lessonMapper, teacherId, date1, date2);
     }
 
     @Override

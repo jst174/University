@@ -139,23 +139,6 @@ public class TeacherControllerTest {
             .andExpect(model().attribute("message", message));
     }
 
-    @Test
-    public void whenGetLesson_thenShowViewWithJson() throws Exception {
-        List<Lesson> lessons = Arrays.asList(TestData.lesson1, TestData.lesson2);
-        when(lessonService.getByTeacherId(1)).thenReturn(lessons);
-        JSONArray jsonArray = new JSONArray();
-        for (Lesson lesson : lessons) {
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("title", lesson.getCourse().getName() + " " + lesson.getTime().getStartTime().toString() + "-" +
-                lesson.getTime().getEndTime().toString());
-            jsonObject.put("start", lesson.getDate().toString());
-            jsonObject.put("end", lesson.getDate().toString());
-            jsonArray.add(jsonObject);
-        }
-        mockMvc.perform(get("/teachers/{id}/getLessons", 1))
-            .andExpect(status().isOk())
-            .andExpect(content().string(jsonArray.toString()));
-    }
 
     interface TestData {
         Teacher teacher1 = new Teacher.Builder()

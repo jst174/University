@@ -127,24 +127,6 @@ public class GroupControllerTest {
             .andExpect(model().attribute("message", message));
     }
 
-    @Test
-    public void whenGetLesson_thenShowViewWithJson() throws Exception {
-        List<Lesson> lessons = Arrays.asList(TestData.lesson1, TestData.lesson2);
-        when(lessonService.getByGroupId(1)).thenReturn(lessons);
-        JSONArray jsonArray = new JSONArray();
-        for (Lesson lesson : lessons) {
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("title", lesson.getCourse().getName() + " " + lesson.getTime().getStartTime().toString() + "-" +
-                lesson.getTime().getEndTime().toString());
-            jsonObject.put("start", lesson.getDate().toString());
-            jsonObject.put("end", lesson.getDate().toString());
-            jsonArray.add(jsonObject);
-        }
-        mockMvc.perform(get("/groups/{id}/getLessons", 1))
-            .andExpect(status().isOk())
-            .andExpect(content().string(jsonArray.toString()));
-    }
-
 
     interface TestData {
         Group group1 = new Group.Builder()

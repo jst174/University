@@ -435,17 +435,27 @@ public class LessonServiceTest {
     }
 
     @Test
-    public void givenTeacherId_whenGetByTeacherId_thenReturn() {
-        when(lessonDao.getByTeacherId(1)).thenReturn(lessons);
+    public void givenTeacherIdAndTwoDates_whenGetByTeacherIdBetweenDates_thenReturn() {
+        List<Lesson> expected = Arrays.asList(TestData.lesson1,
+            new Lesson.Builder().clone(TestData.lesson1).setId(2).setDate(LocalDate.of(2021, 9, 26)).build());
 
-        assertEquals(lessons, lessonService.getByTeacherId(1));
+        when(lessonDao.getByTeacherIdBetweenDates(1, LocalDate.of(2021, 9, 1),
+            LocalDate.of(2021, 10, 30))).thenReturn(expected);
+
+        assertEquals(expected, lessonService.getByTeacherIdBetweenDates(1, LocalDate.of(2021, 9, 1),
+            LocalDate.of(2021, 10, 30)));
     }
 
     @Test
-    public void givenGroupId_whenGetByGroupId_thenReturn() {
-        when(lessonDao.getByGroupId(1)).thenReturn(lessons);
+    public void givenGroupIdAndTwoDates_whenGetByTeacherIdBetweenDates_thenReturn() {
+        List<Lesson> expected = Arrays.asList(TestData.lesson1,
+            new Lesson.Builder().clone(TestData.lesson1).setId(2).setDate(LocalDate.of(2021, 9, 26)).build());
 
-        assertEquals(lessons, lessonService.getByGroupId(1));
+        when(lessonDao.getByGroupIdBetweenDates(1, LocalDate.of(2021, 9, 1),
+            LocalDate.of(2021, 10, 30))).thenReturn(expected);
+
+        assertEquals(expected, lessonService.getByGroupIdBetweenDates(1, LocalDate.of(2021, 9, 1),
+            LocalDate.of(2021, 10, 30)));
     }
 
     private void addStudentToGroup(Group group, int numberOfStudent) throws IOException {

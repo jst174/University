@@ -195,9 +195,34 @@ public class JdbcLessonDaoTest {
 
     @Test
     public void givenGroupId_whenGetByGroupId_thenReturn() {
-        List<Lesson> expected = Arrays.asList(TestData.lesson, new Lesson.Builder().clone(TestData.lesson).setId(2).setTime(TestData.time2).build());
+        List<Lesson> expected = Arrays.asList(TestData.lesson,
+            new Lesson.Builder().clone(TestData.lesson).setId(2).setTime(TestData.time2).build());
 
         List<Lesson> actual = lessonDao.getByGroupId(1);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void givenGroupIdAndTwoDates_whenGetByGroupIdBetweenDates_thenReturn(){
+        List<Lesson> expected =Arrays.asList(TestData.lesson,
+            new Lesson.Builder().clone(TestData.lesson).setId(2).setTime(TestData.time2).build());
+
+        List<Lesson> actual = lessonDao.getByGroupIdBetweenDates(
+            1, LocalDate.of(2021,9, 25),
+            LocalDate.of(2021,9, 30));
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void givenTeacherIdAndTwoDates_whenGetByTeacherIdBetweenDates_thenReturn(){
+        List<Lesson> expected =Arrays.asList(TestData.lesson,
+            new Lesson.Builder().clone(TestData.lesson).setId(2).setTime(TestData.time2).build());
+
+        List<Lesson> actual = lessonDao.getByTeacherIdBetweenDates(
+            1, LocalDate.of(2021,9, 25),
+            LocalDate.of(2021,9, 30));
 
         assertEquals(expected, actual);
     }

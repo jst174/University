@@ -1,11 +1,13 @@
 package ua.com.foxminded.university.controller;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+import org.mapstruct.factory.Mappers;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import ua.com.foxminded.university.dto.LessonDto;
+import ua.com.foxminded.university.dto.LessonMapper;
 import ua.com.foxminded.university.exceptions.EntityNotFoundException;
 import ua.com.foxminded.university.exceptions.NotUniqueNameException;
 import ua.com.foxminded.university.model.Lesson;
@@ -14,6 +16,8 @@ import ua.com.foxminded.university.service.CourseService;
 import ua.com.foxminded.university.service.LessonService;
 import ua.com.foxminded.university.service.TeacherService;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -37,8 +41,15 @@ public class TeacherController {
     }
 
     @GetMapping("/{id}")
-    public String getById(@PathVariable int id, Model model) throws EntityNotFoundException {
+    public String getById(
+        @PathVariable int id, Model model,
+        @RequestParam(value = "date1", required = false, defaultValue = "#{T(java.time.LocalDate).now()}")
+        @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date1,
+        @RequestParam(value = "date2", required = false, defaultValue = "#{T(java.time.LocalDate).now()}")
+        @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date2) throws EntityNotFoundException {
         model.addAttribute("teacher", teacherService.getById(id));
+        model.addAttribute("date1", date1.toString());
+        model.addAttribute("date2", date2.toString());
         return "teachers/show";
     }
 
@@ -75,17 +86,13 @@ public class TeacherController {
 
     @GetMapping("/{id}/getLessons")
     @ResponseBody
-    public JSONArray getLessons(@PathVariable int id){
-        List<Lesson> lessons = lessonService.getByTeacherId(id);
-        JSONArray jsonArray = new JSONArray();
-        for (Lesson lesson : lessons) {
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("title", lesson.getCourse().getName() + " " + lesson.getTime().getStartTime().toString() + "-" +
-                lesson.getTime().getEndTime().toString());
-            jsonObject.put("start", lesson.getDate().toString());
-            jsonObject.put("end", lesson.getDate().toString());
-            jsonArray.add(jsonObject);
-        }
-        return jsonArray;
+    public List<LessonDto> getLessons(
+        @PathVariable int id,
+        @RequestParam(value = "date1", required = false)
+        @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date1,
+        @RequestParam(value = "date2", required = false)
+        @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date2) {
+        List<Lesson> lessons = lessonService.getByTeacherIdBetweenDates(id, date1, date2);
+        return Mappers.getMapper(LessonMapper.class).convertToDtoList(lessons);
     }
 }

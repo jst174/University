@@ -71,14 +71,14 @@ public class LessonService {
         return lessonDao.getAll();
     }
 
-    public List<Lesson> getByGroupId(int groupId){
-        logger.debug("Getting lessons where group_id = {}", groupId);
-        return lessonDao.getByGroupId(groupId);
+    public List<Lesson> getByGroupIdBetweenDates(int groupId, LocalDate date1, LocalDate date2) {
+        logger.debug("Getting lesson where group_id = {} and date1 = {}, date2 = {}", groupId, date1, date2);
+        return lessonDao.getByGroupIdBetweenDates(groupId, date1, date2);
     }
 
-    public List<Lesson> getByTeacherId(int teacherId){
-        logger.debug("Getting lessons where teacher_id = {}", teacherId);
-        return lessonDao.getByTeacherId(teacherId);
+    public List<Lesson> getByTeacherIdBetweenDates(int teacherId, LocalDate date1, LocalDate date2) {
+        logger.debug("Getting lesson where teacher_id = {} and date1 = {}, date2 = {}", teacherId, date1, date2);
+        return lessonDao.getByTeacherIdBetweenDates(teacherId, date1, date2);
     }
 
     private void checkConditions(Lesson lesson) throws NotAvailableDayException, NotAvailableClassroomException, NotAvailableTeacherException, NotAvailableGroupException {

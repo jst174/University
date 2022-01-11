@@ -14,11 +14,13 @@
   <script th:inline="javascript">
     document.addEventListener('DOMContentLoaded', function () {
       var id = [[${id}]];
+      var date1 = [[${date1}]];
+      var date2 = [[${date2}]];
       var calendarEl = document.getElementById('calendar');
       var calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
         timeZone: 'UTC',
-        events: 'http://localhost:8080/groups/'+id+'/getLessons'
+        events: 'http://localhost:8080/groups/' + id + '/getLessons?date1=' + date1 + '&date2=' + date2
       });
       calendar.render();
     });
@@ -46,6 +48,18 @@
     </div>
   </div>
 </div>
+<form class="form-inline ml-3" th:action="@{/groups/{id}(id=${group.getId()})}" method="GET">
+  <div class="input-group input-group-sm">
+    <input class="form-control form-control-navbar" type="date" name="date1" th:value="${date1}" placeholder="Search"
+           aria-label="Search">
+    <input class="form-control form-control-navbar" type="date" name="date2" th:value="${date2}" placeholder="Search"
+           aria-label="Search">
+
+    <div class="input-group-append">
+      <button class="btn btn-navbar" type="submit"></button>
+    </div>
+  </div>
+</form>
 <div id="calendar"></div>
 </body>
 </html>
