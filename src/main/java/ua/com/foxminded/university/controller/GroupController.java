@@ -1,9 +1,8 @@
 package ua.com.foxminded.university.controller;
 
-import org.mapstruct.factory.Mappers;
 import org.springframework.data.domain.Pageable;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ua.com.foxminded.university.dto.LessonDto;
@@ -19,16 +18,20 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE;
+
 @Controller
 @RequestMapping("/groups")
 public class GroupController {
 
     private final GroupService groupService;
     private final LessonService lessonService;
+    private final LessonMapper lessonMapper;
 
-    public GroupController(GroupService groupService, LessonService lessonService) {
+    public GroupController(GroupService groupService, LessonService lessonService, LessonMapper lessonMapper) {
         this.groupService = groupService;
         this.lessonService = lessonService;
+        this.lessonMapper = lessonMapper;
     }
 
     @GetMapping
@@ -39,14 +42,8 @@ public class GroupController {
 
     @GetMapping("/{id}")
     public String getById(
-        @PathVariable int id, Model model,
-        @RequestParam(value = "date1", required = false, defaultValue = "#{T(java.time.LocalDate).now()}")
-        @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date1,
-        @RequestParam(value = "date2", required = false, defaultValue = "#{T(java.time.LocalDate).now()}")
-        @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date2) throws EntityNotFoundException {
+        @PathVariable int id, Model model) throws EntityNotFoundException {
         model.addAttribute("group", groupService.getById(id));
-        model.addAttribute("date1", date1.toString());
-        model.addAttribute("date2", date2.toString());
         return "groups/show";
     }
 
@@ -83,11 +80,16 @@ public class GroupController {
     @ResponseBody
     public List<LessonDto> getLessons(
         @PathVariable int id,
-        @RequestParam(value = "date1", required = false)
-        @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date1,
-        @RequestParam(value = "date2", required = false)
-        @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date2) {
-        List<Lesson> lessons = lessonService.getByGroupIdBetweenDates(id, date1, date2);
-        return Mappers.getMapper(LessonMapper.class).convertToDtoList(lessons);
+        @RequestParam(value = "fromDate", required = false)
+        @DateTimeFormat(iso = DATE) LocalDate fromDate,
+        @RequestParam(value = "toDate", required = false)
+        @DateTimeFormat(iso = DATE) LocalDate toDate) {
+        List<Lesson> lessons = lessonService.getByGroupIdBetweenDates(id, fromDate, toDate);
+        List<LessonDto> lessonsDto = new ArrayList<>();
+        for (Lesson lesson : lessons) {
+            LessonDto lessonDto = lessonMapper.convertLessonToLessonDto(lesson);
+            lessonsDto.add(lessonDto);
+        }
+        return lessonsDto;
     }
 }

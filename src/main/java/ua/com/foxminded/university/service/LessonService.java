@@ -76,9 +76,9 @@ public class LessonService {
         return lessonDao.getByGroupIdBetweenDates(groupId, date1, date2);
     }
 
-    public List<Lesson> getByTeacherIdBetweenDates(int teacherId, LocalDate date1, LocalDate date2) {
-        logger.debug("Getting lesson where teacher_id = {} and date1 = {}, date2 = {}", teacherId, date1, date2);
-        return lessonDao.getByTeacherIdBetweenDates(teacherId, date1, date2);
+    public List<Lesson> getByTeacherIdBetweenDates(int teacherId, LocalDate fromDate, LocalDate toDate) {
+        logger.debug("Getting lesson where teacher_id = {} and date1 = {}, date2 = {}", teacherId, fromDate, toDate);
+        return lessonDao.getByTeacherIdBetweenDates(teacherId, fromDate, toDate);
     }
 
     private void checkConditions(Lesson lesson) throws NotAvailableDayException, NotAvailableClassroomException, NotAvailableTeacherException, NotAvailableGroupException {

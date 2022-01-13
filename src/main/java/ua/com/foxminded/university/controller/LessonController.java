@@ -1,6 +1,7 @@
 package ua.com.foxminded.university.controller;
 
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -9,8 +10,12 @@ import ua.com.foxminded.university.model.Group;
 import ua.com.foxminded.university.model.Lesson;
 import ua.com.foxminded.university.service.*;
 
+import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE;
 
 @Controller
 @RequestMapping("/lessons")
@@ -104,5 +109,24 @@ public class LessonController {
     public String delete(@PathVariable int id) {
         lessonService.delete(id);
         return "redirect:/lessons";
+    }
+
+    @GetMapping("/groups-schedule")
+    public String getScheduleForGroups(
+        Model model, HttpServletRequest request) {
+        model.addAttribute("groups", groupService.getAll());
+        model.addAttribute("id", request.getParameter("groupId"));
+        model.addAttribute("toDate", request.getParameter("toDate"));
+        model.addAttribute("fromDate", request.getParameter("fromDate"));
+        return "lessons/groupsSchedule";
+    }
+
+    @GetMapping("/teachers-schedule")
+    public String getScheduleForTeachers(Model model, HttpServletRequest request) {
+        model.addAttribute("teachers", teacherService.getAll());
+        model.addAttribute("id", request.getParameter("groupId"));
+        model.addAttribute("toDate", request.getParameter("toDate"));
+        model.addAttribute("fromDate", request.getParameter("fromDate"));
+        return "lessons/teachersSchedule";
     }
 }

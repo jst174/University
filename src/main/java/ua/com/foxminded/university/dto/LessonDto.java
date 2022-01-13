@@ -2,9 +2,18 @@ package ua.com.foxminded.university.dto;
 
 public class LessonDto {
 
+    private int id;
     private String title;
     private String start;
     private String end;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public String getTitle() {
         return title;

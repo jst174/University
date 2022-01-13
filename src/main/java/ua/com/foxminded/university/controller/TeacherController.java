@@ -20,6 +20,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE;
+
 @Controller
 @RequestMapping("/teachers")
 public class TeacherController {
@@ -27,11 +29,13 @@ public class TeacherController {
     private final TeacherService teacherService;
     private final CourseService courseService;
     private final LessonService lessonService;
+    private final LessonMapper lessonMapper;
 
-    public TeacherController(TeacherService teacherService, CourseService courseService, LessonService lessonService) {
+    public TeacherController(TeacherService teacherService, CourseService courseService, LessonService lessonService, LessonMapper lessonMapper) {
         this.teacherService = teacherService;
         this.courseService = courseService;
         this.lessonService = lessonService;
+        this.lessonMapper = lessonMapper;
     }
 
     @GetMapping
@@ -88,11 +92,16 @@ public class TeacherController {
     @ResponseBody
     public List<LessonDto> getLessons(
         @PathVariable int id,
-        @RequestParam(value = "date1", required = false)
-        @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date1,
-        @RequestParam(value = "date2", required = false)
-        @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date2) {
-        List<Lesson> lessons = lessonService.getByTeacherIdBetweenDates(id, date1, date2);
-        return Mappers.getMapper(LessonMapper.class).convertToDtoList(lessons);
+        @RequestParam(value = "fromDate", required = false)
+        @DateTimeFormat(iso = DATE) LocalDate fromDate,
+        @RequestParam(value = "toDate", required = false)
+        @DateTimeFormat(iso = DATE) LocalDate toDate) {
+        List<Lesson> lessons = lessonService.getByTeacherIdBetweenDates(id, fromDate, toDate);
+        List<LessonDto> lessonsDto = new ArrayList<>();
+        for (Lesson lesson : lessons) {
+            LessonDto lessonDto = lessonMapper.convertLessonToLessonDto(lesson);
+            lessonsDto.add(lessonDto);
+        }
+        return lessonsDto;
     }
 }

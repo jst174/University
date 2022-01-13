@@ -1,29 +1,25 @@
 package ua.com.foxminded.university.dto;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.Mappings;
+import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 import ua.com.foxminded.university.model.Lesson;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface LessonMapper {
 
     LessonMapper mapper = Mappers.getMapper(LessonMapper.class);
 
     @Mappings({
-        @Mapping(target = "title", expression = "java(entity.getCourse().getName() + \" \" " +
-            "+ entity.getTime().getStartTime().toString() + \"-\"" +
-            "+ entity.getTime().getEndTime().toString())"),
-        @Mapping(target = "start", source = "entity.date", dateFormat = "yyyy-MM-dd"),
-        @Mapping(target = "end", source = "entity.date", dateFormat = "yyyy-MM-dd")
+        @Mapping(target = "title", source = "lesson.course.name"),
+        @Mapping(target = "start", expression = "java(lesson.getDate().atTime(lesson.getTime().getStartTime()).toString())"),
+        @Mapping(target = "end", expression = "java(lesson.getDate().atTime(lesson.getTime().getEndTime()).toString())")
     })
-    LessonDto convertLessonToLessonDto(Lesson entity);
+    LessonDto convertLessonToLessonDto(Lesson lesson);
 
-    default List<LessonDto> convertToDtoList(List<Lesson> lessons) {
+        default List<LessonDto> convertToDtoList(List<Lesson> lessons) {
         List<LessonDto> lessonsDto = new ArrayList<>();
         LessonMapper mapper = Mappers.getMapper(LessonMapper.class);
         for (Lesson lesson : lessons) {
@@ -32,4 +28,5 @@ public interface LessonMapper {
         }
         return lessonsDto;
     }
+
 }

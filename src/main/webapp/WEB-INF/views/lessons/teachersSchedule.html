@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Schedule for teachers</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link rel="stylesheet" href="/static/fullcalendar5/lib/main.css">
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+          integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+          crossorigin="anonymous"></script>
+  <script src="https://code.jquery.com/jquery.min.js"></script>
+  <script src="/static/fullcalendar5/lib/main.js"></script>
+  <script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function () {
+      var id = [[${id}]];
+      var fromDate = [[${fromDate}]];
+      var toDate = [[${toDate}]];
+      var calendarEl = document.getElementById('calendar');
+      var calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        timeZone: 'UTC',
+        events: 'http://localhost:8080/teachers/' + id + '/getLessons?fromDate=' + fromDate + '&toDate=' + toDate
+      });
+      calendar.render();
+    });
+  </script>
+</head>
+<body>
+<div class="btn-group">
+  <a href="/lessons/groups-schedule" class="btn btn-primary">Groups</a>
+  <button class="btn btn-primary active">Teachers</button>
+</div>
+<form th:action="@{/lessons/teachers-schedule}" method="get">
+  <div align="left">
+    <label for="teachers">Choose: </label>
+    <select id="teachers" name="teacherId">
+      <option selected disabled hidden style='display: none' value=''></option>
+      <option th:each="teacher: ${teachers}" th:value="${teacher.id}" th:text="${teacher.firstName} + ' ' +
+          ${teacher.lastName}"></option>
+    </select>
+    <div class="input-group input-group-sm">
+
+      <input class="form-control form-control-navbar" type="date" name="fromDate"
+             placeholder="Search"
+             aria-label="Search">
+      <input class="form-control form-control-navbar" type="date" name="toDate"
+             placeholder="Search"
+             aria-label="Search">
+      <button class="btn btn-primary" type="submit">Search</button>
+    </div>
+  </div>
+</form>
+<div id="calendar"></div>
+</body>
+</html>

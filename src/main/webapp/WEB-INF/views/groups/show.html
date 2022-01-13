@@ -5,26 +5,9 @@
   <title>Group information</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
         integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-  <link rel="stylesheet" href="/static/fullcalendar5/lib/main.css">
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
           integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
           crossorigin="anonymous"></script>
-  <script src="https://code.jquery.com/jquery.min.js"></script>
-  <script src="/static/fullcalendar5/lib/main.js"></script>
-  <script th:inline="javascript">
-    document.addEventListener('DOMContentLoaded', function () {
-      var id = [[${id}]];
-      var date1 = [[${date1}]];
-      var date2 = [[${date2}]];
-      var calendarEl = document.getElementById('calendar');
-      var calendar = new FullCalendar.Calendar(calendarEl, {
-        initialView: 'dayGridMonth',
-        timeZone: 'UTC',
-        events: 'http://localhost:8080/groups/' + id + '/getLessons?date1=' + date1 + '&date2=' + date2
-      });
-      calendar.render();
-    });
-  </script>
 </head>
 <body>
 <div class="row justify-content-center">
@@ -48,18 +31,5 @@
     </div>
   </div>
 </div>
-<form class="form-inline ml-3" th:action="@{/groups/{id}(id=${group.getId()})}" method="GET">
-  <div class="input-group input-group-sm">
-    <input class="form-control form-control-navbar" type="date" name="date1" th:value="${date1}" placeholder="Search"
-           aria-label="Search">
-    <input class="form-control form-control-navbar" type="date" name="date2" th:value="${date2}" placeholder="Search"
-           aria-label="Search">
-
-    <div class="input-group-append">
-      <button class="btn btn-navbar" type="submit"></button>
-    </div>
-  </div>
-</form>
-<div id="calendar"></div>
 </body>
 </html>

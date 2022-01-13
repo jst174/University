@@ -24,5 +24,5 @@ public interface LessonDao extends Dao<Lesson> {
 
     List<Lesson> getByGroupIdBetweenDates(int groupId, LocalDate date1, LocalDate date2);
 
-    List<Lesson> getByTeacherIdBetweenDates(int teacherId, LocalDate date1, LocalDate date2);
+    List<Lesson> getByTeacherIdBetweenDates(int teacherId, LocalDate fromDate, LocalDate toDate);
 }
