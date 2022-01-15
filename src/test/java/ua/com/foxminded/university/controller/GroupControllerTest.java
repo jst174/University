@@ -1,7 +1,5 @@
 package ua.com.foxminded.university.controller;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -15,12 +13,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import ua.com.foxminded.university.dto.LessonDto;
+import ua.com.foxminded.university.dto.LessonMapper;
 import ua.com.foxminded.university.exceptions.EntityNotFoundException;
 import ua.com.foxminded.university.model.*;
 import ua.com.foxminded.university.service.GroupService;
 import ua.com.foxminded.university.service.LessonService;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,6 +39,8 @@ public class GroupControllerTest {
     private GroupService groupService;
     @Mock
     private LessonService lessonService;
+    @Mock
+    private LessonMapper lessonMapper;
     @InjectMocks
     private GroupController groupController;
 
@@ -125,6 +128,23 @@ public class GroupControllerTest {
             .andExpect(view().name("exception/error"))
             .andExpect(model().attribute("exception", "EntityNotFoundException"))
             .andExpect(model().attribute("message", message));
+    }
+
+    @Test
+    public void givenTwoDates_whenGetLessons_thenReturn() throws Exception {
+        LessonDto lessonDto = new LessonDto();
+        lessonDto.setTitle(TestData.lesson1.getCourse().getName());
+        lessonDto.setStart(TestData.lesson1.getDate().atTime(TestData.lesson1.getTime().getStartTime()));
+        lessonDto.setEnd(TestData.lesson1.getDate().atTime(TestData.lesson1.getTime().getEndTime()));
+        when(lessonService.getByGroupIdBetweenDates(1, LocalDate.of(2021, 11, 30),
+            LocalDate.of(2022, 1, 1))).thenReturn(Arrays.asList(TestData.lesson1));
+        when(lessonMapper.convertLessonToLessonDto(TestData.lesson1)).thenReturn(lessonDto);
+        mockMvc.perform(get("/groups/{id}/getLessons?fromDate={fromDate}&toDate={toDate}", 1,
+                LocalDate.of(2021, 11, 30),
+                LocalDate.of(2022, 1, 1)))
+            .andExpect(status().isOk())
+            .andExpect(content()
+                .string("[{\"title\":\"History\",\"start\":\"2021-12-12T08:00:00\",\"end\":\"2021-12-12T09:30:00\"}]"));
     }
 
 

@@ -140,7 +140,7 @@ public class LessonControllerTest {
         when(timeService.getById(1)).thenReturn(TestData.time1);
         when(teacherService.getById(1)).thenReturn(TestData.teacher1);
         when(courseService.getById(1)).thenReturn(TestData.course1);
-        mockMvc.perform(patch("/lessons/{id}",1)
+        mockMvc.perform(patch("/lessons/{id}", 1)
                 .flashAttr("lesson", TestData.lesson1)
             )
             .andDo(MockMvcResultHandlers.print())
@@ -156,6 +156,20 @@ public class LessonControllerTest {
             .andExpect(status().is3xxRedirection())
             .andExpect(view().name("redirect:/lessons"));
         verify(lessonService).delete(1);
+    }
+
+    @Test
+    public void whenGetScheduleForGroups_thenShowScheduleView() throws Exception {
+        mockMvc.perform(get("/lessons/groups-schedule"))
+            .andExpect(status().isOk())
+            .andExpect(view().name("lessons/groupsSchedule"));
+    }
+
+    @Test
+    public void whenGetScheduleForTeachers_thenShowScheduleView() throws Exception {
+        mockMvc.perform(get("/lessons/teachers-schedule"))
+            .andExpect(status().isOk())
+            .andExpect(view().name("lessons/teachersSchedule"));
     }
 
     interface TestData {

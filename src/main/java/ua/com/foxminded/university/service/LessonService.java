@@ -71,9 +71,9 @@ public class LessonService {
         return lessonDao.getAll();
     }
 
-    public List<Lesson> getByGroupIdBetweenDates(int groupId, LocalDate date1, LocalDate date2) {
-        logger.debug("Getting lesson where group_id = {} and date1 = {}, date2 = {}", groupId, date1, date2);
-        return lessonDao.getByGroupIdBetweenDates(groupId, date1, date2);
+    public List<Lesson> getByGroupIdBetweenDates(int groupId, LocalDate fromDate, LocalDate toDate) {
+        logger.debug("Getting lesson where group_id = {} and date1 = {}, date2 = {}", groupId, fromDate, toDate);
+        return lessonDao.getByGroupIdBetweenDates(groupId, fromDate, toDate);
     }
 
     public List<Lesson> getByTeacherIdBetweenDates(int teacherId, LocalDate fromDate, LocalDate toDate) {

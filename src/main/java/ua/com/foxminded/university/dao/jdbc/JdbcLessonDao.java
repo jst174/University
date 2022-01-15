@@ -151,8 +151,8 @@ public class JdbcLessonDao implements LessonDao {
     }
 
     @Override
-    public List<Lesson> getByGroupIdBetweenDates(int groupId, LocalDate date1, LocalDate date2) {
-        return jdbcTemplate.query(SQL_GET_BY_GROUP_BETWEEN_DATES, lessonMapper, groupId, date1, date2);
+    public List<Lesson> getByGroupIdBetweenDates(int groupId, LocalDate fromDate, LocalDate toDate) {
+        return jdbcTemplate.query(SQL_GET_BY_GROUP_BETWEEN_DATES, lessonMapper, groupId, fromDate, toDate);
     }
 
     @Override

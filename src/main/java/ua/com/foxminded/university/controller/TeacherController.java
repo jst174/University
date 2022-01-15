@@ -1,6 +1,5 @@
 package ua.com.foxminded.university.controller;
 
-import org.mapstruct.factory.Mappers;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
@@ -19,6 +18,7 @@ import ua.com.foxminded.university.service.TeacherService;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE;
 
@@ -45,15 +45,8 @@ public class TeacherController {
     }
 
     @GetMapping("/{id}")
-    public String getById(
-        @PathVariable int id, Model model,
-        @RequestParam(value = "date1", required = false, defaultValue = "#{T(java.time.LocalDate).now()}")
-        @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date1,
-        @RequestParam(value = "date2", required = false, defaultValue = "#{T(java.time.LocalDate).now()}")
-        @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date2) throws EntityNotFoundException {
+    public String getById(@PathVariable int id, Model model) throws EntityNotFoundException {
         model.addAttribute("teacher", teacherService.getById(id));
-        model.addAttribute("date1", date1.toString());
-        model.addAttribute("date2", date2.toString());
         return "teachers/show";
     }
 
@@ -92,16 +85,13 @@ public class TeacherController {
     @ResponseBody
     public List<LessonDto> getLessons(
         @PathVariable int id,
-        @RequestParam(value = "fromDate", required = false)
+        @RequestParam(required = false)
         @DateTimeFormat(iso = DATE) LocalDate fromDate,
-        @RequestParam(value = "toDate", required = false)
+        @RequestParam(required = false)
         @DateTimeFormat(iso = DATE) LocalDate toDate) {
-        List<Lesson> lessons = lessonService.getByTeacherIdBetweenDates(id, fromDate, toDate);
-        List<LessonDto> lessonsDto = new ArrayList<>();
-        for (Lesson lesson : lessons) {
-            LessonDto lessonDto = lessonMapper.convertLessonToLessonDto(lesson);
-            lessonsDto.add(lessonDto);
-        }
-        return lessonsDto;
+        return lessonService.getByTeacherIdBetweenDates(id, fromDate, toDate)
+            .stream()
+            .map(lessonMapper::convertLessonToLessonDto)
+            .collect(Collectors.toList());
     }
 }

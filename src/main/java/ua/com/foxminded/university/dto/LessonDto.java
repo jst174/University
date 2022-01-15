@@ -1,19 +1,19 @@
 package ua.com.foxminded.university.dto;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+import java.time.LocalDateTime;
+
 public class LessonDto {
 
-    private int id;
     private String title;
-    private String start;
-    private String end;
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    private LocalDateTime start;
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    private LocalDateTime end;
 
     public String getTitle() {
         return title;
@@ -23,19 +23,19 @@ public class LessonDto {
         this.title = title;
     }
 
-    public String getStart() {
+    public LocalDateTime getStart() {
         return start;
     }
 
-    public void setStart(String start) {
+    public void setStart(LocalDateTime start) {
         this.start = start;
     }
 
-    public String getEnd() {
+    public LocalDateTime getEnd() {
         return end;
     }
 
-    public void setEnd(String end) {
+    public void setEnd(LocalDateTime end) {
         this.end = end;
     }
 }

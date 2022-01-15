@@ -15,8 +15,10 @@ import ua.com.foxminded.university.service.GroupService;
 import ua.com.foxminded.university.service.LessonService;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE;
 
@@ -80,16 +82,13 @@ public class GroupController {
     @ResponseBody
     public List<LessonDto> getLessons(
         @PathVariable int id,
-        @RequestParam(value = "fromDate", required = false)
+        @RequestParam(required = false)
         @DateTimeFormat(iso = DATE) LocalDate fromDate,
-        @RequestParam(value = "toDate", required = false)
+        @RequestParam(required = false)
         @DateTimeFormat(iso = DATE) LocalDate toDate) {
-        List<Lesson> lessons = lessonService.getByGroupIdBetweenDates(id, fromDate, toDate);
-        List<LessonDto> lessonsDto = new ArrayList<>();
-        for (Lesson lesson : lessons) {
-            LessonDto lessonDto = lessonMapper.convertLessonToLessonDto(lesson);
-            lessonsDto.add(lessonDto);
-        }
-        return lessonsDto;
+        return lessonService.getByGroupIdBetweenDates(id, fromDate, toDate)
+            .stream()
+            .map(lessonMapper::convertLessonToLessonDto)
+            .collect(Collectors.toList());
     }
 }
