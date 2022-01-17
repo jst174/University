@@ -11,6 +11,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ua.com.foxminded.university.dto.LessonDto;
@@ -23,7 +24,6 @@ import ua.com.foxminded.university.service.TeacherService;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -150,16 +150,25 @@ public class TeacherControllerTest {
         when(lessonService.getByTeacherIdBetweenDates(1, LocalDate.of(2021, 11, 30),
             LocalDate.of(2022, 1, 1))).thenReturn(Arrays.asList(TestData.lesson1));
         when(lessonMapper.convertLessonToLessonDto(TestData.lesson1)).thenReturn(lessonDto);
-        mockMvc.perform(get("/teachers/{id}/getLessons?fromDate={fromDate}&toDate={toDate}", 1,
-                LocalDate.of(2021, 11, 30),
-                LocalDate.of(2022, 1, 1)))
+        mockMvc.perform(get("/teachers/{id}/getLessons", 1)
+                .param("fromDate", "2021-11-30")
+                .param("toDate", "2022-01-01"))
             .andExpect(status().isOk())
-            .andExpect(content()
-                .string("[{\"title\":\"History\",\"start\":\"2021-12-12T08:00:00\",\"end\":\"2021-12-12T09:30:00\"}]"));
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$[0].title").value("History"))
+            .andExpect(jsonPath("$[0].start").value("2021-12-12 08:00:00"))
+            .andExpect(jsonPath("$[0].end").value("2021-12-12 09:30:00"));
     }
 
-
     interface TestData {
+        Group group1 = new Group.Builder()
+            .setName("GD-12")
+            .setId(1)
+            .build();
+        Group group2 = new Group.Builder()
+            .setName("GS-14")
+            .setId(2)
+            .build();
         Teacher teacher1 = new Teacher.Builder()
             .setFirstName("Mike")
             .setLastName("Miller")
@@ -208,7 +217,7 @@ public class TeacherControllerTest {
             .setClassroom(classroom1)
             .setCourse(course1)
             .setTeacher(teacher1)
-            .setGroups(new ArrayList<>(Arrays.asList(LessonControllerTest.TestData.group1, LessonControllerTest.TestData.group2)))
+            .setGroups(Arrays.asList(TestData.group1, TestData.group2))
             .setId(1)
             .build();
         Lesson lesson2 = new Lesson.Builder()
@@ -217,7 +226,7 @@ public class TeacherControllerTest {
             .setClassroom(classroom2)
             .setTeacher(teacher1)
             .setCourse(course2)
-            .setGroups(new ArrayList<>(Arrays.asList(LessonControllerTest.TestData.group1, LessonControllerTest.TestData.group2)))
+            .setGroups(Arrays.asList(TestData.group1, TestData.group2))
             .setId(2)
             .build();
     }
