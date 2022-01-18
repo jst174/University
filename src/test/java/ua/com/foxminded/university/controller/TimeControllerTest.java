@@ -13,11 +13,14 @@ import ua.com.foxminded.university.exceptions.EntityNotFoundException;
 import ua.com.foxminded.university.model.Time;
 import ua.com.foxminded.university.service.TimeService;
 
+import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 
@@ -59,6 +62,52 @@ public class TimeControllerTest {
     }
 
     @Test
+    public void whenShowCreatingForm_thenShowCreatingForm() throws Exception {
+        mockMvc.perform(get("/times/new"))
+            .andExpect(status().isOk())
+            .andExpect(model().attributeExists("time"))
+            .andExpect(view().name("times/new"));
+    }
+
+    @Test
+    public void whenCreate_thenCreatedAndRedirectView() throws Exception {
+        mockMvc.perform(post("/times")
+                .param("startTime", "08:00")
+                .param("endTime", "09:30"))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(model().attributeExists("time"))
+            .andExpect(view().name("redirect:/times"));
+        verify(timeService).create(TestData.time1);
+    }
+
+    @Test
+    public void whenEdit_thenShowEditingForm() throws Exception {
+        when(timeService.getById(1)).thenReturn(TestData.time1);
+        mockMvc.perform(get("/times/{id}/edit", 1))
+            .andExpect(status().isOk())
+            .andExpect(view().name("times/edit"))
+            .andExpect(model().attribute("time", TestData.time1));
+    }
+
+    @Test
+    public void whenUpdate_thenUpdateAndRedirectView() throws Exception {
+        mockMvc.perform(patch("/times/{id}", 1)
+                .param("startTime", "08:00")
+                .param("endTime", "09:30"))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(view().name("redirect:/times"));
+        verify(timeService).update(TestData.time1);
+    }
+
+    @Test
+    public void whenDelete_thenDeleteClassroomAndRedirectView() throws Exception {
+        mockMvc.perform(delete("/times/{id}", 1))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(view().name("redirect:/times"));
+        verify(timeService).delete(1);
+    }
+
+    @Test
     public void givenIncorrectGetRequest_whenGetById_thenShowExceptionView() throws Exception {
         String message = "Time with id = 1 not found";
         when(timeService.getById(1)).thenThrow(new EntityNotFoundException(message));
@@ -70,9 +119,13 @@ public class TimeControllerTest {
 
     interface TestData {
         Time time1 = new Time.Builder()
+            .setStartTime(LocalTime.of(8, 0))
+            .setEndTime(LocalTime.of(9, 30))
             .setId(1)
             .build();
         Time time2 = new Time.Builder()
+            .setStartTime(LocalTime.of(12, 0))
+            .setEndTime(LocalTime.of(13, 30))
             .setId(2)
             .build();
     }

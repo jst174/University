@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <title th:text="${classroom.getNumber()}">Classroom</title>
+  <title>Classroom information</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
         integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
@@ -10,7 +10,31 @@
           crossorigin="anonymous"></script>
 </head>
 <body>
-<p> Number: <span th:text="${classroom.getNumber()}">value</span></p>
-<p> Capacity: <span th:text="${classroom.getCapacity()}">value</span></p>
+<div class="row justify-content-center">
+  <div class="col-auto">
+    <table class="table table-responsive">
+      <tbody>
+      <tr>
+        <td>Number:</td>
+        <td th:text="${classroom.getNumber()}"/>
+      </tr>
+      <tr>
+        <td>Capacity:</td>
+        <td th:text="${classroom.getCapacity()}"/>
+      </tr>
+      </tbody>
+    </table>
+    <div class="btn-group" role="group">
+      <a th:href="@{/classrooms}" class="btn btn-primary btn-sm" role="button"
+         aria-pressed="true">Back</a>
+      <a th:href="@{/classrooms/{id}/edit(id=${classroom.getId()})}" class="btn btn-warning btn-sm" role="button"
+         aria-pressed="true">Edit</a>
+      <form th:method="DELETE" th:action="@{/classrooms/{id}(id=${classroom.getId()})}">
+        <input type="submit" class="btn btn-danger btn-sm" value="Delete">
+      </form>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>

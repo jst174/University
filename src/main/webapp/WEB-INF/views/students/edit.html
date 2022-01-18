@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Editing student</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+          integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+          crossorigin="anonymous"></script>
+</head>
+<body>
+<div class="container h-100">
+  <div class="row h-100 justify-content-center align-items-center">
+    <form th:method="PATCH" th:action="@{/students/{id}(id=${student.getId()})}" th:object="${student}"
+          class="col-3">
+      <div class="form-group">
+        <label for="first-name">First Name:</label>
+        <input type="text" class="form-control" th:field="*{firstName}" id="first-name">
+      </div>
+      <div class="form-group">
+        <label for="last-name">Last Name:</label>
+        <input type="text" class="form-control" th:field="*{lastName}" id="last-name">
+      </div>
+      <div class="form-group">
+        <label for="birthday">Birthday:</label>
+        <input type="text" class="form-control" th:field="*{birthDate}" id="birthday">
+      </div>
+      <div class="form-group">
+        <label for="phone">Number of phone:</label>
+        <input type="text" class="form-control" th:field="*{phoneNumber}" id="phone">
+      </div>
+      <div class="form-group">
+        <label for="email">Email:</label>
+        <input type="text" class="form-control" th:field="*{email}" id="email">
+      </div>
+      <div class="form-group">
+        <label for="gender" class="form-label">Gender</label>
+        <select id="gender" th:field="*{gender}" class="form-select">
+          <option th:each="gender : ${T(ua.com.foxminded.university.model.Gender).values()}"
+                  th:value="${gender}" th:text="${gender}"></option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="col-form-label">Select group:</label>
+        <select class="form-select" id="group" th:field="*{group.id}">
+          <option th:each="group: ${groups}" th:value="${group.id}" th:text="${group.name}"></option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="country">Country:</label>
+        <input type="text" class="form-control" th:field="*{address.country}" id="country">
+      </div>
+      <div class="form-group">
+        <label for="city">City:</label>
+        <input type="text" class="form-control" th:field="*{address.city}" id="city">
+      </div>
+      <div class="form-group">
+        <label for="street">Street:</label>
+        <input type="text" class="form-control" th:field="*{address.street}" id="street">
+      </div>
+      <div class="form-group">
+        <label for="house">House:</label>
+        <input type="text" class="form-control" th:field="*{address.houseNumber}" id="house">
+      </div>
+      <div class="form-group">
+        <label for="apartment">Apartment:</label>
+        <input type="text" class="form-control" th:field="*{address.apartmentNumber}" id="apartment">
+      </div>
+      <div class="form-group">
+        <label for="postcode">Postcode:</label>
+        <input type="text" class="form-control" th:field="*{address.postcode}" id="postcode">
+      </div>
+      <button type="submit" class="btn btn-primary btn-sm btn-block">Update</button>
+    </form>
+  </div>
+</div>
+</body>
+</html>

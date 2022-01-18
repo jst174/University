@@ -14,6 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 import ua.com.foxminded.university.dao.AddressDao;
 import ua.com.foxminded.university.dao.StudentDao;
 import ua.com.foxminded.university.dao.mapper.StudentMapper;
+import ua.com.foxminded.university.exceptions.EntityNotFoundException;
+import ua.com.foxminded.university.model.Address;
 import ua.com.foxminded.university.model.Classroom;
 import ua.com.foxminded.university.model.Course;
 import ua.com.foxminded.university.model.Student;
@@ -76,17 +78,18 @@ public class JdbcStudentDao implements StudentDao {
         }
     }
 
-    public void update(Student student) {
+    public void update(Student updatedStudent) {
+        updateAddress(updatedStudent);
         jdbcTemplate.update(SQL_UPDATE_STUDENT,
-            student.getFirstName(),
-            student.getLastName(),
-            student.getBirthDate(),
-            student.getGender().toString(),
-            student.getAddress().getId(),
-            student.getPhoneNumber(),
-            student.getEmail(),
-            student.getGroup().getId(),
-            student.getId());
+            updatedStudent.getFirstName(),
+            updatedStudent.getLastName(),
+            updatedStudent.getBirthDate(),
+            updatedStudent.getGender().toString(),
+            updatedStudent.getAddress().getId(),
+            updatedStudent.getPhoneNumber(),
+            updatedStudent.getEmail(),
+            updatedStudent.getGroup().getId(),
+            updatedStudent.getId());
     }
 
     public void delete(int id) {
@@ -119,5 +122,15 @@ public class JdbcStudentDao implements StudentDao {
         int pageSize = pageable.getPageSize();
         List<Student> students = jdbcTemplate.query(SQL_GET_STUDENTS_PAGE, studentMapper, pageSize, pageable.getOffset());
         return new PageImpl<Student>(students, pageable, totalRows);
+    }
+
+    private void updateAddress(Student updatedStudent) {
+        Student student = jdbcTemplate.queryForObject(SQL_FIND_STUDENT, studentMapper, updatedStudent.getId());
+        if (student != null) {
+            Address address = student.getAddress();
+            Address updatedAddress = updatedStudent.getAddress();
+            updatedAddress.setId(address.getId());
+            addressDao.update(updatedAddress);
+        }
     }
 }

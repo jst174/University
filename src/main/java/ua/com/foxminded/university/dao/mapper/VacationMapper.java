@@ -18,9 +18,10 @@ public class VacationMapper implements RowMapper<Vacation> {
 
     @Override
     public Vacation mapRow(ResultSet rs, int rowNum) throws SQLException {
-        Vacation vacation = new Vacation(rs.getObject("start", LocalDate.class),
-            rs.getObject("ending", LocalDate.class),
-            teacherDao.getById(rs.getInt("teacher_id")).orElse(null));
+        Vacation vacation = new Vacation();
+        vacation.setStart(rs.getObject("start", LocalDate.class));
+        vacation.setEnd(rs.getObject("ending", LocalDate.class));
+        teacherDao.getById(rs.getInt("teacher_id")).ifPresent(vacation::setTeacher);
         vacation.setId(rs.getInt("id"));
         return vacation;
     }

@@ -1,12 +1,17 @@
 package ua.com.foxminded.university.model;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import java.time.LocalDate;
 import java.util.Objects;
+
+import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE;
 
 public abstract class Person {
 
     private String firstName;
     private String lastName;
+    @DateTimeFormat(iso = DATE)
     private LocalDate birthDate;
     private Gender gender;
     private Address address;

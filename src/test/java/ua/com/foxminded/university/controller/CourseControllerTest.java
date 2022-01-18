@@ -20,8 +20,8 @@ import ua.com.foxminded.university.service.CourseService;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -66,10 +66,54 @@ public class CourseControllerTest {
     }
 
     @Test
+    public void whenShowCreatingForm_thenShowCreatingForm() throws Exception {
+        mockMvc.perform(get("/courses/new"))
+            .andExpect(status().isOk())
+            .andExpect(model().attributeExists("course"))
+            .andExpect(view().name("courses/new"));
+    }
+
+    @Test
+    public void whenCreate_thenCreatedAndRedirectView() throws Exception {
+        mockMvc.perform(post("/courses")
+                .param("name", "History"))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(model().attributeExists("course"))
+            .andExpect(view().name("redirect:/courses"));
+        verify(courseService).create(TestData.course1);
+    }
+
+    @Test
+    public void whenEdit_thenShowEditingForm() throws Exception {
+        when(courseService.getById(1)).thenReturn(TestData.course1);
+        mockMvc.perform(get("/courses/{id}/edit", 1))
+            .andExpect(status().isOk())
+            .andExpect(view().name("courses/edit"))
+            .andExpect(model().attribute("course", TestData.course1));
+    }
+
+    @Test
+    public void whenUpdate_thenUpdateAndRedirectView() throws Exception {
+        mockMvc.perform(patch("/courses/{id}", 1)
+                .param("name", "History"))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(view().name("redirect:/courses"));
+        verify(courseService).update(TestData.course1);
+    }
+
+    @Test
+    public void whenDelete_thenDeleteClassroomAndRedirectView() throws Exception {
+        mockMvc.perform(delete("/courses/{id}", 1))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(view().name("redirect:/courses"));
+        verify(courseService).delete(1);
+    }
+
+    @Test
     public void givenIncorrectGetRequest_whenGetById_thenShowExceptionView() throws Exception {
         String message = "Course with id = 1 not found";
         when(courseService.getById(1)).thenThrow(new EntityNotFoundException(message));
-        mockMvc.perform(get("/courses/1"))
+        mockMvc.perform(get("/courses/{id}", 1))
             .andExpect(view().name("exception/error"))
             .andExpect(model().attribute("exception", "EntityNotFoundException"))
             .andExpect(model().attribute("message", message));

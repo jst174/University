@@ -14,14 +14,20 @@ import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ua.com.foxminded.university.exceptions.EntityNotFoundException;
+import ua.com.foxminded.university.model.Gender;
+import ua.com.foxminded.university.model.Teacher;
 import ua.com.foxminded.university.model.Vacation;
+import ua.com.foxminded.university.service.TeacherService;
 import ua.com.foxminded.university.service.VacationService;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 
@@ -31,6 +37,8 @@ public class VacationControllerTest {
     private MockMvc mockMvc;
     @Mock
     private VacationService vacationService;
+    @Mock
+    private TeacherService teacherService;
     @InjectMocks
     private VacationController vacationController;
 
@@ -67,6 +75,52 @@ public class VacationControllerTest {
     }
 
     @Test
+    public void whenShowCreatingForm_thenShowCreatingForm() throws Exception {
+        mockMvc.perform(get("/vacations/new"))
+            .andExpect(status().isOk())
+            .andExpect(model().attributeExists("vacation"))
+            .andExpect(view().name("vacations/new"));
+    }
+
+    @Test
+    public void whenCreate_thenCreatedAndRedirectView() throws Exception {
+        mockMvc.perform(post("/vacations")
+                .param("start", "2021-12-12")
+                .param("end", "2021-12-20"))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(model().attributeExists("vacation"))
+            .andExpect(view().name("redirect:/vacations"));
+        verify(vacationService).create(TestData.vacation1);
+    }
+
+    @Test
+    public void whenEdit_thenShowEditingForm() throws Exception {
+        when(vacationService.getById(1)).thenReturn(TestData.vacation1);
+        mockMvc.perform(get("/vacations/{id}/edit", 1))
+            .andExpect(status().isOk())
+            .andExpect(view().name("vacations/edit"))
+            .andExpect(model().attribute("vacation", TestData.vacation1));
+    }
+
+    @Test
+    public void whenUpdate_thenUpdateAndRedirectView() throws Exception {
+        mockMvc.perform(patch("/vacations/{id}", 1)
+                .param("start", "2021-12-12")
+                .param("end", "2021-12-20"))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(view().name("redirect:/vacations"));
+        verify(vacationService).update(TestData.vacation1);
+    }
+
+    @Test
+    public void whenDelete_thenDeleteClassroomAndRedirectView() throws Exception {
+        mockMvc.perform(delete("/vacations/{id}", 1))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(view().name("redirect:/vacations"));
+        verify(vacationService).delete(1);
+    }
+
+    @Test
     public void givenIncorrectGetRequest_whenGetById_thenShowExceptionView() throws Exception {
         String message = "Vacation with id = 1 not found";
         when(vacationService.getById(1)).thenThrow(new EntityNotFoundException(message));
@@ -78,9 +132,13 @@ public class VacationControllerTest {
 
     interface TestData {
         Vacation vacation1 = new Vacation.Builder()
+            .setStart(LocalDate.of(2021, 12, 12))
+            .setEnd(LocalDate.of(2021, 12, 20))
             .setId(1)
             .build();
         Vacation vacation2 = new Vacation.Builder()
+            .setStart(LocalDate.of(2022, 1, 12))
+            .setEnd(LocalDate.of(2022, 1, 20))
             .setId(2)
             .build();
     }

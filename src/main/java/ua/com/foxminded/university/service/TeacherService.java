@@ -7,9 +7,14 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import ua.com.foxminded.university.dao.AddressDao;
+import ua.com.foxminded.university.dao.CourseDao;
 import ua.com.foxminded.university.dao.TeacherDao;
+import ua.com.foxminded.university.dao.VacationDao;
 import ua.com.foxminded.university.exceptions.EntityNotFoundException;
 import ua.com.foxminded.university.exceptions.NotUniqueNameException;
+import ua.com.foxminded.university.model.Address;
+import ua.com.foxminded.university.model.Student;
 import ua.com.foxminded.university.model.Teacher;
 
 import java.util.Collections;
@@ -23,9 +28,13 @@ public class TeacherService {
     private static final Logger logger = LoggerFactory.getLogger(TeacherService.class);
 
     private TeacherDao teacherDao;
+    private CourseDao courseDao;
+    private VacationDao vacationDao;
 
-    public TeacherService(TeacherDao teacherDao) {
+    public TeacherService(TeacherDao teacherDao, CourseDao courseDao, VacationDao vacationDao) {
         this.teacherDao = teacherDao;
+        this.courseDao = courseDao;
+        this.vacationDao = vacationDao;
     }
 
     public void create(Teacher teacher) throws NotUniqueNameException {
@@ -36,14 +45,17 @@ public class TeacherService {
 
     public Teacher getById(int id) throws EntityNotFoundException {
         logger.debug("Getting teacher with id = {}", id);
-        return teacherDao.getById(id).orElseThrow(() ->
+        Teacher teacher = teacherDao.getById(id).orElseThrow(() ->
             new EntityNotFoundException(format("Teacher with id = %s not found", id)));
+        teacher.setCourses(courseDao.getByTeacherId(id));
+        teacher.setVacations(vacationDao.getByTeacherId(id));
+        return teacher;
     }
 
-    public void update(Teacher teacher) throws NotUniqueNameException {
-        logger.debug("Updating teacher with id = {}", teacher.getId());
-        verifyNameUniqueness(teacher);
-        teacherDao.update(teacher);
+    public void update(Teacher updatedTeacher) throws NotUniqueNameException, EntityNotFoundException {
+        logger.debug("Updating teacher with id = {}", updatedTeacher.getId());
+        verifyNameUniqueness(updatedTeacher);
+        teacherDao.update(updatedTeacher);
     }
 
     public void delete(int id) {
@@ -54,6 +66,11 @@ public class TeacherService {
     public Page<Teacher> getAll(Pageable pageable) {
         logger.debug("Getting all teacher");
         return teacherDao.getAll(pageable);
+    }
+
+    public List<Teacher> getAll() {
+        logger.debug("Getting all teacher");
+        return teacherDao.getAll();
     }
 
     private void verifyNameUniqueness(Teacher teacher) throws NotUniqueNameException {

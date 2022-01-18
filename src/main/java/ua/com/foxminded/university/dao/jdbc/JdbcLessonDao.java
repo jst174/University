@@ -45,15 +45,20 @@ public class JdbcLessonDao implements LessonDao {
     private static final String SQL_FIND_BY_DATE_AND_TIME = "SELECT * FROM lessons WHERE date = ? and time_id = ?";
     private static final String SQL_COUNT_ROWS = "SELECT COUNT(*) FROM lessons";
     private static final String SQL_GET_LESSONS_PAGE = "SELECT * FROM lessons LIMIT (?) OFFSET (?)";
+    private static final String SQL_GET_BY_GROUP = "SELECT * FROM lessons INNER JOIN lessons_groups lg ON lessons.id = lg.lesson_id WHERE lg.group_id = ?";
+    private static final String SQL_GET_BY_GROUP_BETWEEN_DATES = "SELECT * FROM lessons " +
+        "INNER JOIN lessons_groups lg ON lessons.id = lg.lesson_id WHERE lg.group_id = ? " +
+        "AND date BETWEEN ? AND ?";
+    private static final String SQL_GET_BY_TEACHER_BETWEEN_DATES = "SELECT * FROM lessons WHERE teacher_id = ? AND date BETWEEN ? AND ?";
 
     private JdbcTemplate jdbcTemplate;
     private LessonMapper lessonMapper;
-    @Autowired
     private GroupDao groupDao;
 
-    public JdbcLessonDao(JdbcTemplate jdbcTemplate, LessonMapper lessonMapper) {
+    public JdbcLessonDao(JdbcTemplate jdbcTemplate, LessonMapper lessonMapper, GroupDao groupDao) {
         this.jdbcTemplate = jdbcTemplate;
         this.lessonMapper = lessonMapper;
+        this.groupDao = groupDao;
     }
 
     @Transactional
@@ -116,8 +121,12 @@ public class JdbcLessonDao implements LessonDao {
 
     @Override
     public Optional<Lesson> getByDateAndTimeAndTeacher(LocalDate date, Time time, Teacher teacher) {
-        return Optional.ofNullable(jdbcTemplate.queryForObject(SQL_FIND_BY_DATE_AND_TIME_AND_TEACHER, lessonMapper, date,
-            time.getId(), teacher.getId()));
+        try {
+            return Optional.of(jdbcTemplate.queryForObject(SQL_FIND_BY_DATE_AND_TIME_AND_TEACHER, lessonMapper, date,
+                time.getId(), teacher.getId()));
+        } catch (DataAccessException e) {
+            return Optional.empty();
+        }
     }
 
     @Override
@@ -134,6 +143,21 @@ public class JdbcLessonDao implements LessonDao {
     public List<Lesson> getByDateAndTime(LocalDate date, Time time) {
         return jdbcTemplate.query(SQL_FIND_BY_DATE_AND_TIME, lessonMapper, date,
             time.getId());
+    }
+
+    @Override
+    public List<Lesson> getByGroupId(int groupId) {
+        return jdbcTemplate.query(SQL_GET_BY_GROUP, lessonMapper, groupId);
+    }
+
+    @Override
+    public List<Lesson> getByGroupIdBetweenDates(int groupId, LocalDate fromDate, LocalDate toDate) {
+        return jdbcTemplate.query(SQL_GET_BY_GROUP_BETWEEN_DATES, lessonMapper, groupId, fromDate, toDate);
+    }
+
+    @Override
+    public List<Lesson> getByTeacherIdBetweenDates(int teacherId, LocalDate fromDate, LocalDate toDate) {
+        return jdbcTemplate.query(SQL_GET_BY_TEACHER_BETWEEN_DATES, lessonMapper, teacherId, fromDate, toDate);
     }
 
     @Override

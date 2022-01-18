@@ -36,8 +36,8 @@ CREATE TABLE students
   phone_number VARCHAR,
   email        VARCHAR,
   group_id     INTEGER,
-  FOREIGN KEY (address_id) REFERENCES addresses (id) ON DELETE SET NULL,
-  FOREIGN KEY (group_id) REFERENCES groups (id) ON DELETE SET NULL
+  FOREIGN KEY (address_id) REFERENCES addresses (id) ON DELETE RESTRICT,
+  FOREIGN KEY (group_id) REFERENCES groups (id) ON DELETE RESTRICT
 );
 
 DROP TABLE IF EXISTS teachers CASCADE;
@@ -52,7 +52,7 @@ CREATE TABLE teachers
   phone_number    VARCHAR,
   email           VARCHAR,
   academic_degree VARCHAR,
-  FOREIGN KEY (address_id) REFERENCES addresses (id) ON UPDATE CASCADE ON DELETE CASCADE
+  FOREIGN KEY (address_id) REFERENCES addresses (id) ON DELETE RESTRICT
 );
 
 DROP TABLE IF EXISTS vacations CASCADE;
@@ -92,11 +92,11 @@ DROP TABLE IF EXISTS lessons CASCADE;
 CREATE TABLE lessons
 (
   id           SERIAL PRIMARY KEY NOT NULL,
-  classroom_id INTEGER REFERENCES classrooms (id) ON UPDATE CASCADE ON DELETE CASCADE,
-  course_id    INTEGER REFERENCES courses (id) ON UPDATE CASCADE ON DELETE CASCADE,
-  teacher_id   INTEGER REFERENCES teachers (id) ON UPDATE CASCADE ON DELETE CASCADE,
+  classroom_id INTEGER REFERENCES classrooms (id) ON DELETE RESTRICT,
+  course_id    INTEGER REFERENCES courses (id) ON DELETE RESTRICT,
+  teacher_id   INTEGER REFERENCES teachers (id) ON DELETE RESTRICT,
   date         DATE,
-  time_id      INTEGER REFERENCES times (id) ON UPDATE CASCADE ON DELETE CASCADE
+  time_id      INTEGER REFERENCES times (id) ON DELETE RESTRICT
 );
 
 DROP TABLE IF EXISTS teachers_courses CASCADE;

@@ -4,18 +4,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import ua.com.foxminded.university.dao.AddressDao;
 import ua.com.foxminded.university.dao.StudentDao;
 import ua.com.foxminded.university.exceptions.EntityNotFoundException;
 import ua.com.foxminded.university.exceptions.NotAvailableGroupException;
 import ua.com.foxminded.university.exceptions.NotUniqueNameException;
+import ua.com.foxminded.university.model.Address;
 import ua.com.foxminded.university.model.Group;
 import ua.com.foxminded.university.model.Student;
 
-import java.util.Collections;
 import java.util.List;
 
 import static java.lang.String.format;
@@ -47,11 +46,11 @@ public class StudentService {
             new EntityNotFoundException(format("Student with id = %s not found", id)));
     }
 
-    public void update(Student student) throws NotUniqueNameException, NotAvailableGroupException {
-        logger.debug("Updating student with id = {}", student.getId());
-        verifyNameUniqueness(student);
-        verifyGroupAvailability(student.getGroup());
-        studentDao.update(student);
+    public void update(Student updatedStudent) throws NotUniqueNameException, NotAvailableGroupException, EntityNotFoundException {
+        logger.debug("Updating student with id = {}", updatedStudent.getId());
+        verifyNameUniqueness(updatedStudent);
+        verifyGroupAvailability(updatedStudent.getGroup());
+        studentDao.update(updatedStudent);
     }
 
     public void delete(int id) {
@@ -62,6 +61,11 @@ public class StudentService {
     public Page<Student> getAll(Pageable pageable) {
         logger.debug("Getting all students");
         return studentDao.getAll(pageable);
+    }
+
+    public List<Student> getByGroupId(int groupId) {
+        logger.debug("Getting students with group id = {}", groupId);
+        return studentDao.getByGroupId(groupId);
     }
 
     private void verifyNameUniqueness(Student student) throws NotUniqueNameException {
@@ -80,5 +84,4 @@ public class StudentService {
                 "Max group size = %s has already been reached", group.getName(), groupSize));
         }
     }
-
 }

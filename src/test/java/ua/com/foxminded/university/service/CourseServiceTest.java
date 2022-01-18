@@ -10,7 +10,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import ua.com.foxminded.university.DataSource;
 import ua.com.foxminded.university.dao.CourseDao;
 import ua.com.foxminded.university.exceptions.EntityNotFoundException;
 import ua.com.foxminded.university.exceptions.NotUniqueNameException;
@@ -19,6 +18,7 @@ import ua.com.foxminded.university.model.Teacher;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,29 +32,6 @@ public class CourseServiceTest {
     private CourseDao courseDao;
     @InjectMocks
     private CourseService courseService;
-    private List<Course> courses;
-    private List<Teacher> teachers;
-    private DataSource dataSource;
-
-    @BeforeEach
-    public void setUp() throws IOException {
-        DataSource dataSource = new DataSource();
-        courses = new ArrayList<>();
-        Course course1 = new Course("Math");
-        course1.setId(1);
-        Course course2 = new Course("Physics");
-        course2.setId(2);
-        courses.add(course1);
-        courses.add(course2);
-        teachers = new ArrayList<>();
-        Teacher teacher1 = dataSource.generateTeacher();
-        teacher1.setId(1);
-        teacher1.setCourses(courses);
-        Teacher teacher2 = dataSource.generateTeacher();
-        teacher2.setId(2);
-        teachers.add(teacher1);
-        teachers.add(teacher2);
-    }
 
     @Test
     public void givenNewCourse_whenCreate_thenCreated() throws NotUniqueNameException {
@@ -68,8 +45,8 @@ public class CourseServiceTest {
 
     @Test
     public void givenCourseWithExistentName_whenCreate_thenNotUniqueNameExceptionThrow() {
-        Course course = new Course(courses.get(0).getName());
-        when(courseDao.getByName(course.getName())).thenReturn(Optional.of(courses.get(0)));
+        Course course = new Course(TestData.course1.getName());
+        when(courseDao.getByName(course.getName())).thenReturn(Optional.of(TestData.course1));
 
         Exception exception = assertThrows(NotUniqueNameException.class, () -> courseService.create(course));
 
@@ -81,11 +58,9 @@ public class CourseServiceTest {
 
     @Test
     public void givenExistentId_whenGetById_thenReturn() throws EntityNotFoundException {
-        Course course = courses.get(0);
+        when(courseDao.getById(1)).thenReturn(Optional.of(TestData.course1));
 
-        when(courseDao.getById(1)).thenReturn(Optional.of(course));
-
-        assertEquals(course, courseService.getById(1));
+        assertEquals(TestData.course1, courseService.getById(1));
 
     }
 
@@ -101,18 +76,17 @@ public class CourseServiceTest {
 
     @Test
     public void givenExistentCourse_whenUpdate_thenUpdated() throws NotUniqueNameException {
-        Course course = courses.get(0);
-        when(courseDao.getByName(course.getName())).thenReturn(Optional.of(course));
+        when(courseDao.getByName(TestData.course1.getName())).thenReturn(Optional.of(TestData.course1));
 
-        courseService.update(course);
+        courseService.update(TestData.course1);
 
-        verify(courseDao).update(course);
+        verify(courseDao).update(TestData.course1);
     }
 
     @Test
     public void givenCourseWithOtherCourseName_whenUpdate_thenNotUniqueNameExceptionThrow() {
-        Course course1 = courses.get(0);
-        Course course2 = courses.get(1);
+        Course course1 = TestData.course1;
+        Course course2 = TestData.course2;
         course1.setName(course2.getName());
         when(courseDao.getByName(course1.getName())).thenReturn(Optional.of(course2));
 
@@ -131,7 +105,8 @@ public class CourseServiceTest {
     }
 
     @Test
-    public void whenGetAll_thenReturn() {
+    public void givenPageable_whenGetAll_thenReturn() {
+        List<Course> courses = Arrays.asList(TestData.course1, TestData.course2);
         Pageable pageable = PageRequest.of(1, 10);
         Page<Course> coursePage = new PageImpl<Course>(courses, pageable, courses.size());
         when(courseDao.getAll(pageable)).thenReturn(coursePage);
@@ -140,9 +115,29 @@ public class CourseServiceTest {
     }
 
     @Test
+    public void whenGetAll_thenReturn() {
+        List<Course> courses = Arrays.asList(TestData.course1, TestData.course2);
+        when(courseDao.getAll()).thenReturn(courses);
+
+        assertEquals(courses, courseService.getAll());
+    }
+
+    @Test
     public void givenExistentTeacherId_whenGetByTeacherId_whenReturn() {
+        List<Course> courses = Arrays.asList(TestData.course1, TestData.course2);
         when(courseDao.getByTeacherId(1)).thenReturn(courses);
 
         assertEquals(courses, courseService.getByTeacherId(1));
+    }
+
+    interface TestData {
+        Course course1 = new Course.Builder()
+            .setName("Math")
+            .setId(1)
+            .build();
+        Course course2 = new Course.Builder()
+            .setName("Physics")
+            .setId(2)
+            .build();
     }
 }

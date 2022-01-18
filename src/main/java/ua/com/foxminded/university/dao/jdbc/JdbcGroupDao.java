@@ -3,7 +3,6 @@ package ua.com.foxminded.university.dao.jdbc;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -11,13 +10,10 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ua.com.foxminded.university.dao.GroupDao;
 import ua.com.foxminded.university.dao.mapper.GroupMapper;
-import ua.com.foxminded.university.model.Classroom;
-import ua.com.foxminded.university.model.Course;
 import ua.com.foxminded.university.model.Group;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 

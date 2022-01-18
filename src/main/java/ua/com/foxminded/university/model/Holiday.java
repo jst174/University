@@ -1,13 +1,17 @@
 package ua.com.foxminded.university.model;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.Objects;
+
+import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE;
 
 public class Holiday {
 
     private int id;
     private String name;
+    @DateTimeFormat(iso = DATE)
     private LocalDate date;
 
     public Holiday() {
@@ -54,6 +58,14 @@ public class Holiday {
     @Override
     public int hashCode() {
         return Objects.hash(name, date);
+    }
+
+    @Override
+    public String toString() {
+        return "Holiday{" +
+            "name='" + name + '\'' +
+            ", date=" + date +
+            '}';
     }
 
     public static class Builder {

@@ -1,9 +1,7 @@
 package ua.com.foxminded.university.dao.mapper;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
-import ua.com.foxminded.university.dao.StudentDao;
 import ua.com.foxminded.university.model.Group;
 
 import java.sql.ResultSet;
@@ -14,7 +12,8 @@ public class GroupMapper implements RowMapper<Group> {
 
     @Override
     public Group mapRow(ResultSet rs, int rowNum) throws SQLException {
-        Group group = new Group(rs.getString("name"));
+        Group group = new Group();
+        group.setName(rs.getString("name"));
         group.setId(rs.getInt("id"));
         return group;
     }

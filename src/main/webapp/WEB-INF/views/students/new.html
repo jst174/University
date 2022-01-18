@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Creating new student</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+          integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+          crossorigin="anonymous"></script>
+</head>
+<body>
+<div class="container h-100">
+  <div class="row h-100 justify-content-center align-items-center">
+    <form th:method="POST" th:action="@{/students}" th:object="${student}"
+          class="col-3">
+      <div class="form-group">
+        <input type="text" class="form-control" th:field="*{firstName}" placeholder="First Name"
+               aria-label="First Name">
+      </div>
+      <div class="form-group">
+        <input type="text" class="form-control" th:field="*{lastName}" placeholder="Last Name"
+               aria-label="Last Name">
+      </div>
+      <div class="form-group">
+        <label for="birthday" class="form-label">Birthday</label>
+        <input type="date" class="form-control" th:field="*{birthDate}" id="birthday">
+      </div>
+      <div class="form-group">
+        <input type="text" class="form-control" th:field="*{phoneNumber}" placeholder="Number of phone"
+               aria-label="Number of phone">
+      </div>
+      <div class="form-group">
+        <input type="text" class="form-control" th:field="*{email}" placeholder="Email"
+               aria-label="Email">
+      </div>
+      <div class="form-group">
+        <label for="gender" class="form-label">Gender</label>
+        <select id="gender" th:field="*{gender}" class="form-select">
+          <option th:each="gender : ${T(ua.com.foxminded.university.model.Gender).values()}"
+                  th:value="${gender}" th:text="${gender}"></option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="col-form-label">Select group:</label>
+        <select class="form-select" id="group" th:field="*{group.id}">
+          <option th:each="group: ${groups}" th:value="${group.id}" th:text="${group.name}"></option>
+        </select>
+      </div>
+      <div class="form-group">
+        <input type="text" class="form-control" th:field="*{address.country}" placeholder="Country"
+               aria-label="Country">
+      </div>
+      <div class="form-group">
+        <input type="text" class="form-control" th:field="*{address.city}" placeholder="City"
+               aria-label="City">
+      </div>
+      <div class="form-group">
+        <input type="text" class="form-control" th:field="*{address.street}" placeholder="Street"
+               aria-label="Street">
+      </div>
+      <div class="form-group">
+        <input type="text" class="form-control" th:field="*{address.houseNumber}" placeholder="House"
+               aria-label="House">
+      </div>
+      <div class="form-group">
+        <input type="text" class="form-control" th:field="*{address.apartmentNumber}" placeholder="Apartment"
+               aria-label="Apartment">
+      </div>
+      <div class="form-group">
+        <input type="text" class="form-control" th:field="*{address.postcode}" placeholder="Postcode"
+               aria-label="Postcode">
+      </div>
+      <button type="submit" class="btn btn-primary btn-sm btn-block">Create</button>
+    </form>
+  </div>
+</div>
+</body>
+</html>
