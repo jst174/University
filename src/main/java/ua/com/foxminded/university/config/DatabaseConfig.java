@@ -5,11 +5,12 @@ import org.springframework.context.annotation.*;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
+import org.springframework.jndi.JndiTemplate;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+import javax.naming.NamingException;
 import javax.sql.DataSource;
 
 @Configuration
@@ -18,23 +19,12 @@ import javax.sql.DataSource;
 @EnableTransactionManagement
 public class DatabaseConfig {
 
-    @Value("${db.driver}")
-    private String driver;
     @Value("${db.url}")
-    private String url;
-    @Value("${db.username}")
-    private String username;
-    @Value("${db.password}")
-    private String password;
+    private String dbUrl;
 
     @Bean
-    public DataSource dataSource() {
-        DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        dataSource.setDriverClassName(driver);
-        dataSource.setUrl(url);
-        dataSource.setUsername(username);
-        dataSource.setPassword(password);
-        return dataSource;
+    public DataSource dataSource() throws NamingException {
+        return (DataSource) new JndiTemplate().lookup(dbUrl);
     }
 
     @Bean
