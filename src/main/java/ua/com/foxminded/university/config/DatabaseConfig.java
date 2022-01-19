@@ -19,12 +19,12 @@ import javax.sql.DataSource;
 @EnableTransactionManagement
 public class DatabaseConfig {
 
-    @Value("${db.url}")
-    private String dbUrl;
+    @Value("${db.jndi.name}")
+    private String jndiName;
 
     @Bean
     public DataSource dataSource() throws NamingException {
-        return (DataSource) new JndiTemplate().lookup(dbUrl);
+        return new JndiTemplate().lookup(jndiName, DataSource.class);
     }
 
     @Bean
