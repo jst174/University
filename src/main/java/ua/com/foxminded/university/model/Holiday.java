@@ -2,13 +2,18 @@ package ua.com.foxminded.university.model;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.Objects;
 
 import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE;
 
+@Entity
+@Table(name = "holidays")
 public class Holiday {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String name;
     @DateTimeFormat(iso = DATE)

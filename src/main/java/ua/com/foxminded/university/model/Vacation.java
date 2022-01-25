@@ -2,19 +2,27 @@ package ua.com.foxminded.university.model;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Objects;
 
 import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE;
 
+@Entity
+@Table(name = "vacations")
 public class Vacation {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     @DateTimeFormat(iso = DATE)
     private LocalDate start;
     @DateTimeFormat(iso = DATE)
+    @Column(name = "ending")
     private LocalDate end;
+    @ManyToOne
+    @JoinColumn(name = "teacher_id")
     private Teacher teacher;
 
     public Vacation() {

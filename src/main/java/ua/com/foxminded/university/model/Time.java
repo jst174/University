@@ -2,16 +2,23 @@ package ua.com.foxminded.university.model;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.persistence.*;
 import java.time.LocalTime;
 import java.util.Objects;
 
 import static org.springframework.format.annotation.DateTimeFormat.ISO.TIME;
 
+@Entity
+@Table(name = "times")
 public class Time {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+    @Column(name = "start")
     @DateTimeFormat(iso = TIME)
     private LocalTime startTime;
+    @Column(name = "ending")
     @DateTimeFormat(iso = TIME)
     private LocalTime endTime;
 

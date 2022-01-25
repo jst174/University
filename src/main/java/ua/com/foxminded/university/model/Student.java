@@ -1,12 +1,18 @@
 package ua.com.foxminded.university.model;
 
+import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 
+@Entity
+@Table(name = "students")
 public class Student extends Person {
 
-    private int id;
+    @ManyToOne(cascade = {
+        CascadeType.PERSIST, CascadeType.MERGE,
+        CascadeType.DETACH, CascadeType.REFRESH})
+    @JoinColumn(name = "group_id")
     private Group group;
 
     public Student() {
@@ -16,14 +22,6 @@ public class Student extends Person {
     public Student(String firstName, String lastName, LocalDate birthDate, Gender gender, Address address,
                    String phoneNumber, String email) {
         super(firstName, lastName, birthDate, gender, address, phoneNumber, email);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public Group getGroup() {

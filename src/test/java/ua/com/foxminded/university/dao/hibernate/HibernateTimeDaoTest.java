@@ -1,4 +1,4 @@
-package ua.com.foxminded.university.dao.jdbc;
+package ua.com.foxminded.university.dao.hibernate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.jdbc.JdbcTestUtils.*;
@@ -29,7 +29,7 @@ import java.util.Optional;
 @ContextConfiguration(classes = {DatabaseConfigTest.class})
 @Sql({"/create_time_test.sql"})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public class JdbcTimeDaoTest {
+public class HibernateTimeDaoTest {
 
     @Autowired
     public TimeDao timeDao;

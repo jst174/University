@@ -2,21 +2,38 @@ package ua.com.foxminded.university.model;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 
 import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE;
 
+@Entity
+@Table(name = "lessons")
 public class Lesson {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+    @ManyToMany
+    @JoinTable(name = "lessons_groups",
+        joinColumns = {@JoinColumn(name = "lesson_id")},
+        inverseJoinColumns = {@JoinColumn(name = "group_id")})
     private List<Group> groups;
+    @OneToOne
+    @JoinColumn(name = "course_id")
     private Course course;
+    @OneToOne
+    @JoinColumn(name = "classroom_id")
     private Classroom classroom;
+    @OneToOne
+    @JoinColumn(name = "teacher_id")
     private Teacher teacher;
     @DateTimeFormat(iso = DATE)
     private LocalDate date;
+    @OneToOne
+    @JoinColumn(name = "time_id")
     private Time time;
 
     public Lesson() {

@@ -1,15 +1,29 @@
 package ua.com.foxminded.university.model;
 
+import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+@Entity
+@Table(name = "teachers")
 public class Teacher extends Person {
 
-    private int id;
+    @Column(name = "academic_degree")
+    @Enumerated(EnumType.STRING)
     private AcademicDegree academicDegree;
+    @ManyToMany(cascade = {
+        CascadeType.PERSIST, CascadeType.DETACH,
+        CascadeType.MERGE, CascadeType.MERGE
+    })
+    @JoinTable(
+        name = "teachers_courses",
+        joinColumns = {@JoinColumn(name = "teacher_id")},
+        inverseJoinColumns = {@JoinColumn(name = "course_id")}
+    )
     private List<Course> courses;
+    @OneToMany(mappedBy = "teacher", cascade = CascadeType.ALL)
     private List<Vacation> vacations;
 
     public Teacher() {
@@ -22,14 +36,6 @@ public class Teacher extends Person {
         this.academicDegree = academicDegree;
         courses = new ArrayList<>();
         vacations = new ArrayList<>();
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public AcademicDegree getAcademicDegree() {

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ua.com.foxminded.university.dao.AddressDao;
 import ua.com.foxminded.university.dao.StudentDao;
 import ua.com.foxminded.university.exceptions.EntityNotFoundException;
@@ -38,7 +39,6 @@ public class StudentService {
         verifyGroupAvailability(student.getGroup());
         studentDao.create(student);
     }
-
 
     public Student getById(int id) throws EntityNotFoundException {
         logger.debug("Getting student with id = {}", id);

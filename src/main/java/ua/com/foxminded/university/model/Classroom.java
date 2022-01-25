@@ -1,9 +1,14 @@
 package ua.com.foxminded.university.model;
 
+import javax.persistence.*;
 import java.util.Objects;
 
+@Entity
+@Table(name = "classrooms")
 public class Classroom {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private int number;
     private int capacity;

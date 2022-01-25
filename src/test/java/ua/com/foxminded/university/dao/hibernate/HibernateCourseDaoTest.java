@@ -1,4 +1,4 @@
-package ua.com.foxminded.university.dao.jdbc;
+package ua.com.foxminded.university.dao.hibernate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.jdbc.JdbcTestUtils.*;
@@ -28,7 +28,7 @@ import java.util.Optional;
 @ContextConfiguration(classes = {DatabaseConfigTest.class})
 @Sql({"/create_address_test.sql", "/create_teacher_test.sql", "/create_course_test.sql"})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public class JdbcCourseDaoTest {
+public class HibernateCourseDaoTest {
 
     @Autowired
     private CourseDao courseDao;

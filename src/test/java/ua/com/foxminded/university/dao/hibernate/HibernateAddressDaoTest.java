@@ -1,4 +1,4 @@
-package ua.com.foxminded.university.dao.jdbc;
+package ua.com.foxminded.university.dao.hibernate;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,7 +16,6 @@ import ua.com.foxminded.university.config.DatabaseConfigTest;
 import ua.com.foxminded.university.dao.AddressDao;
 import ua.com.foxminded.university.model.Address;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -28,7 +27,7 @@ import static org.springframework.test.jdbc.JdbcTestUtils.*;
 @ContextConfiguration(classes = {DatabaseConfigTest.class})
 @Sql({"/create_address_test.sql"})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public class JdbcAddressDaoTest {
+public class HibernateAddressDaoTest {
 
     @Autowired
     private AddressDao addressDao;

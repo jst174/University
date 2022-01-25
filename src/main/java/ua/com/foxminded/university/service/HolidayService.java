@@ -10,8 +10,6 @@ import ua.com.foxminded.university.exceptions.EntityNotFoundException;
 import ua.com.foxminded.university.exceptions.NotUniqueDateException;
 import ua.com.foxminded.university.model.Holiday;
 
-import java.util.List;
-
 import static java.lang.String.format;
 
 @Service

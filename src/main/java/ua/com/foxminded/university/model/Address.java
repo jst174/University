@@ -1,14 +1,21 @@
 package ua.com.foxminded.university.model;
 
+import javax.persistence.*;
 import java.util.Objects;
 
+@Entity
+@Table(name = "addresses")
 public class Address {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String country;
     private String city;
     private String street;
+    @Column(name = "house_number")
     private String houseNumber;
+    @Column(name = "apartment_number")
     private String apartmentNumber;
     private String postcode;
 

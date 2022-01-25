@@ -1,9 +1,8 @@
-package ua.com.foxminded.university.dao.jdbc;
+package ua.com.foxminded.university.dao.hibernate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.jdbc.JdbcTestUtils.*;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,17 +20,15 @@ import ua.com.foxminded.university.dao.VacationDao;
 import ua.com.foxminded.university.model.*;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {DatabaseConfigTest.class})
 @Sql({"/create_vacation_test.sql"})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public class JdbcVacationDaoTest {
+public class HibernateVacationDaoTest {
 
     @Autowired
     public VacationDao vacationDao;

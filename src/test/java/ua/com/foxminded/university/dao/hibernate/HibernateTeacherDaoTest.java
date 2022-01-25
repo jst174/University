@@ -1,4 +1,4 @@
-package ua.com.foxminded.university.dao.jdbc;
+package ua.com.foxminded.university.dao.hibernate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.jdbc.JdbcTestUtils.*;
@@ -20,7 +20,6 @@ import ua.com.foxminded.university.dao.TeacherDao;
 import ua.com.foxminded.university.model.*;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -30,7 +29,7 @@ import java.util.Optional;
 @ContextConfiguration(classes = {DatabaseConfigTest.class})
 @Sql({"/create_address_test.sql", "/create_teacher_test.sql", "/create_teacher_courses_test.sql"})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public class JdbcTeacherDaoTest {
+public class HibernateTeacherDaoTest {
 
     @Autowired
     private TeacherDao teacherDao;
