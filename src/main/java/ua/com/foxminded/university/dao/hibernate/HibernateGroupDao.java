@@ -29,13 +29,9 @@ public class HibernateGroupDao implements GroupDao {
     }
 
     public Optional<Group> getById(int id) {
-        try {
-            return sessionFactory.getCurrentSession()
-                .byId(Group.class)
-                .loadOptional(id);
-        } catch (DataAccessException e) {
-            return Optional.empty();
-        }
+        return sessionFactory.getCurrentSession()
+            .byId(Group.class)
+            .loadOptional(id);
     }
 
     public void update(Group group) {
@@ -44,7 +40,7 @@ public class HibernateGroupDao implements GroupDao {
 
     public void delete(int id) {
         sessionFactory.getCurrentSession()
-            .createQuery("DELETE FROM Group WHERE id=:id")
+            .getNamedQuery("Group_delete")
             .setParameter("id", id)
             .executeUpdate();
     }
@@ -52,7 +48,7 @@ public class HibernateGroupDao implements GroupDao {
     @Override
     public List<Group> getAll() {
         return sessionFactory.getCurrentSession()
-            .createQuery("FROM Group")
+            .createNamedQuery("Group_getAll", Group.class)
             .list();
     }
 
@@ -66,27 +62,26 @@ public class HibernateGroupDao implements GroupDao {
 
     @Override
     public Optional<Group> getByName(String name) {
-        try {
-            return sessionFactory.getCurrentSession()
-                .createQuery("FROM Group WHERE name=:name")
-                .setParameter("name", name)
-                .uniqueResultOptional();
-        } catch (DataAccessException e) {
-            return Optional.empty();
-        }
+        return sessionFactory.getCurrentSession()
+            .createNamedQuery("Group_getByName", Group.class)
+            .setParameter("name", name)
+            .uniqueResultOptional();
     }
 
     @Override
     public Page<Group> getAll(Pageable pageable) {
-        Session session = sessionFactory.getCurrentSession();
-        Long totalRows = (Long) session
-            .createQuery("SELECT COUNT (*) FROM Group")
-            .uniqueResult();
-        List<Group> groups = session
-            .createQuery("FROM Group")
+        List<Group> groups = sessionFactory.getCurrentSession()
+            .createNamedQuery("Group_getAll", Group.class)
             .setFirstResult((int) pageable.getOffset())
             .setMaxResults(pageable.getPageSize())
             .list();
-        return new PageImpl<Group>(groups, pageable, totalRows);
+        return new PageImpl<Group>(groups, pageable, countTotalRows());
+    }
+
+    @Override
+    public Long countTotalRows() {
+        return sessionFactory.getCurrentSession()
+            .createNamedQuery("Group_countAllRows", Long.class)
+            .getSingleResult();
     }
 }

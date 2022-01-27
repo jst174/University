@@ -31,13 +31,9 @@ public class HibernateVacationDao implements VacationDao {
     }
 
     public Optional<Vacation> getById(int id) {
-        try {
-            return sessionFactory.getCurrentSession()
-                .byId(Vacation.class)
-                .loadOptional(id);
-        } catch (DataAccessException e) {
-            return Optional.empty();
-        }
+        return sessionFactory.getCurrentSession()
+            .byId(Vacation.class)
+            .loadOptional(id);
     }
 
     public void update(Vacation vacation) {
@@ -46,7 +42,7 @@ public class HibernateVacationDao implements VacationDao {
 
     public void delete(int id) {
         sessionFactory.getCurrentSession()
-            .createQuery("DELETE FROM Vacation WHERE id=:id")
+            .getNamedQuery("Vacation_delete")
             .setParameter("id", id)
             .executeUpdate();
     }
@@ -54,7 +50,7 @@ public class HibernateVacationDao implements VacationDao {
     @Override
     public List<Vacation> getAll() {
         return sessionFactory.getCurrentSession()
-            .createQuery("FROM Vacation")
+            .createNamedQuery("Vacation_getAll", Vacation.class)
             .list();
     }
 
@@ -68,42 +64,37 @@ public class HibernateVacationDao implements VacationDao {
 
     @Override
     public Optional<Vacation> getByTeacherAndLessonDate(Teacher teacher, LocalDate lessonDate) {
-        try {
-            return sessionFactory.getCurrentSession()
-                .createQuery("FROM Vacation WHERE teacher.id=:id AND :lessonDate BETWEEN start AND end")
-                .setParameter("id", teacher.getId())
-                .setParameter("lessonDate", lessonDate)
-                .uniqueResultOptional();
-        } catch (DataAccessException e) {
-            return Optional.empty();
-        }
+        return sessionFactory.getCurrentSession()
+            .createNamedQuery("Vacation_getByTeacherAndLessonDate", Vacation.class)
+            .setParameter("id", teacher.getId())
+            .setParameter("lessonDate", lessonDate)
+            .uniqueResultOptional();
     }
 
     @Override
     public Optional<Vacation> getByTeacherAndVacationDates(Vacation vacation) {
-        try {
-            return sessionFactory.getCurrentSession()
-                .createQuery("FROM Vacation WHERE teacher.id=:id AND start=:start AND end=:end")
-                .setParameter("id", vacation.getTeacher().getId())
-                .setParameter("start", vacation.getStart())
-                .setParameter("end", vacation.getEnd())
-                .uniqueResultOptional();
-        } catch (DataAccessException e) {
-            return Optional.empty();
-        }
+        return sessionFactory.getCurrentSession()
+            .createNamedQuery("Vacation_getByTeacherAndVacationDates", Vacation.class)
+            .setParameter("id", vacation.getTeacher().getId())
+            .setParameter("start", vacation.getStart())
+            .setParameter("end", vacation.getEnd())
+            .uniqueResultOptional();
     }
 
     @Override
     public Page<Vacation> getAll(Pageable pageable) {
-        Session session = sessionFactory.getCurrentSession();
-        Long totalRows = (Long) session
-            .createQuery("SELECT COUNT (*) FROM Vacation")
-            .uniqueResult();
-        List<Vacation> vacations = session
-            .createQuery("FROM Vacation")
+        List<Vacation> vacations = sessionFactory.getCurrentSession()
+            .createNamedQuery("Vacation_getAll", Vacation.class)
             .setFirstResult((int) pageable.getOffset())
             .setMaxResults(pageable.getPageSize())
             .list();
-        return new PageImpl<Vacation>(vacations, pageable, totalRows);
+        return new PageImpl<Vacation>(vacations, pageable, countTotalRows());
+    }
+
+    @Override
+    public Long countTotalRows() {
+        return sessionFactory.getCurrentSession()
+            .createNamedQuery("Vacation_countAllRows", Long.class)
+            .getSingleResult();
     }
 }

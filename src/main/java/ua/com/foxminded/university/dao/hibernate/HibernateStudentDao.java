@@ -27,20 +27,15 @@ public class HibernateStudentDao implements StudentDao {
         this.sessionFactory = sessionFactory;
     }
 
-    @Transactional
     public void create(Student student) {
         addressDao.create(student.getAddress());
         sessionFactory.getCurrentSession().save(student);
     }
 
     public Optional<Student> getById(int id) {
-        try {
-            return sessionFactory.getCurrentSession()
-                .byId(Student.class)
-                .loadOptional(id);
-        } catch (DataAccessException e) {
-            return Optional.empty();
-        }
+        return sessionFactory.getCurrentSession()
+            .byId(Student.class)
+            .loadOptional(id);
     }
 
     public void update(Student updatedStudent) {
@@ -49,7 +44,7 @@ public class HibernateStudentDao implements StudentDao {
 
     public void delete(int id) {
         sessionFactory.getCurrentSession()
-            .createQuery("DELETE FROM Student WHERE id=:id")
+            .getNamedQuery("Student_delete")
             .setParameter("id", id)
             .executeUpdate();
     }
@@ -57,7 +52,7 @@ public class HibernateStudentDao implements StudentDao {
     @Override
     public List<Student> getAll() {
         return sessionFactory.getCurrentSession()
-            .createQuery("FROM Student")
+            .createNamedQuery("Student_getAll", Student.class)
             .list();
     }
 
@@ -71,28 +66,27 @@ public class HibernateStudentDao implements StudentDao {
 
     @Override
     public Optional<Student> getByName(String firstName, String lastName) {
-        try {
-            return sessionFactory.getCurrentSession()
-                .createQuery("FROM Student WHERE firstName=:firstName and lastName=:lastName")
-                .setParameter("firstName", firstName)
-                .setParameter("lastName", lastName)
-                .uniqueResultOptional();
-        } catch (DataAccessException e) {
-            return Optional.empty();
-        }
+        return sessionFactory.getCurrentSession()
+            .createNamedQuery("Student_getByName", Student.class)
+            .setParameter("firstName", firstName)
+            .setParameter("lastName", lastName)
+            .uniqueResultOptional();
     }
 
     @Override
     public Page<Student> getAll(Pageable pageable) {
-        Session session = sessionFactory.getCurrentSession();
-        Long totalRows = (Long) session.
-            createQuery("SELECT COUNT (*) FROM Student")
-            .uniqueResult();
-        List<Student> students = session
-            .createQuery("FROM Student")
+        List<Student> students = sessionFactory.getCurrentSession()
+            .createNamedQuery("Student_getAll", Student.class)
             .setFirstResult((int) pageable.getOffset())
             .setMaxResults(pageable.getPageSize())
             .list();
-        return new PageImpl<Student>(students, pageable, totalRows);
+        return new PageImpl<Student>(students, pageable, countTotalRows());
+    }
+
+    @Override
+    public Long countTotalRows() {
+        return sessionFactory.getCurrentSession()
+            .createNamedQuery("Student_countAllRows", Long.class)
+            .getSingleResult();
     }
 }

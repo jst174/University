@@ -31,11 +31,7 @@ public class HibernateHolidayDao implements HolidayDao {
     }
 
     public Optional<Holiday> getById(int id) {
-        try {
-            return sessionFactory.getCurrentSession().byId(Holiday.class).loadOptional(id);
-        } catch (DataAccessException e) {
-            return Optional.empty();
-        }
+        return sessionFactory.getCurrentSession().byId(Holiday.class).loadOptional(id);
     }
 
     public void update(Holiday holiday) {
@@ -44,7 +40,7 @@ public class HibernateHolidayDao implements HolidayDao {
 
     public void delete(int id) {
         sessionFactory.getCurrentSession()
-            .createQuery("DELETE FROM Holiday WHERE id=:id")
+            .getNamedQuery("Holiday_delete")
             .setParameter("id", id)
             .executeUpdate();
     }
@@ -52,34 +48,33 @@ public class HibernateHolidayDao implements HolidayDao {
     @Override
     public List<Holiday> getAll() {
         return sessionFactory.getCurrentSession()
-            .createQuery("FROM Holiday")
+            .createNamedQuery("Holiday_getAll", Holiday.class)
             .list();
     }
 
     @Override
     public Page<Holiday> getAll(Pageable pageable) {
-        Session session = sessionFactory.getCurrentSession();
-        Long totalRows = (Long) session
-            .createQuery("SELECT COUNT (*) FROM Holiday")
-            .uniqueResult();
-        List<Holiday> holidays = session
-            .createQuery("FROM Holiday")
+        List<Holiday> holidays = sessionFactory.getCurrentSession()
+            .createNamedQuery("Holiday_getAll", Holiday.class)
             .setFirstResult((int) pageable.getOffset())
             .setMaxResults(pageable.getPageSize())
             .list();
-        return new PageImpl<Holiday>(holidays, pageable, totalRows);
+        return new PageImpl<Holiday>(holidays, pageable, countTotalRows());
+    }
+
+    @Override
+    public Long countTotalRows() {
+        return sessionFactory.getCurrentSession()
+            .createNamedQuery("Holiday_countAllRows", Long.class)
+            .getSingleResult();
     }
 
     @Override
     public Optional<Holiday> getByDate(LocalDate date) {
-        try {
-            return sessionFactory.getCurrentSession()
-                .createQuery("FROM Holiday WHERE date=:date")
-                .setParameter("date", date)
-                .uniqueResultOptional();
-        } catch (DataAccessException e) {
-            return Optional.empty();
-        }
+        return sessionFactory.getCurrentSession()
+            .createNamedQuery("Holiday_getByDate", Holiday.class)
+            .setParameter("date", date)
+            .uniqueResultOptional();
     }
 
 }

@@ -30,13 +30,9 @@ public class HibernateTimeDao implements TimeDao {
     }
 
     public Optional<Time> getById(int id) {
-        try {
-            return sessionFactory.getCurrentSession()
-                .byId(Time.class)
-                .loadOptional(id);
-        } catch (DataAccessException e) {
-            return Optional.empty();
-        }
+        return sessionFactory.getCurrentSession()
+            .byId(Time.class)
+            .loadOptional(id);
     }
 
     public void update(Time time) {
@@ -45,7 +41,7 @@ public class HibernateTimeDao implements TimeDao {
 
     public void delete(int id) {
         sessionFactory.getCurrentSession()
-            .createQuery("DELETE FROM Time WHERE id=:id")
+            .getNamedQuery("Time_delete")
             .setParameter("id", id)
             .executeUpdate();
     }
@@ -53,34 +49,33 @@ public class HibernateTimeDao implements TimeDao {
     @Override
     public List<Time> getAll() {
         return sessionFactory.getCurrentSession()
-            .createQuery("FROM Time")
+            .createNamedQuery("Time_getAll", Time.class)
             .list();
     }
 
     @Override
     public Page<Time> getAll(Pageable pageable) {
-        Session session = sessionFactory.getCurrentSession();
-        Long totalRows = (Long) session
-            .createQuery("SELECT COUNT (*) FROM Time")
-            .uniqueResult();
-        List<Time> times = session
-            .createQuery("FROM Time")
+        List<Time> times = sessionFactory.getCurrentSession()
+            .createNamedQuery("Time_getAll", Time.class)
             .setFirstResult((int) pageable.getOffset())
             .setMaxResults(pageable.getPageSize())
             .list();
-        return new PageImpl<Time>(times, pageable, totalRows);
+        return new PageImpl<Time>(times, pageable, countTotalRows());
+    }
+
+    @Override
+    public Long countTotalRows() {
+        return sessionFactory.getCurrentSession()
+            .createNamedQuery("Time_countAllRows", Long.class)
+            .getSingleResult();
     }
 
     @Override
     public Optional<Time> getByTime(LocalTime start, LocalTime end) {
-        try {
-            return sessionFactory.getCurrentSession()
-                .createQuery("FROM Time WHERE startTime=:start and endTime=:end")
-                .setParameter("start", start)
-                .setParameter("end", end)
-                .uniqueResultOptional();
-        } catch (DataAccessException e) {
-            return Optional.empty();
-        }
+        return sessionFactory.getCurrentSession()
+            .createNamedQuery("Time_getByTime", Time.class)
+            .setParameter("start", start)
+            .setParameter("end", end)
+            .uniqueResultOptional();
     }
 }

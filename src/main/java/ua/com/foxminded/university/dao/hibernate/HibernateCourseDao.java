@@ -29,11 +29,9 @@ public class HibernateCourseDao implements CourseDao {
     }
 
     public Optional<Course> getById(int id) {
-        try {
-            return sessionFactory.getCurrentSession().byId(Course.class).loadOptional(id);
-        } catch (DataAccessException e) {
-            return Optional.empty();
-        }
+        return sessionFactory.getCurrentSession()
+            .byId(Course.class)
+            .loadOptional(id);
     }
 
     public void update(Course course) {
@@ -42,16 +40,15 @@ public class HibernateCourseDao implements CourseDao {
 
     public void delete(int id) {
         sessionFactory.getCurrentSession()
-            .createQuery("DELETE FROM Course WHERE id = :id")
+            .getNamedQuery("Course_delete")
             .setParameter("id", id)
             .executeUpdate();
     }
 
     @Override
     public List<Course> getAll() {
-        return sessionFactory
-            .getCurrentSession()
-            .createQuery("FROM Course")
+        return sessionFactory.getCurrentSession()
+            .createNamedQuery("Course_getAll", Course.class)
             .list();
     }
 
@@ -65,27 +62,26 @@ public class HibernateCourseDao implements CourseDao {
 
     @Override
     public Optional<Course> getByName(String name) {
-        try {
-            return sessionFactory.getCurrentSession()
-                .createQuery("FROM Course WHERE name=:name")
-                .setParameter("name", name)
-                .uniqueResultOptional();
-        } catch (DataAccessException e) {
-            return Optional.empty();
-        }
+        return sessionFactory.getCurrentSession()
+            .createNamedQuery("Course_getByName", Course.class)
+            .setParameter("name", name)
+            .uniqueResultOptional();
     }
 
     @Override
     public Page<Course> getAll(Pageable pageable) {
-        Session session = sessionFactory.getCurrentSession();
-        Long totalRows = (Long) session
-            .createQuery("SELECT COUNT (*) FROM Course")
-            .uniqueResult();
-        List<Course> courses = session
-            .createQuery("FROM Course")
+        List<Course> courses = sessionFactory.getCurrentSession()
+            .createNamedQuery("Course_getAll", Course.class)
             .setFirstResult((int) pageable.getOffset())
             .setMaxResults(pageable.getPageSize())
             .list();
-        return new PageImpl<>(courses, pageable, totalRows);
+        return new PageImpl<>(courses, pageable, countTotalRows());
+    }
+
+    @Override
+    public Long countTotalRows() {
+        return sessionFactory.getCurrentSession()
+            .createNamedQuery("Course_countAllRows", Long.class)
+            .getSingleResult();
     }
 }

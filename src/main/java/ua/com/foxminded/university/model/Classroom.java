@@ -3,6 +3,12 @@ package ua.com.foxminded.university.model;
 import javax.persistence.*;
 import java.util.Objects;
 
+@NamedQueries({
+    @NamedQuery(name = "Classroom_delete", query = "DELETE FROM Classroom AS c WHERE c.id = :id"),
+    @NamedQuery(name = "Classroom_getAll", query = "SELECT c FROM Classroom AS c"),
+    @NamedQuery(name = "Classroom_countAllRows", query = "SELECT COUNT (c) FROM Classroom AS c"),
+    @NamedQuery(name = "Classroom_getByNumber", query = "SElECT c FROM Classroom AS c WHERE c.number = :number")
+})
 @Entity
 @Table(name = "classrooms")
 public class Classroom {
@@ -87,7 +93,7 @@ public class Classroom {
             return this;
         }
 
-        public Classroom build(){
+        public Classroom build() {
             return classroom;
         }
     }

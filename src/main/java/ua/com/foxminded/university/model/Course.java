@@ -3,6 +3,12 @@ package ua.com.foxminded.university.model;
 import javax.persistence.*;
 import java.util.Objects;
 
+@NamedQueries({
+    @NamedQuery(name = "Course_delete", query = "DELETE FROM Course AS c WHERE c.id = :id"),
+    @NamedQuery(name = "Course_getAll", query = "SELECT c FROM Course AS c"),
+    @NamedQuery(name = "Course_countAllRows", query = "SELECT COUNT (c) FROM Course AS c"),
+    @NamedQuery(name = "Course_getByName", query = "SELECT COUNT (c) FROM Course AS c WHERE c.name = :name")
+})
 @Entity
 @Table(name = "courses")
 public class Course {

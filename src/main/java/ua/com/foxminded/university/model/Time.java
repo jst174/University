@@ -8,6 +8,13 @@ import java.util.Objects;
 
 import static org.springframework.format.annotation.DateTimeFormat.ISO.TIME;
 
+@NamedQueries({
+    @NamedQuery(name = "Time_delete", query = "DELETE FROM Time AS t WHERE t.id = :id"),
+    @NamedQuery(name = "Time_getAll", query = "SELECT t FROM Time AS t"),
+    @NamedQuery(name = "Time_countAllRows", query = "SELECT COUNT(t) FROM Time AS t"),
+    @NamedQuery(name = "Time_getByTime", query = "SELECT t FROM Time AS t " +
+        "WHERE t.startTime = :start AND t.endTime = :end")
+})
 @Entity
 @Table(name = "times")
 public class Time {

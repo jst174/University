@@ -9,8 +9,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import ua.com.foxminded.university.dao.ClassroomDao;
+import ua.com.foxminded.university.model.Address;
 import ua.com.foxminded.university.model.Classroom;
 
+import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,11 +31,9 @@ public class HibernateClassroomDao implements ClassroomDao {
     }
 
     public Optional<Classroom> getById(int id) {
-        try {
-            return sessionFactory.getCurrentSession().byId(Classroom.class).loadOptional(id);
-        } catch (DataAccessException e) {
-            return Optional.empty();
-        }
+        return sessionFactory.getCurrentSession()
+            .byId(Classroom.class)
+            .loadOptional(id);
     }
 
     public void update(Classroom classroom) {
@@ -42,41 +42,40 @@ public class HibernateClassroomDao implements ClassroomDao {
 
     public void delete(int id) {
         sessionFactory.getCurrentSession()
-            .createQuery("DELETE FROM Classroom WHERE id=:id")
+            .getNamedQuery("Classroom_delete")
             .setParameter("id", id)
             .executeUpdate();
     }
 
     @Override
     public List<Classroom> getAll() {
-        return sessionFactory.getCurrentSession().
-            createQuery("FROM Classroom ")
+        return sessionFactory.getCurrentSession()
+            .createNamedQuery("Classroom_getAll", Classroom.class)
             .list();
     }
 
     @Override
     public Page<Classroom> getAll(Pageable pageable) {
-        Session session = sessionFactory.getCurrentSession();
-        Long totalRows = (Long) session
-            .createQuery("SELECT COUNT (*) FROM Classroom")
-            .uniqueResult();
-        List<Classroom> classrooms = session
-            .createQuery("FROM Classroom")
+        List<Classroom> classrooms = sessionFactory.getCurrentSession()
+            .createNamedQuery("Classroom_getAll", Classroom.class)
             .setFirstResult((int) pageable.getOffset())
             .setMaxResults(pageable.getPageSize())
             .list();
-        return new PageImpl<Classroom>(classrooms, pageable, totalRows);
+        return new PageImpl<Classroom>(classrooms, pageable, countTotalRows());
     }
 
     @Override
     public Optional<Classroom> findByNumber(int number) {
-        try {
-            return sessionFactory.getCurrentSession()
-                .createQuery("FROM Classroom WHERE number=:number")
-                .setParameter("number", number)
-                .uniqueResultOptional();
-        } catch (DataAccessException e) {
-            return Optional.empty();
-        }
+        return sessionFactory.getCurrentSession()
+            .createNamedQuery("Classroom_getByNumber", Classroom.class)
+            .setParameter("number", number)
+            .uniqueResultOptional();
+    }
+
+    @Override
+    public Long countTotalRows() {
+        return sessionFactory.getCurrentSession()
+            .createNamedQuery("Classroom_countAllRows", Long.class)
+            .getSingleResult();
     }
 }

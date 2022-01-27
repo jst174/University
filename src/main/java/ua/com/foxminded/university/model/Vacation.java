@@ -9,6 +9,15 @@ import java.util.Objects;
 
 import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE;
 
+@NamedQueries({
+    @NamedQuery(name = "Vacation_delete", query = "DELETE FROM Vacation AS v WHERE v.id = :id"),
+    @NamedQuery(name = "Vacation_getAll", query = "SELECT v FROM Vacation AS v"),
+    @NamedQuery(name = "Vacation_countAllRows", query = "SELECT COUNT (v) FROM Vacation AS v"),
+    @NamedQuery(name = "Vacation_getByTeacherAndLessonDate", query = "SELECT v FROM Vacation AS v " +
+        "WHERE v.teacher.id=:id AND :lessonDate BETWEEN v.start AND v.end"),
+    @NamedQuery(name = "Vacation_getByTeacherAndVacationDates", query = "SELECT v FROM Vacation AS v " +
+        "WHERE v.teacher.id=:id AND v.start = :start AND v.end = :end")
+})
 @Entity
 @Table(name = "vacations")
 public class Vacation {

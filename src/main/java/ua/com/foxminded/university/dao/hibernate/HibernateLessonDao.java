@@ -32,13 +32,9 @@ public class HibernateLessonDao implements LessonDao {
     }
 
     public Optional<Lesson> getById(int id) {
-        try {
-            return sessionFactory.getCurrentSession()
-                .byId(Lesson.class)
-                .loadOptional(id);
-        } catch (DataAccessException e) {
-            return Optional.empty();
-        }
+        return sessionFactory.getCurrentSession()
+            .byId(Lesson.class)
+            .loadOptional(id);
     }
 
     @Override
@@ -48,7 +44,7 @@ public class HibernateLessonDao implements LessonDao {
 
     public void delete(int id) {
         sessionFactory.getCurrentSession()
-            .createQuery("DELETE FROM Lesson WHERE id=:id")
+            .getNamedQuery("Lesson_delete")
             .setParameter("id", id)
             .executeUpdate();
     }
@@ -56,7 +52,7 @@ public class HibernateLessonDao implements LessonDao {
     @Override
     public List<Lesson> getAll() {
         return sessionFactory.getCurrentSession()
-            .createQuery("FROM Lesson")
+            .createNamedQuery("Lesson_getAll", Lesson.class)
             .list();
     }
 
@@ -80,7 +76,7 @@ public class HibernateLessonDao implements LessonDao {
     public Optional<Lesson> getByDateAndTimeAndTeacher(LocalDate date, Time time, Teacher teacher) {
         try {
             return sessionFactory.getCurrentSession()
-                .createQuery("FROM Lesson WHERE date=:date AND time.id=:timeId AND teacher.id=:teacherId")
+                .createNamedQuery("Lesson_getByDateAndTimeAndTeacher", Lesson.class)
                 .setParameter("date", date)
                 .setParameter("timeId", time.getId())
                 .setParameter("teacherId", teacher.getId())
@@ -92,22 +88,18 @@ public class HibernateLessonDao implements LessonDao {
 
     @Override
     public Optional<Lesson> getByDateAndTimeAndClassroom(LocalDate date, Time time, Classroom classroom) {
-        try {
-            return sessionFactory.getCurrentSession()
-                .createQuery("FROM Lesson WHERE date=:date AND time.id=:timeId AND classroom.id=:classroomId")
-                .setParameter("date", date)
-                .setParameter("timeId", time.getId())
-                .setParameter("classroomId", classroom.getId())
-                .uniqueResultOptional();
-        } catch (DataAccessException e) {
-            return Optional.empty();
-        }
+        return sessionFactory.getCurrentSession()
+            .createNamedQuery("Lesson_getByDateAndTimeAndClassroom", Lesson.class)
+            .setParameter("date", date)
+            .setParameter("timeId", time.getId())
+            .setParameter("classroomId", classroom.getId())
+            .uniqueResultOptional();
     }
 
     @Override
     public List<Lesson> getByDateAndTime(LocalDate date, Time time) {
         return sessionFactory.getCurrentSession()
-            .createQuery("FROM Lesson WHERE date=:date AND time.id=:timeId")
+            .createNamedQuery("Lesson_getByDateAndTime", Lesson.class)
             .setParameter("date", date)
             .setParameter("timeId", time.getId())
             .list();
@@ -124,7 +116,7 @@ public class HibernateLessonDao implements LessonDao {
     @Override
     public List<Lesson> getByGroupIdBetweenDates(int groupId, LocalDate fromDate, LocalDate toDate) {
         return sessionFactory.getCurrentSession()
-            .createQuery("SELECT l FROM Lesson l join Group g WHERE g.id=:groupId AND l.date BETWEEN :fromDate AND :toDate")
+            .createNamedQuery("Lesson_getByGroupIdBetweenDates", Lesson.class)
             .setParameter("groupId", groupId)
             .setParameter("fromDate", fromDate)
             .setParameter("toDate", toDate)
@@ -134,7 +126,7 @@ public class HibernateLessonDao implements LessonDao {
     @Override
     public List<Lesson> getByTeacherIdBetweenDates(int teacherId, LocalDate fromDate, LocalDate toDate) {
         return sessionFactory.getCurrentSession()
-            .createQuery("FROM Lesson  WHERE teacher.id=:teacherId AND date BETWEEN :fromDate AND :toDate")
+            .createNamedQuery("Lesson_getByTeacherIdBetweenDates", Lesson.class)
             .setParameter("teacherId", teacherId)
             .setParameter("fromDate", fromDate)
             .setParameter("toDate", toDate)
@@ -143,15 +135,18 @@ public class HibernateLessonDao implements LessonDao {
 
     @Override
     public Page<Lesson> getAll(Pageable pageable) {
-        Session session = sessionFactory.getCurrentSession();
-        Long totalRows = (Long) session
-            .createQuery("SELECT COUNT (*) FROM Lesson")
-            .uniqueResult();
-        List<Lesson> lessons = session
-            .createQuery("FROM Lesson")
-            .setFirstResult((int)pageable.getOffset())
+        List<Lesson> lessons = sessionFactory.getCurrentSession()
+            .createNamedQuery("Lesson_getAll", Lesson.class)
+            .setFirstResult((int) pageable.getOffset())
             .setMaxResults(pageable.getPageSize())
             .list();
-        return new PageImpl<Lesson>(lessons, pageable, totalRows);
+        return new PageImpl<Lesson>(lessons, pageable, countTotalRows());
+    }
+
+    @Override
+    public Long countTotalRows() {
+        return sessionFactory.getCurrentSession()
+            .createNamedQuery("Lesson_countAllRows", Long.class)
+            .getSingleResult();
     }
 }

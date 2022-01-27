@@ -33,23 +33,18 @@ public class HibernateTeacherDao implements TeacherDao {
     }
 
     public Optional<Teacher> getById(int id) {
-        try {
-            return sessionFactory.getCurrentSession()
-                .byId(Teacher.class)
-                .loadOptional(id);
-        } catch (DataAccessException e) {
-            return Optional.empty();
-        }
+        return sessionFactory.getCurrentSession()
+            .byId(Teacher.class)
+            .loadOptional(id);
     }
 
-    @Transactional
     public void update(Teacher updatedTeacher) {
         sessionFactory.getCurrentSession().update(updatedTeacher);
     }
 
     public void delete(int id) {
         sessionFactory.getCurrentSession()
-            .createQuery("DELETE FROM Teacher WHERE id=:id")
+            .getNamedQuery("Teacher_delete")
             .setParameter("id", id)
             .executeUpdate();
     }
@@ -57,34 +52,33 @@ public class HibernateTeacherDao implements TeacherDao {
     @Override
     public List<Teacher> getAll() {
         return sessionFactory.getCurrentSession()
-            .createQuery("FROM Teacher")
+            .createNamedQuery("Teacher_getAll", Teacher.class)
             .list();
     }
 
     @Override
     public Optional<Teacher> getByName(String firstName, String lastName) {
-        try {
-            return sessionFactory.getCurrentSession()
-                .createQuery("FROM Teacher WHERE firstName=:firstName and lastName=:lastName")
-                .setParameter("firstName", firstName)
-                .setParameter("lastName", lastName)
-                .uniqueResultOptional();
-        } catch (DataAccessException e) {
-            return Optional.empty();
-        }
+        return sessionFactory.getCurrentSession()
+            .createNamedQuery("Teacher_getByName", Teacher.class)
+            .setParameter("firstName", firstName)
+            .setParameter("lastName", lastName)
+            .uniqueResultOptional();
     }
 
     @Override
     public Page<Teacher> getAll(Pageable pageable) {
-        Session session = sessionFactory.getCurrentSession();
-        Long totalRows = (Long) session.
-            createQuery("SELECT COUNT (*) FROM Teacher")
-            .uniqueResult();
-        List<Teacher> teachers = session
-            .createQuery("FROM Teacher")
+        List<Teacher> teachers = sessionFactory.getCurrentSession()
+            .createNamedQuery("Teacher_getAll", Teacher.class)
             .setFirstResult((int) pageable.getOffset())
             .setMaxResults(pageable.getPageSize())
             .list();
-        return new PageImpl<Teacher>(teachers, pageable, totalRows);
+        return new PageImpl<Teacher>(teachers, pageable, countTotalRows());
+    }
+
+    @Override
+    public Long countTotalRows() {
+        return sessionFactory.getCurrentSession()
+            .createNamedQuery("Teacher_countAllRows", Long.class)
+            .getSingleResult();
     }
 }
