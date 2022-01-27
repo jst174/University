@@ -28,13 +28,9 @@ public class TeacherService {
     private static final Logger logger = LoggerFactory.getLogger(TeacherService.class);
 
     private TeacherDao teacherDao;
-    private CourseDao courseDao;
-    private VacationDao vacationDao;
 
-    public TeacherService(TeacherDao teacherDao, CourseDao courseDao, VacationDao vacationDao) {
+    public TeacherService(TeacherDao teacherDao) {
         this.teacherDao = teacherDao;
-        this.courseDao = courseDao;
-        this.vacationDao = vacationDao;
     }
 
     public void create(Teacher teacher) throws NotUniqueNameException {
@@ -45,11 +41,8 @@ public class TeacherService {
 
     public Teacher getById(int id) throws EntityNotFoundException {
         logger.debug("Getting teacher with id = {}", id);
-        Teacher teacher = teacherDao.getById(id).orElseThrow(() ->
+        return teacherDao.getById(id).orElseThrow(() ->
             new EntityNotFoundException(format("Teacher with id = %s not found", id)));
-        teacher.setCourses(courseDao.getByTeacherId(id));
-        teacher.setVacations(vacationDao.getByTeacherId(id));
-        return teacher;
     }
 
     public void update(Teacher updatedTeacher) throws NotUniqueNameException, EntityNotFoundException {
