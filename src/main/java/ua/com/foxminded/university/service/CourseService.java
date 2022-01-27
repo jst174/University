@@ -58,11 +58,6 @@ public class CourseService {
         return courseDao.getAll();
     }
 
-    public List<Course> getByTeacherId(int teacherId) {
-        logger.debug("Getting courses by teacher with id = {}", teacherId);
-        return courseDao.getByTeacherId(teacherId);
-    }
-
     private void verifyNameUniqueness(Course course) throws NotUniqueNameException {
         if (courseDao.getByName(course.getName())
             .filter(c -> c.getId() != course.getId())

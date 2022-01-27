@@ -1,8 +1,6 @@
 package ua.com.foxminded.university.dao.hibernate;
 
-import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -49,14 +47,6 @@ public class HibernateCourseDao implements CourseDao {
     public List<Course> getAll() {
         return sessionFactory.getCurrentSession()
             .createNamedQuery("Course_getAll", Course.class)
-            .list();
-    }
-
-    @Override
-    public List<Course> getByTeacherId(int teacherId) {
-        return sessionFactory.getCurrentSession()
-            .createQuery("SELECT t.courses FROM Teacher t where t.id=:id")
-            .setParameter("id", teacherId)
             .list();
     }
 
