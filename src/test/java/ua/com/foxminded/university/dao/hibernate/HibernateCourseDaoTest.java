@@ -102,21 +102,6 @@ public class HibernateCourseDaoTest {
     }
 
     @Test
-    public void givenTeacherId_whenGetByTeacherId_thenReturnTeacherCourses() {
-        Course course1 = new Course("History");
-        Course course2 = new Course("Music");
-        course1.setId(1);
-        course2.setId(2);
-        List<Course> expected = new ArrayList<>();
-        expected.add(course1);
-        expected.add(course2);
-
-        List<Course> actual = courseDao.getByTeacherId(1);
-
-        assertEquals(expected, actual);
-    }
-
-    @Test
     public void givenCourseName_whereGetByName_thenReturn() {
         Course courseExpected = new Course("History");
 

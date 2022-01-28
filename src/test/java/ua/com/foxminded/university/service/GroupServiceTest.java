@@ -60,7 +60,6 @@ public class GroupServiceTest {
     @Test
     public void givenExistentGroupId_whenGetById_thenReturn() throws EntityNotFoundException {
         when(groupDao.getById(1)).thenReturn(Optional.of(TestData.group1));
-        when(studentDao.getByGroupId(1)).thenReturn(Arrays.asList(TestData.student1, TestData.student2));
 
         assertEquals(TestData.group1, groupService.getById(1));
     }
@@ -118,14 +117,6 @@ public class GroupServiceTest {
         when(groupDao.getAll()).thenReturn(groups);
 
         assertEquals(groups, groupService.getAll());
-    }
-
-    @Test
-    public void givenExistentLessonId_whenGetByLessonId_thenReturn() {
-        List<Group> groups = Arrays.asList(TestData.group1, TestData.group2);
-        when(groupDao.getByLessonId(1)).thenReturn(groups);
-
-        assertEquals(groups, groupService.getByLessonId(1));
     }
 
     interface TestData {

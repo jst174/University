@@ -114,24 +114,6 @@ public class HibernateGroupDaoTest {
     }
 
     @Test
-    public void givenLessonId_whenGetByLessonId_thenReturnLessonGroups() {
-        Group group1 = new Group("MH-12");
-        Group group2 = new Group("JW-23");
-        Group group3 = new Group("MG-54");
-        group1.setId(1);
-        group2.setId(2);
-        group3.setId(3);
-        List<Group> expected = new ArrayList<>();
-        expected.add(group1);
-        expected.add(group2);
-        expected.add(group3);
-
-        List<Group> actual = groupDao.getByLessonId(1);
-
-        assertEquals(expected, actual);
-    }
-
-    @Test
     public void givenGroupName_whenGetByName_thenReturn() {
         Group group = new Group("MH-12");
 

@@ -128,39 +128,6 @@ public class HibernateLessonDaoTest {
         assertEquals(lessonPage, lessonDao.getAll(pageable));
     }
 
-    @Test
-    public void givenTeacherId_whenGetByTeacherId_thenReturnLessons() {
-        Lesson lesson1 = TestData.lesson;
-        Lesson lesson2 = new Lesson.Builder().clone(lesson1)
-            .setId(2)
-            .setTime(TestData.time2)
-            .build();
-
-        List<Lesson> expected = new ArrayList<>();
-        expected.add(lesson1);
-        expected.add(lesson2);
-
-        List<Lesson> actual = lessonDao.getByTeacherId(1);
-
-        assertEquals(expected, actual);
-    }
-
-    @Test
-    public void givenClassroomId_whenGetByClassroomId_thenReturnLessons() {
-        Lesson lesson1 = TestData.lesson;
-        Lesson lesson2 = new Lesson.Builder().clone(lesson1)
-            .setId(2)
-            .setTime(TestData.time2)
-            .build();
-
-        List<Lesson> expected = new ArrayList<>();
-        expected.add(lesson1);
-        expected.add(lesson2);
-
-        List<Lesson> actual = lessonDao.getByClassroomId(1);
-
-        assertEquals(expected, actual);
-    }
 
     @Test
     public void givenDateAndTime_whenGetByDateAndTime_thenReturn() {
@@ -191,16 +158,6 @@ public class HibernateLessonDaoTest {
             expected.getTime(), expected.getClassroom());
 
         assertEquals(expected, actual.get());
-    }
-
-    @Test
-    public void givenGroupId_whenGetByGroupId_thenReturn() {
-        List<Lesson> expected = Arrays.asList(TestData.lesson,
-            new Lesson.Builder().clone(TestData.lesson).setId(2).setTime(TestData.time2).build());
-
-        List<Lesson> actual = lessonDao.getByGroupId(1);
-
-        assertEquals(expected, actual);
     }
 
     @Test

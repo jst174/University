@@ -37,10 +37,8 @@ public class GroupService {
 
     public Group getById(int id) throws EntityNotFoundException {
         logger.debug("Getting group with id = {}", id);
-        Group group = groupDao.getById(id).orElseThrow(() ->
+        return groupDao.getById(id).orElseThrow(() ->
             new EntityNotFoundException(format("Group with id = %s not found", id)));
-        group.setStudents(studentDao.getByGroupId(id));
-        return group;
     }
 
     public void update(Group group) throws NotUniqueNameException {
@@ -63,11 +61,6 @@ public class GroupService {
     public List<Group> getAll() {
         logger.debug("Getting all group");
         return groupDao.getAll();
-    }
-
-    public List<Group> getByLessonId(int lessonId) {
-        logger.debug("Getting groups by lesson with id = {}", lessonId);
-        return groupDao.getByLessonId(lessonId);
     }
 
     private void verifyNameUniqueness(Group group) throws NotUniqueNameException {

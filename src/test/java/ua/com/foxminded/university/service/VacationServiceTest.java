@@ -57,9 +57,9 @@ public class VacationServiceTest {
             LocalDate.of(2021, 3, 1),
             LocalDate.of(2021, 3, 10),
             TestData.teacher1);
+        TestData.teacher1.setVacations(vacations);
         when(teacherService.getById(vacation.getTeacher().getId())).thenReturn(TestData.teacher1);
         when(vacationDao.getByTeacherAndVacationDates(vacation)).thenReturn(Optional.empty());
-        when(vacationDao.getByTeacherId(vacation.getTeacher().getId())).thenReturn(vacations);
 
         vacationService.create(vacation);
 
@@ -74,7 +74,7 @@ public class VacationServiceTest {
             TestData.teacher1);
         when(teacherService.getById(vacation.getTeacher().getId())).thenReturn(TestData.teacher1);
         when(vacationDao.getByTeacherAndVacationDates(vacation)).thenReturn(Optional.empty());
-        when(vacationDao.getByTeacherId(vacation.getTeacher().getId())).thenReturn(vacations);
+        TestData.teacher1.setVacations(vacations);
 
         Exception exception = assertThrows(NotAvailablePeriodException.class, () -> vacationService.create(vacation));
 
@@ -119,8 +119,8 @@ public class VacationServiceTest {
     @Test
     public void givenExistentVacation_whenUpdate_thenUpdated() throws NotAvailablePeriodException, NotUniqueVacationDatesException, EntityNotFoundException {
         when(vacationDao.getByTeacherAndVacationDates(TestData.vacation1)).thenReturn(Optional.of(TestData.vacation1));
-        when(vacationDao.getByTeacherId(TestData.vacation1.getTeacher().getId())).thenReturn(vacations);
         when(teacherService.getById(TestData.vacation1.getTeacher().getId())).thenReturn(TestData.teacher1);
+        TestData.teacher1.setVacations(vacations);
 
         vacationService.update(TestData.vacation1);
 
@@ -144,8 +144,8 @@ public class VacationServiceTest {
         vacation.setStart(LocalDate.of(2021, 1, 1));
         vacation.setEnd(LocalDate.of(2021, 1, 26));
         vacation.setTeacher(TestData.teacher1);
+        TestData.teacher1.setVacations(vacations);
         when(vacationDao.getByTeacherAndVacationDates(vacation)).thenReturn(Optional.of(vacation));
-        when(vacationDao.getByTeacherId(1)).thenReturn(vacations);
         when(teacherService.getById(vacation.getTeacher().getId())).thenReturn(TestData.teacher1);
 
         Exception exception = assertThrows(NotAvailablePeriodException.class, () -> vacationService.update(vacation));
@@ -161,13 +161,6 @@ public class VacationServiceTest {
         vacationService.delete(1);
 
         verify(vacationDao).delete(1);
-    }
-
-    @Test
-    public void givenExistentTeacherId_whenGetByTeacherId_whenReturn() {
-        when(vacationDao.getByTeacherId(1)).thenReturn(vacations);
-
-        assertEquals(vacations, vacationService.getByTeacherId(1));
     }
 
     @Test

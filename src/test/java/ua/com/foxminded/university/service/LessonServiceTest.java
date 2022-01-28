@@ -217,7 +217,6 @@ public class LessonServiceTest {
             .thenReturn(Optional.empty());
         when(lessonDao.getByDateAndTime(lesson.getDate(), lesson.getTime()))
             .thenReturn(lessons);
-        when(courseDao.getByTeacherId(lesson.getTeacher().getId())).thenReturn(TestData.teacher1.getCourses());
 
         Exception exception = assertThrows(NotAvailableGroupException.class, () -> lessonService.create(lesson));
 

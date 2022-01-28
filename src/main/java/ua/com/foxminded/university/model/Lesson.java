@@ -39,7 +39,8 @@ public class Lesson {
     @OneToOne
     @JoinColumn(name = "course_id")
     private Course course;
-    @OneToOne
+    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
+        CascadeType.DETACH, CascadeType.REFRESH})
     @JoinColumn(name = "classroom_id")
     private Classroom classroom;
     @OneToOne

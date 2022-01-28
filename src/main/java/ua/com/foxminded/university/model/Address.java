@@ -155,6 +155,18 @@ public class Address {
             return this;
         }
 
+        public Builder clone(Address address){
+            Builder builder = new Builder();
+            builder.setId(address.getId());
+            builder.setCountry(address.getCountry());
+            builder.setCity(address.getCity());
+            builder.setStreet(address.getStreet());
+            builder.setHouseNumber(address.getHouseNumber());
+            builder.setApartmentNumber(address.getApartmentNumber());
+            builder.setPostcode(address.getPostcode());
+            return builder;
+        }
+
         public Address build(){
             return address;
         }

@@ -92,11 +92,6 @@ public class HibernateVacationDaoTest {
     }
 
     @Test
-    public void givenTeacherId_whenGetByTeacherId_thenReturnVacations() {
-        assertEquals(Arrays.asList(TestData.vacation1, TestData.vacation2), vacationDao.getByTeacherId(1));
-    }
-
-    @Test
     public void givenTeacherAndLessonDate_whenGetByTeacherAndLessonDate_thenReturn() {
         assertEquals(TestData.vacation1, vacationDao.getByTeacherAndLessonDate(TestData.teacher,
             LocalDate.of(2021, 10, 20)).get());

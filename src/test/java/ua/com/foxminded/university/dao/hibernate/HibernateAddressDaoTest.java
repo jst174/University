@@ -1,5 +1,6 @@
 package ua.com.foxminded.university.dao.hibernate;
 
+import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.annotation.Transactional;
 import ua.com.foxminded.university.config.DatabaseConfigTest;
 import ua.com.foxminded.university.dao.AddressDao;
 import ua.com.foxminded.university.model.Address;
@@ -27,56 +29,58 @@ import static org.springframework.test.jdbc.JdbcTestUtils.*;
 @ContextConfiguration(classes = {DatabaseConfigTest.class})
 @Sql({"/create_address_test.sql"})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@Transactional
 public class HibernateAddressDaoTest {
 
     @Autowired
     private AddressDao addressDao;
     @Autowired
-    private JdbcTemplate jdbcTemplate;
+    private SessionFactory sessionFactory;
 
     @Test
     public void givenNewAddress_whenCreate_thenCreated() {
         Address address = new Address("Russia", "Saint Petersburg", "Nevsky Prospect",
             "15", "45", "342423");
-        int expectedRows = countRowsInTable(jdbcTemplate, "addresses") + 1;
+        Long expectedRows = countRows() + 1;
 
         addressDao.create(address);
 
-        assertEquals(expectedRows, countRowsInTable(jdbcTemplate, "addresses"));
+        Long actualRows = countRows();
+        assertEquals(expectedRows, actualRows);
     }
 
     @Test
     public void givenId_whenGetById_thenReturn() {
-        Address expected = new Address("Russia", "Saint Petersburg", "Nevsky Prospect",
-            "15", "45", "342423");
-
         Optional<Address> actual = addressDao.getById(1);
 
-        assertEquals(expected, actual.get());
+        assertEquals(TestData.address1, actual.get());
     }
 
     @Test
     public void givenUpdatedAddressAndId_whenUpdate_thenUpdated() {
-        String sql = "SELECT COUNT(0) FROM addresses WHERE country = 'Russia' and city = 'Moscow'" +
-            "and street = 'Kutuzov Avenue' and house_number = '43' " +
-            "and apartment_number = '192' and postcode = '432436'";
-        Address updatedAddress = new Address("Russia", "Moscow", "Kutuzov Avenue",
-            "43", "192", "432436");
-        updatedAddress.setId(1);
-        int expectedRows = countRowsInTableWhere(jdbcTemplate, "addresses", sql) + 1;
+        Address updatedAddress = new Address.Builder().clone(TestData.address1)
+            .setCity("Moscow")
+            .setStreet("Kutuzov Avenue")
+            .setHouseNumber("43")
+            .setApartmentNumber("192")
+            .setPostcode("432436")
+            .build();
+        Long expectedRows = countUpdatedRows(updatedAddress) + 1;
 
         addressDao.update(updatedAddress);
 
-        assertEquals(expectedRows, countRowsInTableWhere(jdbcTemplate, "addresses", sql));
+        Long actualRows = countUpdatedRows(updatedAddress);
+        assertEquals(expectedRows, actualRows);
     }
 
     @Test
     public void givenId_whenDelete_thenDeleted() {
-        int expectedRows = countRowsInTable(jdbcTemplate, "addresses") - 1;
+        Long expectedRows = countRows() - 1;
 
         addressDao.delete(1);
 
-        assertEquals(expectedRows, countRowsInTable(jdbcTemplate, "addresses"));
+        Long actual = countRows();
+        assertEquals(expectedRows, actual);
     }
 
     @Test
@@ -96,6 +100,27 @@ public class HibernateAddressDaoTest {
         Page<Address> addressPage = new PageImpl<Address>(addresses, pageable, addresses.size());
 
         assertEquals(addressPage, addressDao.getAll(pageable));
+    }
+
+
+    private Long countRows() {
+        return sessionFactory.getCurrentSession()
+            .createQuery("SELECT COUNT (a) FROM Address AS a", Long.class)
+            .uniqueResult();
+    }
+
+    private Long countUpdatedRows(Address address) {
+        return sessionFactory.getCurrentSession()
+            .createQuery("SELECT COUNT(a.id) FROM Address AS a WHERE a.country = :country AND " +
+                "a.city = :city AND a.street = :street AND a.houseNumber = :houseNumber " +
+                "AND a.apartmentNumber = :apartmentNumber AND a.postcode = :postcode", Long.class)
+            .setParameter("country", address.getCountry())
+            .setParameter("city", address.getCity())
+            .setParameter("street", address.getStreet())
+            .setParameter("houseNumber", address.getHouseNumber())
+            .setParameter("apartmentNumber", address.getHouseNumber())
+            .setParameter("postcode", address.getPostcode())
+            .getSingleResult();
     }
 
     interface TestData {

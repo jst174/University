@@ -63,11 +63,6 @@ public class StudentService {
         return studentDao.getAll(pageable);
     }
 
-    public List<Student> getByGroupId(int groupId) {
-        logger.debug("Getting students with group id = {}", groupId);
-        return studentDao.getByGroupId(groupId);
-    }
-
     private void verifyNameUniqueness(Student student) throws NotUniqueNameException {
         if (studentDao.getByName(student.getFirstName(), student.getLastName())
             .filter(s -> s.getId() != student.getId())
@@ -78,7 +73,7 @@ public class StudentService {
     }
 
     private void verifyGroupAvailability(Group group) throws NotAvailableGroupException {
-        int groupSize = studentDao.getByGroupId(group.getId()).size();
+        int groupSize = group.getStudents().size();
         if (groupSize >= maxGroupSize) {
             throw new NotAvailableGroupException(format("Group with name %s not available. " +
                 "Max group size = %s has already been reached", group.getName(), groupSize));

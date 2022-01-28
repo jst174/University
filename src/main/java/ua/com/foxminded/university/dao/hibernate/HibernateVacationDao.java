@@ -55,14 +55,6 @@ public class HibernateVacationDao implements VacationDao {
     }
 
     @Override
-    public List<Vacation> getByTeacherId(int id) {
-        return sessionFactory.getCurrentSession()
-            .createQuery("FROM Vacation WHERE teacher.id=:id")
-            .setParameter("id", id)
-            .list();
-    }
-
-    @Override
     public Optional<Vacation> getByTeacherAndLessonDate(Teacher teacher, LocalDate lessonDate) {
         return sessionFactory.getCurrentSession()
             .createNamedQuery("Vacation_getByTeacherAndLessonDate", Vacation.class)

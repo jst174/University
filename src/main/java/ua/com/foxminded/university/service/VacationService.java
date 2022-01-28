@@ -64,11 +64,6 @@ public class VacationService {
         vacationDao.delete(id);
     }
 
-    public List<Vacation> getByTeacherId(int teacherId) {
-        logger.debug("Getting teacher vacations with teacher id = {}", teacherId);
-        return vacationDao.getByTeacherId(teacherId);
-    }
-
     public Page<Vacation> getAll(Pageable pageable) {
         logger.debug("Getting all vacations");
         return vacationDao.getAll(pageable);
@@ -84,7 +79,7 @@ public class VacationService {
     }
 
     private void verifyPeriodAvailability(Vacation vacation) throws NotAvailablePeriodException, EntityNotFoundException {
-        List<Vacation> vacations = vacationDao.getByTeacherId(vacation.getTeacher().getId());
+        List<Vacation> vacations = vacation.getTeacher().getVacations();
         vacations.add(vacation);
         Teacher teacher = teacherService.getById(vacation.getTeacher().getId());
         int maxVacationPeriod = maxPeriodsVacation.get(teacher.getAcademicDegree());

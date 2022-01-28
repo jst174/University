@@ -112,11 +112,6 @@ public class HibernateStudentDaoTest {
     }
 
     @Test
-    public void givenGroupId_whenGetByGroupId_thenReturn() {
-        assertEquals(Arrays.asList(TestData.student1, TestData.student2), studentDao.getByGroupId(1));
-    }
-
-    @Test
     public void givenFirstNameAndLastName_whenGetByName_thenReturn() {
         Student student = TestData.student1;
 

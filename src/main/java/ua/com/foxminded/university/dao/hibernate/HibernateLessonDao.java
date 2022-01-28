@@ -1,6 +1,5 @@
 package ua.com.foxminded.university.dao.hibernate;
 
-import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
@@ -57,22 +56,6 @@ public class HibernateLessonDao implements LessonDao {
     }
 
     @Override
-    public List<Lesson> getByTeacherId(int teacherId) {
-        return sessionFactory.getCurrentSession()
-            .createQuery("FROM Lesson WHERE teacher.id=:teacherId")
-            .setParameter("teacherId", teacherId)
-            .list();
-    }
-
-    @Override
-    public List<Lesson> getByClassroomId(int classroomId) {
-        return sessionFactory.getCurrentSession()
-            .createQuery("FROM Lesson WHERE classroom.id=:classroomId")
-            .setParameter("classroomId", classroomId)
-            .list();
-    }
-
-    @Override
     public Optional<Lesson> getByDateAndTimeAndTeacher(LocalDate date, Time time, Teacher teacher) {
         try {
             return sessionFactory.getCurrentSession()
@@ -102,14 +85,6 @@ public class HibernateLessonDao implements LessonDao {
             .createNamedQuery("Lesson_getByDateAndTime", Lesson.class)
             .setParameter("date", date)
             .setParameter("timeId", time.getId())
-            .list();
-    }
-
-    @Override
-    public List<Lesson> getByGroupId(int groupId) {
-        return sessionFactory.getCurrentSession()
-            .createQuery("SELECT l FROM Lesson l join Group g WHERE g.id =:groupId")
-            .setParameter("groupId", groupId)
             .list();
     }
 

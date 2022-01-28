@@ -24,17 +24,14 @@ public class LessonService {
 
     private LessonDao lessonDao;
     private VacationDao vacationDao;
-    private CourseDao courseDao;
     private HolidayDao holidayDao;
 
     public LessonService(
         LessonDao lessonDao,
         VacationDao vacationDao,
-        CourseDao courseDao,
         HolidayDao holidayDao) {
         this.lessonDao = lessonDao;
         this.vacationDao = vacationDao;
-        this.courseDao = courseDao;
         this.holidayDao = holidayDao;
     }
 
@@ -101,7 +98,7 @@ public class LessonService {
 
     private void verifyTeacherMatchWithCourse(Lesson lesson) throws NotAvailableTeacherException {
         Teacher teacher = lesson.getTeacher();
-        List<Course> teacherCourses = courseDao.getByTeacherId(teacher.getId());
+        List<Course> teacherCourses = lesson.getTeacher().getCourses();
         teacher.setCourses(teacherCourses);
         if (!teacher.getCourses().contains(lesson.getCourse())) {
             throw new NotAvailableTeacherException(format("Teacher %s %s cannot teach %s",

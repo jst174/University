@@ -1,18 +1,14 @@
 package ua.com.foxminded.university.dao.hibernate;
 
-import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import ua.com.foxminded.university.dao.ClassroomDao;
-import ua.com.foxminded.university.model.Address;
 import ua.com.foxminded.university.model.Classroom;
 
-import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.Optional;
 

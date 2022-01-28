@@ -9,7 +9,5 @@ import java.util.Optional;
 
 public interface GroupDao extends Dao<Group> {
 
-    List<Group> getByLessonId(int lessonId);
-
     Optional<Group> getByName(String name);
 }
