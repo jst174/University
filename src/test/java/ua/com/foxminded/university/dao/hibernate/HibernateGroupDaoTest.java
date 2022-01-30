@@ -1,7 +1,6 @@
 package ua.com.foxminded.university.dao.hibernate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.springframework.test.jdbc.JdbcTestUtils.*;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,38 +9,38 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.annotation.Transactional;
 import ua.com.foxminded.university.config.DatabaseConfigTest;
 import ua.com.foxminded.university.dao.GroupDao;
 import ua.com.foxminded.university.model.Group;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {DatabaseConfigTest.class})
 @Sql({"/create_lesson_test.sql"})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@Transactional
 public class HibernateGroupDaoTest {
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
     @Autowired
     private GroupDao groupDao;
 
     @Test
     public void givenNewGroup_whenCreate_thenCreated() {
         Group group = new Group("MJ-12");
-        int expectedRows = countRowsInTable(jdbcTemplate, "groups") + 1;
 
         groupDao.create(group);
 
-        assertEquals(expectedRows, countRowsInTable(jdbcTemplate, "groups"));
+        Group actual = groupDao.getById(6).get();
+        assertEquals(group, actual);
 
     }
 
@@ -54,25 +53,20 @@ public class HibernateGroupDaoTest {
 
     @Test
     public void givenUpdatedCroupAndId_thenUpdated() {
-        String sql = "SELECT COUNT(0) FROM groups WHERE name = 'JD-32'";
         Group updatedGroup = new Group("JD-32");
-        int beforeUpdate = countRowsInTableWhere(jdbcTemplate, "groups", sql);
         updatedGroup.setId(1);
-        int expectedRows = countRowsInTableWhere(jdbcTemplate, "groups", sql) + 1;
 
         groupDao.update(updatedGroup);
 
-        int afterUpdate = countRowsInTableWhere(jdbcTemplate, "groups", sql);
-        assertEquals(expectedRows, afterUpdate);
+        Group actual = groupDao.getById(1).get();
+        assertEquals(updatedGroup, actual);
     }
 
     @Test
     public void givenId_whenDelete_thenDeleted() {
-        int expectedRows = countRowsInTable(jdbcTemplate, "groups") - 1;
-
         groupDao.delete(1);
 
-        assertEquals(expectedRows, countRowsInTable(jdbcTemplate, "groups"));
+        assertEquals(Optional.empty(), groupDao.getById(1));
     }
 
     @Test
@@ -120,5 +114,8 @@ public class HibernateGroupDaoTest {
         assertEquals(group, groupDao.getByName("MH-12").get());
     }
 
-
+    @Test
+    public void whenCountTotalRows_whenReturn(){
+        assertEquals(5, groupDao.countTotalRows());
+    }
 }

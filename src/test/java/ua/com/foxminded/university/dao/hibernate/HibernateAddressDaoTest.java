@@ -1,6 +1,5 @@
 package ua.com.foxminded.university.dao.hibernate;
 
-import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,7 +7,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
@@ -23,7 +21,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.springframework.test.jdbc.JdbcTestUtils.*;
+
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {DatabaseConfigTest.class})
@@ -34,19 +32,16 @@ public class HibernateAddressDaoTest {
 
     @Autowired
     private AddressDao addressDao;
-    @Autowired
-    private SessionFactory sessionFactory;
 
     @Test
     public void givenNewAddress_whenCreate_thenCreated() {
         Address address = new Address("Russia", "Saint Petersburg", "Nevsky Prospect",
             "15", "45", "342423");
-        Long expectedRows = countRows() + 1;
 
         addressDao.create(address);
 
-        Long actualRows = countRows();
-        assertEquals(expectedRows, actualRows);
+        Address actual = addressDao.getById(3).get();
+        assertEquals(address, actual);
     }
 
     @Test
@@ -65,22 +60,18 @@ public class HibernateAddressDaoTest {
             .setApartmentNumber("192")
             .setPostcode("432436")
             .build();
-        Long expectedRows = countUpdatedRows(updatedAddress) + 1;
 
         addressDao.update(updatedAddress);
 
-        Long actualRows = countUpdatedRows(updatedAddress);
-        assertEquals(expectedRows, actualRows);
+        Address actual = addressDao.getById(1).get();
+        assertEquals(updatedAddress, actual);
     }
 
     @Test
     public void givenId_whenDelete_thenDeleted() {
-        Long expectedRows = countRows() - 1;
-
         addressDao.delete(1);
 
-        Long actual = countRows();
-        assertEquals(expectedRows, actual);
+        assertEquals(Optional.empty(), addressDao.getById(1));
     }
 
     @Test
@@ -102,29 +93,14 @@ public class HibernateAddressDaoTest {
         assertEquals(addressPage, addressDao.getAll(pageable));
     }
 
-
-    private Long countRows() {
-        return sessionFactory.getCurrentSession()
-            .createQuery("SELECT COUNT (a) FROM Address AS a", Long.class)
-            .uniqueResult();
-    }
-
-    private Long countUpdatedRows(Address address) {
-        return sessionFactory.getCurrentSession()
-            .createQuery("SELECT COUNT(a.id) FROM Address AS a WHERE a.country = :country AND " +
-                "a.city = :city AND a.street = :street AND a.houseNumber = :houseNumber " +
-                "AND a.apartmentNumber = :apartmentNumber AND a.postcode = :postcode", Long.class)
-            .setParameter("country", address.getCountry())
-            .setParameter("city", address.getCity())
-            .setParameter("street", address.getStreet())
-            .setParameter("houseNumber", address.getHouseNumber())
-            .setParameter("apartmentNumber", address.getHouseNumber())
-            .setParameter("postcode", address.getPostcode())
-            .getSingleResult();
+    @Test
+    public void whenCountTotalRows_thenReturn(){
+        assertEquals(2, addressDao.countTotalRows());
     }
 
     interface TestData {
         Address address1 = new Address.Builder()
+            .setId(1)
             .setCountry("Russia")
             .setCity("Saint Petersburg")
             .setStreet("Nevsky Prospect")
@@ -134,6 +110,7 @@ public class HibernateAddressDaoTest {
             .build();
 
         Address address2 = new Address.Builder()
+            .setId(1)
             .setCountry("Russia")
             .setCity("Yekaterinburg")
             .setStreet("Lenin Avenue")

@@ -15,6 +15,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.annotation.Transactional;
 import ua.com.foxminded.university.config.DatabaseConfigTest;
 import ua.com.foxminded.university.dao.LessonDao;
 import ua.com.foxminded.university.model.*;
@@ -31,28 +32,23 @@ import java.util.Optional;
 @ContextConfiguration(classes = {DatabaseConfigTest.class})
 @Sql({"/create_lesson_test.sql"})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@Transactional
 public class HibernateLessonDaoTest {
 
     @Autowired
     private LessonDao lessonDao;
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
 
     @Test
     public void givenNewLesson_whenCreate_thenCreated() {
         Lesson lesson = new Lesson.Builder().clone(TestData.lesson)
-            .setId(3)
             .setDate(LocalDate.of(2021, 12, 12))
             .setGroups(Arrays.asList(TestData.group3, TestData.group4))
             .build();
 
-        int expectedRows = countRowsInTable(jdbcTemplate, "lessons") + 1;
-        int expectedGroupRows = countRowsInTable(jdbcTemplate, "lessons_groups") + 2;
-
         lessonDao.create(lesson);
 
-        assertEquals(expectedRows, countRowsInTable(jdbcTemplate, "lessons"));
-        assertEquals(expectedGroupRows, countRowsInTable(jdbcTemplate, "lessons_groups"));
+        Lesson actual = lessonDao.getById(3).get();
+        assertEquals(lesson, actual);
     }
 
     @Test
@@ -66,8 +62,6 @@ public class HibernateLessonDaoTest {
 
     @Test
     public void givenUpdatedLesson_whenUpdate_thenUpdated() {
-        String sql = "SELECT COUNT(0) FROM lessons WHERE classroom_id = 2 and course_id = 2 and teacher_id = 2 and " +
-            "date = '2021-06-10' and time_id = 2";
         Lesson updatedLesson = new Lesson.Builder().clone(TestData.lesson)
             .setTeacher(TestData.teacher2)
             .setTime(TestData.time2)
@@ -77,22 +71,17 @@ public class HibernateLessonDaoTest {
             .setDate(LocalDate.of(2021, 6, 10))
             .build();
 
-        int expectedRows = countRowsInTableWhere(jdbcTemplate, "lessons", sql) + 1;
-        int expectedGroupRows = countRowsInTable(jdbcTemplate, "lessons_groups") - 1;
-
         lessonDao.update(updatedLesson);
 
-        assertEquals(expectedRows, countRowsInTableWhere(jdbcTemplate, "lessons", sql));
-        assertEquals(expectedGroupRows, countRowsInTable(jdbcTemplate, "lessons_groups"));
+        Lesson actual = lessonDao.getById(1).get();
+        assertEquals(updatedLesson, actual);
     }
 
     @Test
     public void givenId_whenDelete_thenDeleted() {
-        int expectedRows = countRowsInTable(jdbcTemplate, "lessons") - 1;
-
         lessonDao.delete(1);
 
-        assertEquals(expectedRows, countRowsInTable(jdbcTemplate, "lessons"));
+        assertEquals(Optional.empty(), lessonDao.getById(1));
     }
 
     @Test
@@ -184,6 +173,11 @@ public class HibernateLessonDaoTest {
         assertEquals(expected, actual);
     }
 
+    @Test
+    public void whenCountTotalRows_thenReturn(){
+        assertEquals(2, lessonDao.countTotalRows());
+    }
+
     interface TestData {
         Address address = new Address.Builder()
             .setCountry("Russia")
@@ -237,6 +231,8 @@ public class HibernateLessonDaoTest {
             .setPhoneNumber("5435345334")
             .setEmail("miller77@gmail.com")
             .setAcademicDegree(AcademicDegree.MASTER)
+            .setVacations(new ArrayList<>())
+            .setCourses(new ArrayList<>())
             .setId(1)
             .build();
 
@@ -249,6 +245,8 @@ public class HibernateLessonDaoTest {
             .setPhoneNumber("5345345")
             .setEmail("king65@gmail.com")
             .setAcademicDegree(AcademicDegree.DOCTORAL)
+            .setVacations(new ArrayList<>())
+            .setCourses(new ArrayList<>())
             .setId(2)
             .build();
 

@@ -15,6 +15,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.annotation.Transactional;
 import ua.com.foxminded.university.config.DatabaseConfigTest;
 import ua.com.foxminded.university.dao.HolidayDao;
 import ua.com.foxminded.university.model.Holiday;
@@ -29,21 +30,20 @@ import java.util.Optional;
 @ContextConfiguration(classes = {DatabaseConfigTest.class})
 @Sql({"/create_holiday_test.sql"})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@Transactional
 public class HibernateHolidayDaoTest {
 
     @Autowired
     private HolidayDao holidayDao;
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
 
     @Test
     public void givenNewHoliday_whenCreate_thenCreated() {
         Holiday holiday = new Holiday("New Year", LocalDate.of(2021, 12, 31));
-        int expectedRows = countRowsInTable(jdbcTemplate, "holidays") + 1;
 
         holidayDao.create(holiday);
 
-        assertEquals(expectedRows, countRowsInTable(jdbcTemplate, "holidays"));
+        Holiday actual = holidayDao.getById(3).get();
+        assertEquals(holiday, actual);
     }
 
     @Test
@@ -57,23 +57,20 @@ public class HibernateHolidayDaoTest {
 
     @Test
     public void givenUpdatedHolidayAndId_whenUpdate_thenUpdated() {
-        String sql = "SELECT COUNT(0) FROM holidays WHERE name = 'Christmas' and date = '2022-01-07'";
-        Holiday updatedHoliday = new Holiday("Christmas", LocalDate.of(2022, 01, 07));
+        Holiday updatedHoliday = new Holiday("Christmas", LocalDate.of(2022, 1, 7));
         updatedHoliday.setId(1);
-        int expectedRows = countRowsInTableWhere(jdbcTemplate, "holidays", sql) + 1;
 
         holidayDao.update(updatedHoliday);
 
-        assertEquals(expectedRows, countRowsInTableWhere(jdbcTemplate, "holidays", sql));
+        Holiday actual = holidayDao.getById(1).get();
+        assertEquals(updatedHoliday, actual);
     }
 
     @Test
     public void givenId_whenDelete_thenDeleted() {
-        int expectedRows = countRowsInTable(jdbcTemplate, "holidays") - 1;
-
         holidayDao.delete(1);
 
-        assertEquals(expectedRows, countRowsInTable(jdbcTemplate, "holidays"));
+        assertEquals(Optional.empty(), holidayDao.getById(1));
     }
 
     @Test
@@ -110,5 +107,10 @@ public class HibernateHolidayDaoTest {
         Optional<Holiday> actual = holidayDao.getByDate(LocalDate.of(2021, 12, 31));
 
         assertEquals(expected, actual.get());
+    }
+
+    @Test
+    public void whenCountTotalRows_thenReturn(){
+        assertEquals(2, holidayDao.countTotalRows());
     }
 }

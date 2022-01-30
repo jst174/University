@@ -20,7 +20,7 @@ import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE;
     @NamedQuery(name = "Lesson_getByDateAndTimeAndTeacher", query = "SELECT l FROM Lesson AS l " +
         "WHERE l.date=:date AND l.time.id=:timeId AND l.teacher.id=:teacherId"),
     @NamedQuery(name = "Lesson_getByGroupIdBetweenDates", query = "SELECT l FROM Lesson AS l " +
-        "join Group g WHERE g.id=:groupId AND l.date BETWEEN :fromDate AND :toDate"),
+        "inner join l.groups AS g WHERE g.id=:groupId AND l.date BETWEEN :fromDate AND :toDate"),
     @NamedQuery(name = "Lesson_getByTeacherIdBetweenDates", query = "SELECT l FROM Lesson AS l " +
         "WHERE l.teacher.id=:teacherId AND l.date BETWEEN :fromDate AND :toDate")
 })

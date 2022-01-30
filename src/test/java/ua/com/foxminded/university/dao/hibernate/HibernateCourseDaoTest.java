@@ -15,6 +15,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.annotation.Transactional;
 import ua.com.foxminded.university.config.DatabaseConfigTest;
 import ua.com.foxminded.university.dao.CourseDao;
 import ua.com.foxminded.university.model.Course;
@@ -26,23 +27,22 @@ import java.util.Optional;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {DatabaseConfigTest.class})
-@Sql({"/create_address_test.sql", "/create_teacher_test.sql", "/create_course_test.sql"})
+@Sql({"/create_course_test.sql"})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@Transactional
 public class HibernateCourseDaoTest {
 
     @Autowired
     private CourseDao courseDao;
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
 
     @Test
     public void givenNewCourse_whenCreate_thenCreated() {
         Course course = new Course("History");
-        int expectedRows = countRowsInTable(jdbcTemplate, "courses") + 1;
 
         courseDao.create(course);
 
-        assertEquals(expectedRows, countRowsInTable(jdbcTemplate, "courses"));
+        Course actual = courseDao.getById(1).get();
+        assertEquals(course, actual);
     }
 
     @Test
@@ -56,23 +56,21 @@ public class HibernateCourseDaoTest {
 
     @Test
     public void givenUpdatedCourseAndId_whenUpdated_thenUpdated() {
-        String sql = "SELECT COUNT(0) FROM courses WHERE name = 'Math'";
         Course updatedCourse = new Course("Math");
         updatedCourse.setId(1);
-        int expectedRows = countRowsInTableWhere(jdbcTemplate, "courses", sql) + 1;
 
         courseDao.update(updatedCourse);
 
-        assertEquals(expectedRows, countRowsInTableWhere(jdbcTemplate, "courses", sql));
+        Course actual = courseDao.getById(1).get();
+        assertEquals(updatedCourse, actual);
 
     }
 
     @Test
     public void givenId_whenDelete_thenDeleted() {
-        int expectedRows = countRowsInTable(jdbcTemplate, "courses") - 1;
         courseDao.delete(1);
 
-        assertEquals(expectedRows, countRowsInTable(jdbcTemplate, "courses"));
+        assertEquals(Optional.empty(), courseDao.getById(1));
     }
 
     @Test
@@ -108,5 +106,10 @@ public class HibernateCourseDaoTest {
         Optional<Course> courseActual = courseDao.getByName("History");
 
         assertEquals(courseExpected, courseActual.get());
+    }
+
+    @Test
+    public void whenCountTotalRows_whenReturn(){
+        assertEquals(2, courseDao.countTotalRows());
     }
 }

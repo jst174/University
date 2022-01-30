@@ -15,6 +15,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.annotation.Transactional;
 import ua.com.foxminded.university.config.DatabaseConfigTest;
 import ua.com.foxminded.university.dao.VacationDao;
 import ua.com.foxminded.university.model.*;
@@ -22,18 +23,18 @@ import ua.com.foxminded.university.model.*;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {DatabaseConfigTest.class})
 @Sql({"/create_vacation_test.sql"})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@Transactional
 public class HibernateVacationDaoTest {
 
     @Autowired
     public VacationDao vacationDao;
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
 
     @Test
     public void givenNewVacation_whenCreate_thenCreated() {
@@ -41,11 +42,11 @@ public class HibernateVacationDaoTest {
             LocalDate.of(2021, 10, 15),
             LocalDate.of(2021, 10, 30),
             TestData.teacher);
-        int expectedRows = countRowsInTable(jdbcTemplate, "vacations") + 1;
 
         vacationDao.create(vacation);
 
-        assertEquals(expectedRows, countRowsInTable(jdbcTemplate, "vacations"));
+        Vacation actual = vacationDao.getById(3).get();
+        assertEquals(vacation, actual);
     }
 
     @Test
@@ -55,26 +56,23 @@ public class HibernateVacationDaoTest {
 
     @Test
     public void givenUpdatedVacationAndId_whenUpdate_thenUpdated() {
-        String sql = "SELECT COUNT(0) FROM vacations WHERE start = '2021-11-15' and ending = '2021-11-30' and teacher_id = 1";
         Vacation updatedVacation = new Vacation(
             LocalDate.of(2021, 11, 15),
             LocalDate.of(2021, 11, 30),
             TestData.teacher);
         updatedVacation.setId(1);
-        int expectedRows = countRowsInTableWhere(jdbcTemplate, "vacations", sql) + 1;
 
         vacationDao.update(updatedVacation);
 
-        assertEquals(expectedRows, countRowsInTableWhere(jdbcTemplate, "vacations", sql));
+        Vacation actual = vacationDao.getById(1).get();
+        assertEquals(updatedVacation, actual);
     }
 
     @Test
     public void givenId_whenDelete_thenDeleted() {
-        int expectedRows = countRowsInTable(jdbcTemplate, "vacations") - 1;
-
         vacationDao.delete(1);
 
-        assertEquals(expectedRows, countRowsInTable(jdbcTemplate, "vacations"));
+        assertEquals(Optional.empty(), vacationDao.getById(1));
     }
 
     @Test
@@ -100,6 +98,11 @@ public class HibernateVacationDaoTest {
     @Test
     public void givenVacation_whenGetByTeacherAndVacationDates_thenReturn() {
         assertEquals(TestData.vacation1, vacationDao.getByTeacherAndVacationDates(TestData.vacation1).get());
+    }
+
+    @Test
+    public void whenCountTotalRows_thenReturn(){
+        assertEquals(2, vacationDao.countTotalRows());
     }
 
     interface TestData {

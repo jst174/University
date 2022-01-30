@@ -1,7 +1,6 @@
 package ua.com.foxminded.university.dao.hibernate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.springframework.test.jdbc.JdbcTestUtils.*;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,16 +9,17 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.annotation.Transactional;
 import ua.com.foxminded.university.config.DatabaseConfigTest;
 import ua.com.foxminded.university.dao.TeacherDao;
 import ua.com.foxminded.university.model.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -27,47 +27,31 @@ import java.util.Optional;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {DatabaseConfigTest.class})
-@Sql({"/create_address_test.sql", "/create_teacher_test.sql", "/create_teacher_courses_test.sql"})
+@Sql({"/create_address_test.sql", "/create_teacher_test.sql"})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@Transactional
 public class HibernateTeacherDaoTest {
 
     @Autowired
     private TeacherDao teacherDao;
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
 
     @Test
     public void givenNewTeacher_whenCreate_thenCreated() {
-        Address address = new Address("Russia", "Saint Petersburg", "Nevsky Prospect",
-            "15", "45", "342423");
-
         Teacher teacher = new Teacher(
             "Alex",
             "King",
             LocalDate.of(1977, 12, 16),
             Gender.MALE,
-            address,
+            TestData.address,
             "36d22366",
             "king97@yandex.ru",
             AcademicDegree.MASTER
         );
-        teacher.setAddress(address);
-        Course course1 = new Course("History");
-        Course course2 = new Course("Math");
-        Course course3 = new Course("Physic");
-        course1.setId(1);
-        course2.setId(2);
-        course3.setId(3);
-        teacher.getCourses().add(course1);
-        teacher.getCourses().add(course2);
-        teacher.getCourses().add(course3);
-        int expectedRows = countRowsInTable(jdbcTemplate, "teachers") + 1;
-        int expectedCoursesRows = countRowsInTable(jdbcTemplate, "teachers_courses") + 3;
 
         teacherDao.create(teacher);
 
-        assertEquals(expectedRows, countRowsInTable(jdbcTemplate, "teachers"));
-        assertEquals(expectedCoursesRows, countRowsInTable(jdbcTemplate, "teachers_courses"));
+        Teacher actual = teacherDao.getById(3).get();
+        assertEquals(teacher, actual);
     }
 
     @Test
@@ -77,45 +61,29 @@ public class HibernateTeacherDaoTest {
 
     @Test
     public void givenUpdatedTeacherAndId_whenUpdate_thenUpdated() {
-        String sql = "SELECT COUNT(0) FROM teachers WHERE first_name = 'Alan' and last_name = 'King' and " +
-            "birthday = '1945-12-16' and gender = 'MALE' and address_id = 1 and phone_number = '3622366' " +
-            "and email = 'king97@yandex.ru' and academic_degree = 'DOCTORAL'";
-        Address address = new Address("Russia", "Saint Petersburg", "Nevsky Prospect",
-            "15", "45", "342423");
-        address.setId(1);
         Teacher updatedTeacher = new Teacher(
             "Alan",
             "King",
             LocalDate.of(1945, 12, 16),
             Gender.MALE,
-            address,
+            TestData.address,
             "3622366",
             "king97@yandex.ru",
             AcademicDegree.DOCTORAL
         );
-        Course course1 = new Course("History");
-        course1.setId(1);
-        Course course2 = new Course("Art");
-        course2.setId(4);
-        updatedTeacher.getCourses().add(course1);
-        updatedTeacher.getCourses().add(course2);
         updatedTeacher.setId(1);
-        int expectedRows = countRowsInTableWhere(jdbcTemplate, "teachers", sql) + 1;
-        int expectedCoursesRows = countRowsInTable(jdbcTemplate, "teachers_courses") - 1;
 
         teacherDao.update(updatedTeacher);
 
-        assertEquals(expectedRows, countRowsInTableWhere(jdbcTemplate, "teachers", sql));
-        assertEquals(expectedCoursesRows, countRowsInTable(jdbcTemplate, "teachers_courses"));
+        Teacher actual = teacherDao.getById(1).get();
+        assertEquals(updatedTeacher, actual);
     }
 
     @Test
     public void givenId_whenDelete_thenDeleted() {
-        int expectedRows = countRowsInTable(jdbcTemplate, "teachers") - 1;
-
         teacherDao.delete(1);
 
-        assertEquals(expectedRows, countRowsInTable(jdbcTemplate, "teachers"));
+        assertEquals(Optional.empty(), teacherDao.getById(1));
     }
 
     @Test
@@ -141,6 +109,11 @@ public class HibernateTeacherDaoTest {
         assertEquals(expected, actual.get());
     }
 
+    @Test
+    public void whenCountTotalRows_thenReturn() {
+        assertEquals(2, teacherDao.countTotalRows());
+    }
+
     interface TestData {
         Address address = new Address.Builder()
             .setCountry("Russia")
@@ -160,6 +133,8 @@ public class HibernateTeacherDaoTest {
             .setPhoneNumber("5435345334")
             .setEmail("miller77@gmail.com")
             .setAcademicDegree(AcademicDegree.MASTER)
+            .setCourses(new ArrayList<>())
+            .setVacations(new ArrayList<>())
             .setId(1)
             .build();
         Teacher teacher2 = new Teacher.Builder()
@@ -171,6 +146,8 @@ public class HibernateTeacherDaoTest {
             .setPhoneNumber("5345345")
             .setEmail("king65@gmail.com")
             .setAcademicDegree(AcademicDegree.DOCTORAL)
+            .setCourses(new ArrayList<>())
+            .setVacations(new ArrayList<>())
             .setId(2)
             .build();
     }
