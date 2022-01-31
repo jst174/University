@@ -1,6 +1,7 @@
 package ua.com.foxminded.university.dao.hibernate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.springframework.test.jdbc.JdbcTestUtils.*;
 
 import org.junit.jupiter.api.Test;
@@ -11,6 +12,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.orm.hibernate5.HibernateTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
@@ -35,6 +37,8 @@ public class HibernateHolidayDaoTest {
 
     @Autowired
     private HolidayDao holidayDao;
+    @Autowired
+    private HibernateTemplate hibernateTemplate;
 
     @Test
     public void givenNewHoliday_whenCreate_thenCreated() {
@@ -42,17 +46,14 @@ public class HibernateHolidayDaoTest {
 
         holidayDao.create(holiday);
 
-        Holiday actual = holidayDao.getById(3).get();
-        assertEquals(holiday, actual);
+        assertEquals(holiday, hibernateTemplate.get(Holiday.class, 3));
     }
 
     @Test
     public void givenId_whenGetById_thenReturn() {
         Holiday expected = new Holiday("New Year", LocalDate.of(2021, 12, 31));
 
-        Optional<Holiday> actual = holidayDao.getById(1);
-
-        assertEquals(expected, actual.get());
+        assertEquals(expected, holidayDao.getById(1).get());
     }
 
     @Test
@@ -62,15 +63,14 @@ public class HibernateHolidayDaoTest {
 
         holidayDao.update(updatedHoliday);
 
-        Holiday actual = holidayDao.getById(1).get();
-        assertEquals(updatedHoliday, actual);
+        assertEquals(updatedHoliday, hibernateTemplate.get(Holiday.class, 1));
     }
 
     @Test
     public void givenId_whenDelete_thenDeleted() {
         holidayDao.delete(1);
 
-        assertEquals(Optional.empty(), holidayDao.getById(1));
+        assertNull(hibernateTemplate.get(Holiday.class, 1));
     }
 
     @Test

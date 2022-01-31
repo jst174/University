@@ -1,6 +1,7 @@
 package ua.com.foxminded.university.dao.hibernate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -9,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.orm.hibernate5.HibernateTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
@@ -37,6 +39,8 @@ public class HibernateStudentDaoTest {
 
     @Autowired
     private StudentDao studentDao;
+    @Autowired
+    private HibernateTemplate hibernateTemplate;
 
     @Test
     public void givenNewStudent_whenCreate_thenCreated() throws IOException {
@@ -48,8 +52,7 @@ public class HibernateStudentDaoTest {
 
         studentDao.create(student);
 
-        Student actual = studentDao.getById(3).get();
-        assertEquals(student, actual);
+        assertEquals(student, hibernateTemplate.get(Student.class, 3));
     }
 
     @Test
@@ -58,7 +61,7 @@ public class HibernateStudentDaoTest {
     }
 
     @Test
-    public void givenUpdatedStudentAndId_whenUpdate_thenUpdated() {
+    public void givenUpdatedStudent_whenUpdate_thenUpdated() {
         Student updatedStudent = new Student(
             "Mike",
             "King",
@@ -73,8 +76,7 @@ public class HibernateStudentDaoTest {
 
         studentDao.update(updatedStudent);
 
-        Student actual = studentDao.getById(1).get();
-        assertEquals(updatedStudent, actual);
+        assertEquals(updatedStudent, hibernateTemplate.get(Student.class, 1));
 
     }
 
@@ -82,7 +84,7 @@ public class HibernateStudentDaoTest {
     public void givenId_whenDelete_thenDeleted() {
         studentDao.delete(1);
 
-        assertEquals(Optional.empty(), studentDao.getById(1));
+        assertNull(hibernateTemplate.get(Student.class, 1));
     }
 
     @Test
@@ -109,7 +111,7 @@ public class HibernateStudentDaoTest {
     }
 
     @Test
-    public void whenCountTotalRows_thenReturn(){
+    public void whenCountTotalRows_thenReturn() {
         assertEquals(2, studentDao.countTotalRows());
     }
 

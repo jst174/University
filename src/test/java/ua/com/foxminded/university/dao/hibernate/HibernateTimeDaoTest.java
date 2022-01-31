@@ -1,6 +1,7 @@
 package ua.com.foxminded.university.dao.hibernate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -9,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.orm.hibernate5.HibernateTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
@@ -32,7 +34,9 @@ import java.util.Optional;
 public class HibernateTimeDaoTest {
 
     @Autowired
-    public TimeDao timeDao;
+    private TimeDao timeDao;
+    @Autowired
+    private HibernateTemplate hibernateTemplate;
 
     @Test
     public void givenNewTime_whenCreate_thenCreated() {
@@ -40,17 +44,14 @@ public class HibernateTimeDaoTest {
 
         timeDao.create(time);
 
-        Time actual = timeDao.getById(3).get();
-        assertEquals(time, actual);
+        assertEquals(time, hibernateTemplate.get(Time.class, 3));
     }
 
     @Test
     public void givenId_whenGetById_thenReturn() {
-        Time expected = new Time(LocalTime.of(8, 00), LocalTime.of(9, 30));
+        Time expected = new Time(LocalTime.of(8, 0), LocalTime.of(9, 30));
 
-        Optional<Time> actual = timeDao.getById(1);
-
-        assertEquals(expected, actual.get());
+        assertEquals(expected, timeDao.getById(1).get());
     }
 
     @Test
@@ -60,21 +61,20 @@ public class HibernateTimeDaoTest {
 
         timeDao.update(updatedTime);
 
-        Time actual = timeDao.getById(1).get();
-        assertEquals(updatedTime, actual);
+        assertEquals(updatedTime, hibernateTemplate.get(Time.class, 1));
     }
 
     @Test
     public void givenId_whenDelete_thenDeleted() {
         timeDao.delete(1);
 
-        assertEquals(Optional.empty(), timeDao.getById(1));
+        assertNull(hibernateTemplate.get(Time.class, 1));
     }
 
     @Test
     public void whenGetAll_thenReturnAllTimes() {
-        Time time1 = new Time(LocalTime.of(8, 00), LocalTime.of(9, 30));
-        Time time2 = new Time(LocalTime.of(14, 00), LocalTime.of(15, 30));
+        Time time1 = new Time(LocalTime.of(8, 0), LocalTime.of(9, 30));
+        Time time2 = new Time(LocalTime.of(14, 0), LocalTime.of(15, 30));
         List<Time> expected = new ArrayList<>();
         expected.add(time1);
         expected.add(time2);
@@ -86,8 +86,8 @@ public class HibernateTimeDaoTest {
 
     @Test
     public void givenPageable_whenGetAll_thenReturnAllTimes() {
-        Time time1 = new Time(LocalTime.of(8, 00), LocalTime.of(9, 30));
-        Time time2 = new Time(LocalTime.of(14, 00), LocalTime.of(15, 30));
+        Time time1 = new Time(LocalTime.of(8, 0), LocalTime.of(9, 30));
+        Time time2 = new Time(LocalTime.of(14, 0), LocalTime.of(15, 30));
         List<Time> times = new ArrayList<>();
         times.add(time1);
         times.add(time2);
@@ -99,7 +99,7 @@ public class HibernateTimeDaoTest {
 
     @Test
     public void givenStartAndEndTime_whenGetByTime_thenReturn() {
-        LocalTime start = LocalTime.of(8, 00);
+        LocalTime start = LocalTime.of(8, 0);
         LocalTime end = LocalTime.of(9, 30);
         Time expected = new Time(start, end);
 

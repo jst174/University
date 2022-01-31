@@ -1,6 +1,7 @@
 package ua.com.foxminded.university.dao.hibernate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -9,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.orm.hibernate5.HibernateTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
@@ -31,6 +33,8 @@ public class HibernateClassroomDaoTest {
 
     @Autowired
     private ClassroomDao classroomDao;
+    @Autowired
+    private HibernateTemplate hibernateTemplate;
 
     @Test
     public void givenNewClassroom_whenCreate_thenCreated() {
@@ -38,17 +42,14 @@ public class HibernateClassroomDaoTest {
 
         classroomDao.create(classroom);
 
-        Classroom actual = classroomDao.getById(3).get();
-        assertEquals(classroom, actual);
+        assertEquals(classroom, hibernateTemplate.get(Classroom.class, 3));
     }
 
     @Test
     public void givenId_whenGetById_thenReturn() {
         Classroom expected = new Classroom(102, 30);
 
-        Optional<Classroom> actual = classroomDao.getById(1);
-
-        assertEquals(expected, actual.get());
+        assertEquals(expected, classroomDao.getById(1).get());
     }
 
     @Test
@@ -58,15 +59,14 @@ public class HibernateClassroomDaoTest {
 
         classroomDao.update(updatedClassroom);
 
-        Classroom actual = classroomDao.getById(1).get();
-        assertEquals(updatedClassroom, actual);
+        assertEquals(updatedClassroom, hibernateTemplate.get(Classroom.class, 1));
     }
 
     @Test
     public void givenId_whenDelete_thenDeleted() {
         classroomDao.delete(1);
 
-        assertEquals(Optional.empty(), classroomDao.getById(1));
+        assertNull(hibernateTemplate.get(Classroom.class, 1));
     }
 
     @Test

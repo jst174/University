@@ -17,16 +17,13 @@ import java.util.Optional;
 @Transactional
 public class HibernateStudentDao implements StudentDao {
 
-    private AddressDao addressDao;
     private SessionFactory sessionFactory;
 
-    public HibernateStudentDao(AddressDao addressDao, SessionFactory sessionFactory) {
-        this.addressDao = addressDao;
+    public HibernateStudentDao(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
     }
 
     public void create(Student student) {
-        addressDao.create(student.getAddress());
         sessionFactory.getCurrentSession().save(student);
     }
 

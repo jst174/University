@@ -1,6 +1,7 @@
 package ua.com.foxminded.university.dao.hibernate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.springframework.test.jdbc.JdbcTestUtils.*;
 
 import org.junit.jupiter.api.Test;
@@ -11,6 +12,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.orm.hibernate5.HibernateTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
@@ -34,7 +36,9 @@ import java.util.Optional;
 public class HibernateVacationDaoTest {
 
     @Autowired
-    public VacationDao vacationDao;
+    private VacationDao vacationDao;
+    @Autowired
+    private HibernateTemplate hibernateTemplate;
 
     @Test
     public void givenNewVacation_whenCreate_thenCreated() {
@@ -45,8 +49,7 @@ public class HibernateVacationDaoTest {
 
         vacationDao.create(vacation);
 
-        Vacation actual = vacationDao.getById(3).get();
-        assertEquals(vacation, actual);
+        assertEquals(vacation, hibernateTemplate.get(Vacation.class, 3));
     }
 
     @Test
@@ -64,15 +67,14 @@ public class HibernateVacationDaoTest {
 
         vacationDao.update(updatedVacation);
 
-        Vacation actual = vacationDao.getById(1).get();
-        assertEquals(updatedVacation, actual);
+        assertEquals(updatedVacation, hibernateTemplate.get(Vacation.class, 1));
     }
 
     @Test
     public void givenId_whenDelete_thenDeleted() {
         vacationDao.delete(1);
 
-        assertEquals(Optional.empty(), vacationDao.getById(1));
+        assertNull(hibernateTemplate.get(Vacation.class, 1));
     }
 
     @Test
@@ -137,6 +139,4 @@ public class HibernateVacationDaoTest {
             .setTeacher(teacher)
             .build();
     }
-
-
 }

@@ -1,6 +1,7 @@
 package ua.com.foxminded.university.dao.hibernate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.springframework.test.jdbc.JdbcTestUtils.*;
 
 import org.junit.jupiter.api.Test;
@@ -11,6 +12,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.orm.hibernate5.HibernateTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
@@ -37,6 +39,8 @@ public class HibernateLessonDaoTest {
 
     @Autowired
     private LessonDao lessonDao;
+    @Autowired
+    private HibernateTemplate hibernateTemplate;
 
     @Test
     public void givenNewLesson_whenCreate_thenCreated() {
@@ -47,17 +51,14 @@ public class HibernateLessonDaoTest {
 
         lessonDao.create(lesson);
 
-        Lesson actual = lessonDao.getById(3).get();
-        assertEquals(lesson, actual);
+        assertEquals(lesson, hibernateTemplate.get(Lesson.class, 3));
     }
 
     @Test
     public void givenId_whenGetById_thenReturn() {
         Lesson expected = TestData.lesson;
 
-        Optional<Lesson> actual = lessonDao.getById(1);
-
-        assertEquals(expected, actual.get());
+        assertEquals(expected, lessonDao.getById(1).get());
     }
 
     @Test
@@ -73,15 +74,14 @@ public class HibernateLessonDaoTest {
 
         lessonDao.update(updatedLesson);
 
-        Lesson actual = lessonDao.getById(1).get();
-        assertEquals(updatedLesson, actual);
+        assertEquals(updatedLesson, hibernateTemplate.get(Lesson.class, 1));
     }
 
     @Test
     public void givenId_whenDelete_thenDeleted() {
         lessonDao.delete(1);
 
-        assertEquals(Optional.empty(), lessonDao.getById(1));
+       assertNull(hibernateTemplate.get(Lesson.class, 1));
     }
 
     @Test

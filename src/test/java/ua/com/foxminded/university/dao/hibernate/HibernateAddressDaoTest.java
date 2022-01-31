@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.orm.hibernate5.HibernateTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
@@ -21,6 +22,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 
 @ExtendWith(SpringExtension.class)
@@ -32,6 +34,8 @@ public class HibernateAddressDaoTest {
 
     @Autowired
     private AddressDao addressDao;
+    @Autowired
+    private HibernateTemplate hibernateTemplate;
 
     @Test
     public void givenNewAddress_whenCreate_thenCreated() {
@@ -40,15 +44,12 @@ public class HibernateAddressDaoTest {
 
         addressDao.create(address);
 
-        Address actual = addressDao.getById(3).get();
-        assertEquals(address, actual);
+        assertEquals(address, hibernateTemplate.get(Address.class, 3));
     }
 
     @Test
     public void givenId_whenGetById_thenReturn() {
-        Optional<Address> actual = addressDao.getById(1);
-
-        assertEquals(TestData.address1, actual.get());
+        assertEquals(TestData.address1, addressDao.getById(1).get());
     }
 
     @Test
@@ -63,15 +64,14 @@ public class HibernateAddressDaoTest {
 
         addressDao.update(updatedAddress);
 
-        Address actual = addressDao.getById(1).get();
-        assertEquals(updatedAddress, actual);
+        assertEquals(updatedAddress,  hibernateTemplate.get(Address.class, 1));
     }
 
     @Test
     public void givenId_whenDelete_thenDeleted() {
         addressDao.delete(1);
 
-        assertEquals(Optional.empty(), addressDao.getById(1));
+        assertNull(hibernateTemplate.get(Address.class, 1));
     }
 
     @Test

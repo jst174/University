@@ -1,6 +1,7 @@
 package ua.com.foxminded.university.dao.hibernate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -9,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.orm.hibernate5.HibernateTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
@@ -34,6 +36,8 @@ public class HibernateTeacherDaoTest {
 
     @Autowired
     private TeacherDao teacherDao;
+    @Autowired
+    private HibernateTemplate hibernateTemplate;
 
     @Test
     public void givenNewTeacher_whenCreate_thenCreated() {
@@ -50,8 +54,7 @@ public class HibernateTeacherDaoTest {
 
         teacherDao.create(teacher);
 
-        Teacher actual = teacherDao.getById(3).get();
-        assertEquals(teacher, actual);
+        assertEquals(teacher, hibernateTemplate.get(Teacher.class, 3));
     }
 
     @Test
@@ -75,15 +78,14 @@ public class HibernateTeacherDaoTest {
 
         teacherDao.update(updatedTeacher);
 
-        Teacher actual = teacherDao.getById(1).get();
-        assertEquals(updatedTeacher, actual);
+        assertEquals(updatedTeacher, hibernateTemplate.get(Teacher.class, 1));
     }
 
     @Test
     public void givenId_whenDelete_thenDeleted() {
         teacherDao.delete(1);
 
-        assertEquals(Optional.empty(), teacherDao.getById(1));
+        assertNull(hibernateTemplate.get(Teacher.class, 1));
     }
 
     @Test

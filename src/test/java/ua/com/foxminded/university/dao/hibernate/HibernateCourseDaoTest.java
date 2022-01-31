@@ -1,6 +1,7 @@
 package ua.com.foxminded.university.dao.hibernate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.springframework.test.jdbc.JdbcTestUtils.*;
 
 import org.junit.jupiter.api.Test;
@@ -11,6 +12,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.orm.hibernate5.HibernateTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
@@ -34,6 +36,8 @@ public class HibernateCourseDaoTest {
 
     @Autowired
     private CourseDao courseDao;
+    @Autowired
+    private HibernateTemplate hibernateTemplate;
 
     @Test
     public void givenNewCourse_whenCreate_thenCreated() {
@@ -41,17 +45,14 @@ public class HibernateCourseDaoTest {
 
         courseDao.create(course);
 
-        Course actual = courseDao.getById(1).get();
-        assertEquals(course, actual);
+        assertEquals(course, hibernateTemplate.get(Course.class, 3));
     }
 
     @Test
     public void givenId_whenGetById_thenReturn() {
         Course courseExpected = new Course("History");
 
-        Optional<Course> courseActual = courseDao.getById(1);
-
-        assertEquals(courseExpected, courseActual.get());
+        assertEquals(courseExpected, courseDao.getById(1).get());
     }
 
     @Test
@@ -61,8 +62,7 @@ public class HibernateCourseDaoTest {
 
         courseDao.update(updatedCourse);
 
-        Course actual = courseDao.getById(1).get();
-        assertEquals(updatedCourse, actual);
+        assertEquals(updatedCourse, hibernateTemplate.get(Course.class, 1));
 
     }
 
@@ -70,7 +70,7 @@ public class HibernateCourseDaoTest {
     public void givenId_whenDelete_thenDeleted() {
         courseDao.delete(1);
 
-        assertEquals(Optional.empty(), courseDao.getById(1));
+        assertNull(hibernateTemplate.get(Course.class, 1));
     }
 
     @Test

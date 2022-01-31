@@ -1,6 +1,7 @@
 package ua.com.foxminded.university.dao.hibernate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -9,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.orm.hibernate5.HibernateTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
@@ -32,6 +34,8 @@ public class HibernateGroupDaoTest {
 
     @Autowired
     private GroupDao groupDao;
+    @Autowired
+    private HibernateTemplate hibernateTemplate;
 
     @Test
     public void givenNewGroup_whenCreate_thenCreated() {
@@ -39,8 +43,7 @@ public class HibernateGroupDaoTest {
 
         groupDao.create(group);
 
-        Group actual = groupDao.getById(6).get();
-        assertEquals(group, actual);
+        assertEquals(group, hibernateTemplate.get(Group.class, 6));
 
     }
 
@@ -58,15 +61,14 @@ public class HibernateGroupDaoTest {
 
         groupDao.update(updatedGroup);
 
-        Group actual = groupDao.getById(1).get();
-        assertEquals(updatedGroup, actual);
+        assertEquals(updatedGroup, hibernateTemplate.get(Group.class, 1));
     }
 
     @Test
     public void givenId_whenDelete_thenDeleted() {
         groupDao.delete(1);
 
-        assertEquals(Optional.empty(), groupDao.getById(1));
+        assertNull(hibernateTemplate.get(Group.class, 1));
     }
 
     @Test
