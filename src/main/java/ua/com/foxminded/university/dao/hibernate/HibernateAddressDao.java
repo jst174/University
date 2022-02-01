@@ -1,5 +1,6 @@
 package ua.com.foxminded.university.dao.hibernate;
 
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -30,7 +31,6 @@ public class HibernateAddressDao implements AddressDao {
         return sessionFactory.getCurrentSession()
             .byId(Address.class)
             .loadOptional(id);
-
     }
 
     public void update(Address address) {
@@ -38,10 +38,7 @@ public class HibernateAddressDao implements AddressDao {
     }
 
     public void delete(int id) {
-        sessionFactory.getCurrentSession()
-            .getNamedQuery("Address_delete")
-            .setParameter("id", id)
-            .executeUpdate();
+        getById(id).ifPresent(sessionFactory.getCurrentSession()::delete);
     }
 
     @Override
@@ -58,11 +55,11 @@ public class HibernateAddressDao implements AddressDao {
             .setFirstResult((int) pageable.getOffset())
             .setMaxResults(pageable.getPageSize())
             .list();
-        return new PageImpl<Address>(addresses, pageable, countTotalRows());
+        return new PageImpl<Address>(addresses, pageable, count());
     }
 
     @Override
-    public Long countTotalRows() {
+    public Long count() {
         return sessionFactory.getCurrentSession()
             .createNamedQuery("Address_countAllRows", Long.class)
             .getSingleResult();

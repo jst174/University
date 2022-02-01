@@ -115,11 +115,11 @@ public class HibernateLessonDao implements LessonDao {
             .setFirstResult((int) pageable.getOffset())
             .setMaxResults(pageable.getPageSize())
             .list();
-        return new PageImpl<Lesson>(lessons, pageable, countTotalRows());
+        return new PageImpl<Lesson>(lessons, pageable, count());
     }
 
     @Override
-    public Long countTotalRows() {
+    public Long count() {
         return sessionFactory.getCurrentSession()
             .createNamedQuery("Lesson_countAllRows", Long.class)
             .getSingleResult();

@@ -2,7 +2,6 @@ package ua.com.foxminded.university.dao.hibernate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.springframework.test.jdbc.JdbcTestUtils.*;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,7 +10,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.orm.hibernate5.HibernateTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
@@ -51,7 +49,7 @@ public class HibernateLessonDaoTest {
 
         lessonDao.create(lesson);
 
-        assertEquals(lesson, hibernateTemplate.get(Lesson.class, 3));
+        assertEquals(lesson, hibernateTemplate.get(Lesson.class, lesson.getId()));
     }
 
     @Test
@@ -74,7 +72,7 @@ public class HibernateLessonDaoTest {
 
         lessonDao.update(updatedLesson);
 
-        assertEquals(updatedLesson, hibernateTemplate.get(Lesson.class, 1));
+        assertEquals(updatedLesson, hibernateTemplate.get(Lesson.class, updatedLesson.getId()));
     }
 
     @Test
@@ -174,8 +172,8 @@ public class HibernateLessonDaoTest {
     }
 
     @Test
-    public void whenCountTotalRows_thenReturn(){
-        assertEquals(2, lessonDao.countTotalRows());
+    public void whenCount_thenReturn(){
+        assertEquals(2, lessonDao.count());
     }
 
     interface TestData {

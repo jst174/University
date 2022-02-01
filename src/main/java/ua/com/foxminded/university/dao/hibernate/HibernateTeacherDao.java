@@ -26,7 +26,6 @@ public class HibernateTeacherDao implements TeacherDao {
     }
 
     public void create(Teacher teacher) {
-        addressDao.create(teacher.getAddress());
         sessionFactory.getCurrentSession().save(teacher);
     }
 
@@ -70,11 +69,11 @@ public class HibernateTeacherDao implements TeacherDao {
             .setFirstResult((int) pageable.getOffset())
             .setMaxResults(pageable.getPageSize())
             .list();
-        return new PageImpl<Teacher>(teachers, pageable, countTotalRows());
+        return new PageImpl<Teacher>(teachers, pageable, count());
     }
 
     @Override
-    public Long countTotalRows() {
+    public Long count() {
         return sessionFactory.getCurrentSession()
             .createNamedQuery("Teacher_countAllRows", Long.class)
             .getSingleResult();

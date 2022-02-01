@@ -65,11 +65,11 @@ public class HibernateGroupDao implements GroupDao {
             .setFirstResult((int) pageable.getOffset())
             .setMaxResults(pageable.getPageSize())
             .list();
-        return new PageImpl<Group>(groups, pageable, countTotalRows());
+        return new PageImpl<Group>(groups, pageable, count());
     }
 
     @Override
-    public Long countTotalRows() {
+    public Long count() {
         return sessionFactory.getCurrentSession()
             .createNamedQuery("Group_countAllRows", Long.class)
             .getSingleResult();

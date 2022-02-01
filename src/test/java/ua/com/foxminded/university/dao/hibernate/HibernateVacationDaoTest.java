@@ -2,7 +2,6 @@ package ua.com.foxminded.university.dao.hibernate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.springframework.test.jdbc.JdbcTestUtils.*;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,7 +10,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.orm.hibernate5.HibernateTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
@@ -25,7 +23,6 @@ import ua.com.foxminded.university.model.*;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 
 @ExtendWith(SpringExtension.class)
@@ -49,7 +46,7 @@ public class HibernateVacationDaoTest {
 
         vacationDao.create(vacation);
 
-        assertEquals(vacation, hibernateTemplate.get(Vacation.class, 3));
+        assertEquals(vacation, hibernateTemplate.get(Vacation.class, vacation.getId()));
     }
 
     @Test
@@ -67,7 +64,7 @@ public class HibernateVacationDaoTest {
 
         vacationDao.update(updatedVacation);
 
-        assertEquals(updatedVacation, hibernateTemplate.get(Vacation.class, 1));
+        assertEquals(updatedVacation, hibernateTemplate.get(Vacation.class, updatedVacation.getId()));
     }
 
     @Test
@@ -103,8 +100,8 @@ public class HibernateVacationDaoTest {
     }
 
     @Test
-    public void whenCountTotalRows_thenReturn(){
-        assertEquals(2, vacationDao.countTotalRows());
+    public void whenCount_thenReturn(){
+        assertEquals(2, vacationDao.count());
     }
 
     interface TestData {

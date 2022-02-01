@@ -19,10 +19,9 @@ import ua.com.foxminded.university.model.Address;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
+import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 @ExtendWith(SpringExtension.class)
@@ -44,12 +43,12 @@ public class HibernateAddressDaoTest {
 
         addressDao.create(address);
 
-        assertEquals(address, hibernateTemplate.get(Address.class, 3));
+        assertEquals(address, hibernateTemplate.get(Address.class, address.getId()));
     }
 
     @Test
     public void givenId_whenGetById_thenReturn() {
-        assertEquals(TestData.address1, addressDao.getById(1).get());
+        assertEquals(TestData.address1, addressDao.getById(TestData.address1.getId()).get());
     }
 
     @Test
@@ -64,14 +63,14 @@ public class HibernateAddressDaoTest {
 
         addressDao.update(updatedAddress);
 
-        assertEquals(updatedAddress,  hibernateTemplate.get(Address.class, 1));
+        assertEquals(updatedAddress, hibernateTemplate.get(Address.class, updatedAddress.getId()));
     }
 
     @Test
     public void givenId_whenDelete_thenDeleted() {
-        addressDao.delete(1);
+        addressDao.delete(TestData.address1.getId());
 
-        assertNull(hibernateTemplate.get(Address.class, 1));
+        assertNull(hibernateTemplate.get(Address.class, TestData.address1.getId()));
     }
 
     @Test
@@ -94,8 +93,8 @@ public class HibernateAddressDaoTest {
     }
 
     @Test
-    public void whenCountTotalRows_thenReturn(){
-        assertEquals(2, addressDao.countTotalRows());
+    public void whenCount_thenReturn() {
+        assertEquals(2, addressDao.count());
     }
 
     interface TestData {
@@ -110,7 +109,7 @@ public class HibernateAddressDaoTest {
             .build();
 
         Address address2 = new Address.Builder()
-            .setId(1)
+            .setId(2)
             .setCountry("Russia")
             .setCity("Yekaterinburg")
             .setStreet("Lenin Avenue")

@@ -58,11 +58,11 @@ public class HibernateTimeDao implements TimeDao {
             .setFirstResult((int) pageable.getOffset())
             .setMaxResults(pageable.getPageSize())
             .list();
-        return new PageImpl<Time>(times, pageable, countTotalRows());
+        return new PageImpl<Time>(times, pageable, count());
     }
 
     @Override
-    public Long countTotalRows() {
+    public Long count() {
         return sessionFactory.getCurrentSession()
             .createNamedQuery("Time_countAllRows", Long.class)
             .getSingleResult();

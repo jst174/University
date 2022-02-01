@@ -6,7 +6,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import ua.com.foxminded.university.dao.AddressDao;
 import ua.com.foxminded.university.dao.StudentDao;
 import ua.com.foxminded.university.model.Student;
 
@@ -67,11 +66,11 @@ public class HibernateStudentDao implements StudentDao {
             .setFirstResult((int) pageable.getOffset())
             .setMaxResults(pageable.getPageSize())
             .list();
-        return new PageImpl<Student>(students, pageable, countTotalRows());
+        return new PageImpl<Student>(students, pageable, count());
     }
 
     @Override
-    public Long countTotalRows() {
+    public Long count() {
         return sessionFactory.getCurrentSession()
             .createNamedQuery("Student_countAllRows", Long.class)
             .getSingleResult();

@@ -20,6 +20,6 @@ public interface Dao<T> {
 
     Page<T> getAll(Pageable pageable);
 
-    Long countTotalRows();
+    Long count();
 
 }

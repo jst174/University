@@ -4,7 +4,6 @@ import javax.persistence.*;
 import java.util.Objects;
 
 @NamedQueries({
-    @NamedQuery(name = "Address_delete", query = "DELETE FROM Address where id = :id"),
     @NamedQuery(name = "Address_getAll", query = "SELECT a FROM Address a"),
     @NamedQuery(name = "Address_countAllRows", query = "SELECT COUNT (a) FROM Address a")
 })

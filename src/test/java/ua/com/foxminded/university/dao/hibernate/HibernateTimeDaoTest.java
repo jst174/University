@@ -44,7 +44,7 @@ public class HibernateTimeDaoTest {
 
         timeDao.create(time);
 
-        assertEquals(time, hibernateTemplate.get(Time.class, 3));
+        assertEquals(time, hibernateTemplate.get(Time.class, time.getId()));
     }
 
     @Test
@@ -61,7 +61,7 @@ public class HibernateTimeDaoTest {
 
         timeDao.update(updatedTime);
 
-        assertEquals(updatedTime, hibernateTemplate.get(Time.class, 1));
+        assertEquals(updatedTime, hibernateTemplate.get(Time.class, updatedTime.getId()));
     }
 
     @Test
@@ -109,7 +109,7 @@ public class HibernateTimeDaoTest {
     }
 
     @Test
-    public void whenCountTotalRows_thenReturn() {
-        assertEquals(2, timeDao.countTotalRows());
+    public void whenCount_thenReturn() {
+        assertEquals(2, timeDao.count());
     }
 }

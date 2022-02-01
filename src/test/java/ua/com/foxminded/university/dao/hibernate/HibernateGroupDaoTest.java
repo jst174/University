@@ -22,7 +22,6 @@ import ua.com.foxminded.university.model.Group;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 
 @ExtendWith(SpringExtension.class)
@@ -43,7 +42,7 @@ public class HibernateGroupDaoTest {
 
         groupDao.create(group);
 
-        assertEquals(group, hibernateTemplate.get(Group.class, 6));
+        assertEquals(group, hibernateTemplate.get(Group.class, group.getId()));
 
     }
 
@@ -61,7 +60,7 @@ public class HibernateGroupDaoTest {
 
         groupDao.update(updatedGroup);
 
-        assertEquals(updatedGroup, hibernateTemplate.get(Group.class, 1));
+        assertEquals(updatedGroup, hibernateTemplate.get(Group.class, updatedGroup.getId()));
     }
 
     @Test
@@ -117,7 +116,7 @@ public class HibernateGroupDaoTest {
     }
 
     @Test
-    public void whenCountTotalRows_whenReturn(){
-        assertEquals(5, groupDao.countTotalRows());
+    public void whenCount_whenReturn(){
+        assertEquals(5, groupDao.count());
     }
 }

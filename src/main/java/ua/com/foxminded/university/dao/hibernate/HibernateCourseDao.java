@@ -65,11 +65,11 @@ public class HibernateCourseDao implements CourseDao {
             .setFirstResult((int) pageable.getOffset())
             .setMaxResults(pageable.getPageSize())
             .list();
-        return new PageImpl<>(courses, pageable, countTotalRows());
+        return new PageImpl<>(courses, pageable, count());
     }
 
     @Override
-    public Long countTotalRows() {
+    public Long count() {
         return sessionFactory.getCurrentSession()
             .createNamedQuery("Course_countAllRows", Long.class)
             .getSingleResult();

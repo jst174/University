@@ -42,7 +42,7 @@ public class HibernateClassroomDaoTest {
 
         classroomDao.create(classroom);
 
-        assertEquals(classroom, hibernateTemplate.get(Classroom.class, 3));
+        assertEquals(classroom, hibernateTemplate.get(Classroom.class, classroom.getId()));
     }
 
     @Test
@@ -59,7 +59,7 @@ public class HibernateClassroomDaoTest {
 
         classroomDao.update(updatedClassroom);
 
-        assertEquals(updatedClassroom, hibernateTemplate.get(Classroom.class, 1));
+        assertEquals(updatedClassroom, hibernateTemplate.get(Classroom.class, updatedClassroom.getId()));
     }
 
     @Test
@@ -104,7 +104,7 @@ public class HibernateClassroomDaoTest {
     }
 
     @Test
-    public void whenCountTotalRows_thenReturn(){
-        assertEquals(2, classroomDao.countTotalRows());
+    public void whenCount_thenReturn() {
+        assertEquals(2, classroomDao.count());
     }
 }

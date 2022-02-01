@@ -57,11 +57,11 @@ public class HibernateHolidayDao implements HolidayDao {
             .setFirstResult((int) pageable.getOffset())
             .setMaxResults(pageable.getPageSize())
             .list();
-        return new PageImpl<Holiday>(holidays, pageable, countTotalRows());
+        return new PageImpl<Holiday>(holidays, pageable, count());
     }
 
     @Override
-    public Long countTotalRows() {
+    public Long count() {
         return sessionFactory.getCurrentSession()
             .createNamedQuery("Holiday_countAllRows", Long.class)
             .getSingleResult();

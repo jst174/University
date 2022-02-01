@@ -1,8 +1,6 @@
 package ua.com.foxminded.university.dao.hibernate;
 
-import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -80,11 +78,11 @@ public class HibernateVacationDao implements VacationDao {
             .setFirstResult((int) pageable.getOffset())
             .setMaxResults(pageable.getPageSize())
             .list();
-        return new PageImpl<Vacation>(vacations, pageable, countTotalRows());
+        return new PageImpl<Vacation>(vacations, pageable, count());
     }
 
     @Override
-    public Long countTotalRows() {
+    public Long count() {
         return sessionFactory.getCurrentSession()
             .createNamedQuery("Vacation_countAllRows", Long.class)
             .getSingleResult();

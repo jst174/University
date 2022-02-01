@@ -57,7 +57,7 @@ public class HibernateClassroomDao implements ClassroomDao {
             .setFirstResult((int) pageable.getOffset())
             .setMaxResults(pageable.getPageSize())
             .list();
-        return new PageImpl<Classroom>(classrooms, pageable, countTotalRows());
+        return new PageImpl<Classroom>(classrooms, pageable, count());
     }
 
     @Override
@@ -69,7 +69,7 @@ public class HibernateClassroomDao implements ClassroomDao {
     }
 
     @Override
-    public Long countTotalRows() {
+    public Long count() {
         return sessionFactory.getCurrentSession()
             .createNamedQuery("Classroom_countAllRows", Long.class)
             .getSingleResult();
