@@ -28,7 +28,6 @@ import java.util.List;
 @ContextConfiguration(classes = {DatabaseConfigTest.class})
 @Sql({"/create_lesson_test.sql"})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-@Transactional
 public class HibernateGroupDaoTest {
 
     @Autowired
@@ -37,6 +36,7 @@ public class HibernateGroupDaoTest {
     private HibernateTemplate hibernateTemplate;
 
     @Test
+    @Transactional
     public void givenNewGroup_whenCreate_thenCreated() {
         Group group = new Group("MJ-12");
 
@@ -47,6 +47,7 @@ public class HibernateGroupDaoTest {
     }
 
     @Test
+    @Transactional
     public void givenId_whenGetById_thenReturn() {
         Group group = new Group("MH-12");
 
@@ -54,6 +55,7 @@ public class HibernateGroupDaoTest {
     }
 
     @Test
+    @Transactional
     public void givenUpdatedCroupAndId_thenUpdated() {
         Group updatedGroup = new Group("JD-32");
         updatedGroup.setId(1);
@@ -64,13 +66,18 @@ public class HibernateGroupDaoTest {
     }
 
     @Test
+    @Transactional
     public void givenId_whenDelete_thenDeleted() {
-        groupDao.delete(1);
+        if (hibernateTemplate.get(Group.class, 1) != null) {
+            groupDao.delete(1);
+            hibernateTemplate.clear();
+        }
 
         assertNull(hibernateTemplate.get(Group.class, 1));
     }
 
     @Test
+    @Transactional
     public void whenGetAll_thenReturnAllGroups() {
         Group group1 = new Group("MH-12");
         Group group2 = new Group("JW-23");
@@ -90,6 +97,7 @@ public class HibernateGroupDaoTest {
     }
 
     @Test
+    @Transactional
     public void givenPageable_whenGetAll_thenReturnAllGroups() {
         Group group1 = new Group("MH-12");
         Group group2 = new Group("JW-23");
@@ -109,6 +117,7 @@ public class HibernateGroupDaoTest {
     }
 
     @Test
+    @Transactional
     public void givenGroupName_whenGetByName_thenReturn() {
         Group group = new Group("MH-12");
 
@@ -116,6 +125,7 @@ public class HibernateGroupDaoTest {
     }
 
     @Test
+    @Transactional
     public void whenCount_whenReturn(){
         assertEquals(5, groupDao.count());
     }

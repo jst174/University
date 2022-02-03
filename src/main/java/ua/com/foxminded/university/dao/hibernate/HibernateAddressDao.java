@@ -1,12 +1,10 @@
 package ua.com.foxminded.university.dao.hibernate;
 
-import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 import ua.com.foxminded.university.dao.AddressDao;
 import ua.com.foxminded.university.model.Address;
 
@@ -14,7 +12,6 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
-@Transactional
 public class HibernateAddressDao implements AddressDao {
 
     private SessionFactory sessionFactory;
@@ -38,7 +35,11 @@ public class HibernateAddressDao implements AddressDao {
     }
 
     public void delete(int id) {
-        getById(id).ifPresent(sessionFactory.getCurrentSession()::delete);
+        sessionFactory.getCurrentSession()
+            .getNamedQuery("Address_delete")
+            .setParameter("id", id)
+            .executeUpdate();
+
     }
 
     @Override

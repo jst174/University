@@ -9,7 +9,7 @@ import java.util.Objects;
     @NamedQuery(name = "Student_delete", query = "DELETE FROM Student AS s WHERE s.id = :id"),
     @NamedQuery(name = "Student_getAll", query = "SELECT s FROM Student  AS s"),
     @NamedQuery(name = "Student_countAllRows", query = "SELECT COUNT (s) FROM Student AS s"),
-    @NamedQuery(name = "Student_getByName", query = "SELECT s FROM Student AS s " +
+    @NamedQuery(name = "Student_getByFirstNameAndLastName", query = "SELECT s FROM Student AS s " +
         "WHERE s.firstName =: firstName and s.lastName = :lastName")
 })
 @Entity

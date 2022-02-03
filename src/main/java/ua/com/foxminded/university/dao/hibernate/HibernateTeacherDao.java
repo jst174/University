@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
-@Transactional
 public class HibernateTeacherDao implements TeacherDao {
 
     private SessionFactory sessionFactory;
@@ -54,9 +53,9 @@ public class HibernateTeacherDao implements TeacherDao {
     }
 
     @Override
-    public Optional<Teacher> getByName(String firstName, String lastName) {
+    public Optional<Teacher> getByFirstNameAndLastName(String firstName, String lastName) {
         return sessionFactory.getCurrentSession()
-            .createNamedQuery("Teacher_getByName", Teacher.class)
+            .createNamedQuery("Teacher_getByFirstNameAndLastName", Teacher.class)
             .setParameter("firstName", firstName)
             .setParameter("lastName", lastName)
             .uniqueResultOptional();

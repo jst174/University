@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
-@Transactional
 public class HibernateTimeDao implements TimeDao {
 
     private SessionFactory sessionFactory;

@@ -5,7 +5,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 import ua.com.foxminded.university.dao.CourseDao;
 import ua.com.foxminded.university.model.Course;
 
@@ -13,7 +12,6 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
-@Transactional
 public class HibernateCourseDao implements CourseDao {
 
     private SessionFactory sessionFactory;

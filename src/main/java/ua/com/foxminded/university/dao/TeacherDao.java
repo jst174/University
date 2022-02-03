@@ -8,5 +8,5 @@ import java.util.Optional;
 
 public interface TeacherDao extends Dao<Teacher> {
 
-    Optional<Teacher> getByName(String firstName, String lastName);
+    Optional<Teacher> getByFirstNameAndLastName(String firstName, String lastName);
 }

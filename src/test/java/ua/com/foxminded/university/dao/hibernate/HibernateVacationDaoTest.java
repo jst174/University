@@ -29,7 +29,6 @@ import java.util.List;
 @ContextConfiguration(classes = {DatabaseConfigTest.class})
 @Sql({"/create_vacation_test.sql"})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-@Transactional
 public class HibernateVacationDaoTest {
 
     @Autowired
@@ -38,6 +37,7 @@ public class HibernateVacationDaoTest {
     private HibernateTemplate hibernateTemplate;
 
     @Test
+    @Transactional
     public void givenNewVacation_whenCreate_thenCreated() {
         Vacation vacation = new Vacation(
             LocalDate.of(2021, 10, 15),
@@ -50,11 +50,13 @@ public class HibernateVacationDaoTest {
     }
 
     @Test
+    @Transactional
     public void givenId_whenGetById_thenReturn() {
         assertEquals(TestData.vacation1, vacationDao.getById(1).get());
     }
 
     @Test
+    @Transactional
     public void givenUpdatedVacationAndId_whenUpdate_thenUpdated() {
         Vacation updatedVacation = new Vacation(
             LocalDate.of(2021, 11, 15),
@@ -68,18 +70,24 @@ public class HibernateVacationDaoTest {
     }
 
     @Test
+    @Transactional
     public void givenId_whenDelete_thenDeleted() {
-        vacationDao.delete(1);
+        if (hibernateTemplate.get(Vacation.class, 1) != null) {
+            vacationDao.delete(1);
+            hibernateTemplate.clear();
+        }
 
         assertNull(hibernateTemplate.get(Vacation.class, 1));
     }
 
     @Test
+    @Transactional
     public void whenGetAll_thenReturnAllVacations() {
         assertEquals(Arrays.asList(TestData.vacation1, TestData.vacation2), vacationDao.getAll());
     }
 
     @Test
+    @Transactional
     public void givenPageable_whenGetAll_thenReturn() {
         List<Vacation> vacations = Arrays.asList(TestData.vacation1, TestData.vacation2);
         Pageable pageable = PageRequest.of(0, vacations.size());
@@ -89,18 +97,22 @@ public class HibernateVacationDaoTest {
     }
 
     @Test
-    public void givenTeacherAndLessonDate_whenGetByTeacherAndLessonDate_thenReturn() {
-        assertEquals(TestData.vacation1, vacationDao.getByTeacherAndLessonDate(TestData.teacher,
+    @Transactional
+    public void givenTeacherAndDate_whenGetByTeacherAndDate_thenReturn() {
+        assertEquals(TestData.vacation1, vacationDao.getByTeacherAndDate(TestData.teacher,
             LocalDate.of(2021, 10, 20)).get());
     }
 
     @Test
+    @Transactional
     public void givenVacation_whenGetByTeacherAndVacationDates_thenReturn() {
-        assertEquals(TestData.vacation1, vacationDao.getByTeacherAndVacationDates(TestData.vacation1).get());
+        assertEquals(TestData.vacation1, vacationDao.getByTeacherAndVacationDates(TestData.teacher,
+            TestData.vacation1.getStart(), TestData.vacation1.getEnding()).get());
     }
 
     @Test
-    public void whenCount_thenReturn(){
+    @Transactional
+    public void whenCount_thenReturn() {
         assertEquals(2, vacationDao.count());
     }
 

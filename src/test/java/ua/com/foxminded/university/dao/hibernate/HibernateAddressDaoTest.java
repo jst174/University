@@ -19,7 +19,6 @@ import ua.com.foxminded.university.model.Address;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -28,7 +27,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @ContextConfiguration(classes = {DatabaseConfigTest.class})
 @Sql({"/create_address_test.sql"})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-@Transactional
 public class HibernateAddressDaoTest {
 
     @Autowired
@@ -37,6 +35,7 @@ public class HibernateAddressDaoTest {
     private HibernateTemplate hibernateTemplate;
 
     @Test
+    @Transactional
     public void givenNewAddress_whenCreate_thenCreated() {
         Address address = new Address("Russia", "Saint Petersburg", "Nevsky Prospect",
             "15", "45", "342423");
@@ -47,11 +46,13 @@ public class HibernateAddressDaoTest {
     }
 
     @Test
+    @Transactional
     public void givenId_whenGetById_thenReturn() {
         assertEquals(TestData.address1, addressDao.getById(TestData.address1.getId()).get());
     }
 
     @Test
+    @Transactional
     public void givenUpdatedAddressAndId_whenUpdate_thenUpdated() {
         Address updatedAddress = new Address.Builder().clone(TestData.address1)
             .setCity("Moscow")
@@ -67,13 +68,18 @@ public class HibernateAddressDaoTest {
     }
 
     @Test
+    @Transactional
     public void givenId_whenDelete_thenDeleted() {
-        addressDao.delete(TestData.address1.getId());
+        if (hibernateTemplate.get(Address.class, TestData.address1.getId()) != null) {
+            addressDao.delete(TestData.address1.getId());
+            hibernateTemplate.clear();
+        }
 
         assertNull(hibernateTemplate.get(Address.class, TestData.address1.getId()));
     }
 
     @Test
+    @Transactional
     public void whenGetAll_thenReturnAllAddress() {
         List<Address> expected = Arrays.asList(TestData.address1, TestData.address2);
 
@@ -83,6 +89,7 @@ public class HibernateAddressDaoTest {
     }
 
     @Test
+    @Transactional
     public void givenPageable_whenGetAll_thenReturn() {
         List<Address> addresses = Arrays.asList(TestData.address1, TestData.address2);
         Pageable pageable = PageRequest.of(0, 2);
@@ -93,6 +100,7 @@ public class HibernateAddressDaoTest {
     }
 
     @Test
+    @Transactional
     public void whenCount_thenReturn() {
         assertEquals(2, addressDao.count());
     }

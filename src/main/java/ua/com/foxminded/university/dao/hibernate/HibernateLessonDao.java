@@ -1,12 +1,10 @@
 package ua.com.foxminded.university.dao.hibernate;
 
 import org.hibernate.SessionFactory;
-import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import ua.com.foxminded.university.dao.LessonDao;
 import ua.com.foxminded.university.model.*;
@@ -17,7 +15,6 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
-@Transactional
 public class HibernateLessonDao implements LessonDao {
 
     private SessionFactory sessionFactory;
@@ -57,16 +54,12 @@ public class HibernateLessonDao implements LessonDao {
 
     @Override
     public Optional<Lesson> getByDateAndTimeAndTeacher(LocalDate date, Time time, Teacher teacher) {
-        try {
-            return sessionFactory.getCurrentSession()
-                .createNamedQuery("Lesson_getByDateAndTimeAndTeacher", Lesson.class)
-                .setParameter("date", date)
-                .setParameter("timeId", time.getId())
-                .setParameter("teacherId", teacher.getId())
-                .uniqueResultOptional();
-        } catch (DataAccessException e) {
-            return Optional.empty();
-        }
+        return sessionFactory.getCurrentSession()
+            .createNamedQuery("Lesson_getByDateAndTimeAndTeacher", Lesson.class)
+            .setParameter("date", date)
+            .setParameter("timeId", time.getId())
+            .setParameter("teacherId", teacher.getId())
+            .uniqueResultOptional();
     }
 
     @Override
@@ -80,11 +73,12 @@ public class HibernateLessonDao implements LessonDao {
     }
 
     @Override
-    public List<Lesson> getByDateAndTime(LocalDate date, Time time) {
+    public List<Lesson> getByDateAndTimeAndGroupId(LocalDate date, Time time, int groupId) {
         return sessionFactory.getCurrentSession()
-            .createNamedQuery("Lesson_getByDateAndTime", Lesson.class)
+            .createNamedQuery("Lesson_getByDateAndTimeAndGroupId", Lesson.class)
+            .setParameter("time", time)
             .setParameter("date", date)
-            .setParameter("timeId", time.getId())
+            .setParameter("groupId", groupId)
             .list();
     }
 

@@ -30,7 +30,6 @@ import java.util.Optional;
 @ContextConfiguration(classes = {DatabaseConfigTest.class})
 @Sql({"/create_time_test.sql"})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-@Transactional
 public class HibernateTimeDaoTest {
 
     @Autowired
@@ -39,6 +38,7 @@ public class HibernateTimeDaoTest {
     private HibernateTemplate hibernateTemplate;
 
     @Test
+    @Transactional
     public void givenNewTime_whenCreate_thenCreated() {
         Time time = new Time(LocalTime.of(10, 0), LocalTime.of(11, 30));
 
@@ -48,6 +48,7 @@ public class HibernateTimeDaoTest {
     }
 
     @Test
+    @Transactional
     public void givenId_whenGetById_thenReturn() {
         Time expected = new Time(LocalTime.of(8, 0), LocalTime.of(9, 30));
 
@@ -55,6 +56,7 @@ public class HibernateTimeDaoTest {
     }
 
     @Test
+    @Transactional
     public void givenUpdatedTimeAndId_whenUpdate_thenUpdated() {
         Time updatedTime = new Time(LocalTime.of(8, 15), LocalTime.of(9, 45));
         updatedTime.setId(1);
@@ -65,13 +67,18 @@ public class HibernateTimeDaoTest {
     }
 
     @Test
+    @Transactional
     public void givenId_whenDelete_thenDeleted() {
-        timeDao.delete(1);
+        if (hibernateTemplate.get(Time.class, 1) != null) {
+            timeDao.delete(1);
+            hibernateTemplate.clear();
+        }
 
         assertNull(hibernateTemplate.get(Time.class, 1));
     }
 
     @Test
+    @Transactional
     public void whenGetAll_thenReturnAllTimes() {
         Time time1 = new Time(LocalTime.of(8, 0), LocalTime.of(9, 30));
         Time time2 = new Time(LocalTime.of(14, 0), LocalTime.of(15, 30));
@@ -85,6 +92,7 @@ public class HibernateTimeDaoTest {
     }
 
     @Test
+    @Transactional
     public void givenPageable_whenGetAll_thenReturnAllTimes() {
         Time time1 = new Time(LocalTime.of(8, 0), LocalTime.of(9, 30));
         Time time2 = new Time(LocalTime.of(14, 0), LocalTime.of(15, 30));
@@ -98,6 +106,7 @@ public class HibernateTimeDaoTest {
     }
 
     @Test
+    @Transactional
     public void givenStartAndEndTime_whenGetByTime_thenReturn() {
         LocalTime start = LocalTime.of(8, 0);
         LocalTime end = LocalTime.of(9, 30);
@@ -109,6 +118,7 @@ public class HibernateTimeDaoTest {
     }
 
     @Test
+    @Transactional
     public void whenCount_thenReturn() {
         assertEquals(2, timeDao.count());
     }

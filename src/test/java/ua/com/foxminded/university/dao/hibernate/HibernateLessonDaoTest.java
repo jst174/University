@@ -32,7 +32,6 @@ import java.util.Optional;
 @ContextConfiguration(classes = {DatabaseConfigTest.class})
 @Sql({"/create_lesson_test.sql"})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-@Transactional
 public class HibernateLessonDaoTest {
 
     @Autowired
@@ -41,6 +40,7 @@ public class HibernateLessonDaoTest {
     private HibernateTemplate hibernateTemplate;
 
     @Test
+    @Transactional
     public void givenNewLesson_whenCreate_thenCreated() {
         Lesson lesson = new Lesson.Builder().clone(TestData.lesson)
             .setDate(LocalDate.of(2021, 12, 12))
@@ -53,6 +53,7 @@ public class HibernateLessonDaoTest {
     }
 
     @Test
+    @Transactional
     public void givenId_whenGetById_thenReturn() {
         Lesson expected = TestData.lesson;
 
@@ -60,6 +61,7 @@ public class HibernateLessonDaoTest {
     }
 
     @Test
+    @Transactional
     public void givenUpdatedLesson_whenUpdate_thenUpdated() {
         Lesson updatedLesson = new Lesson.Builder().clone(TestData.lesson)
             .setTeacher(TestData.teacher2)
@@ -76,13 +78,18 @@ public class HibernateLessonDaoTest {
     }
 
     @Test
+    @Transactional
     public void givenId_whenDelete_thenDeleted() {
-        lessonDao.delete(1);
+        if (hibernateTemplate.get(Lesson.class, 1) != null) {
+            lessonDao.delete(1);
+            hibernateTemplate.clear();
+        }
 
-       assertNull(hibernateTemplate.get(Lesson.class, 1));
+        assertNull(hibernateTemplate.get(Lesson.class, 1));
     }
 
     @Test
+    @Transactional
     public void whenGetAll_thenReturnAllLessons() {
         Lesson lesson1 = TestData.lesson;
         Lesson lesson2 = new Lesson.Builder().clone(lesson1)
@@ -100,6 +107,7 @@ public class HibernateLessonDaoTest {
     }
 
     @Test
+    @Transactional
     public void givenPageable_whenGetAll_thenReturnAllLessons() {
         Lesson lesson1 = TestData.lesson;
         Lesson lesson2 = new Lesson.Builder().clone(lesson1)
@@ -115,19 +123,8 @@ public class HibernateLessonDaoTest {
         assertEquals(lessonPage, lessonDao.getAll(pageable));
     }
 
-
     @Test
-    public void givenDateAndTime_whenGetByDateAndTime_thenReturn() {
-        Lesson lesson = TestData.lesson;
-        List<Lesson> expected = new ArrayList<>();
-        expected.add(lesson);
-
-        List<Lesson> actual = lessonDao.getByDateAndTime(LocalDate.of(2021, 9, 28), lesson.getTime());
-
-        assertEquals(expected, actual);
-    }
-
-    @Test
+    @Transactional
     public void givenDateAndTimeAndTeacher_whenGetByDateAndTimeAndTeacher_thenReturn() {
         Lesson expected = TestData.lesson;
 
@@ -138,6 +135,7 @@ public class HibernateLessonDaoTest {
     }
 
     @Test
+    @Transactional
     public void givenDateAndTimeAndClassroom_whenGetByDateAndTimeAndClassroom_thenReturn() {
         Lesson expected = TestData.lesson;
 
@@ -148,31 +146,45 @@ public class HibernateLessonDaoTest {
     }
 
     @Test
-    public void givenGroupIdAndTwoDates_whenGetByGroupIdBetweenDates_thenReturn(){
-        List<Lesson> expected =Arrays.asList(TestData.lesson,
+    @Transactional
+    public void givenGroupIdAndTwoDates_whenGetByGroupIdBetweenDates_thenReturn() {
+        List<Lesson> expected = Arrays.asList(TestData.lesson,
             new Lesson.Builder().clone(TestData.lesson).setId(2).setTime(TestData.time2).build());
 
         List<Lesson> actual = lessonDao.getByGroupIdBetweenDates(
-            1, LocalDate.of(2021,9, 25),
-            LocalDate.of(2021,9, 30));
+            1, LocalDate.of(2021, 9, 25),
+            LocalDate.of(2021, 9, 30));
 
         assertEquals(expected, actual);
     }
 
     @Test
-    public void givenTeacherIdAndTwoDates_whenGetByTeacherIdBetweenDates_thenReturn(){
-        List<Lesson> expected =Arrays.asList(TestData.lesson,
+    @Transactional
+    public void givenTeacherIdAndTwoDates_whenGetByTeacherIdBetweenDates_thenReturn() {
+        List<Lesson> expected = Arrays.asList(TestData.lesson,
             new Lesson.Builder().clone(TestData.lesson).setId(2).setTime(TestData.time2).build());
 
         List<Lesson> actual = lessonDao.getByTeacherIdBetweenDates(
-            1, LocalDate.of(2021,9, 25),
-            LocalDate.of(2021,9, 30));
+            1, LocalDate.of(2021, 9, 25),
+            LocalDate.of(2021, 9, 30));
 
         assertEquals(expected, actual);
     }
 
     @Test
-    public void whenCount_thenReturn(){
+    @Transactional
+    public void givenDateAndTimeAndGroupId_whenGetByDateAndTimeAndGroupId_thenReturn() {
+        List<Lesson> expected = Arrays.asList(TestData.lesson);
+
+        List<Lesson> actual = lessonDao.getByDateAndTimeAndGroupId(TestData.lesson.getDate(), TestData.lesson.getTime(),
+            1);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    @Transactional
+    public void whenCount_thenReturn() {
         assertEquals(2, lessonDao.count());
     }
 

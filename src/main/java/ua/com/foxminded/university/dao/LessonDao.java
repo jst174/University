@@ -12,9 +12,9 @@ public interface LessonDao extends Dao<Lesson> {
 
     Optional<Lesson> getByDateAndTimeAndClassroom(LocalDate date, Time time, Classroom classroom);
 
-    List<Lesson> getByDateAndTime(LocalDate date, Time time);
-
     List<Lesson> getByGroupIdBetweenDates(int groupId, LocalDate fromDate, LocalDate toDate);
 
     List<Lesson> getByTeacherIdBetweenDates(int teacherId, LocalDate fromDate, LocalDate toDate);
+
+    List<Lesson> getByDateAndTimeAndGroupId(LocalDate date, Time time, int groupId);
 }

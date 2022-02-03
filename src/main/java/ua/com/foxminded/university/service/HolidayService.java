@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ua.com.foxminded.university.dao.HolidayDao;
 import ua.com.foxminded.university.exceptions.EntityNotFoundException;
 import ua.com.foxminded.university.exceptions.NotUniqueDateException;
@@ -23,6 +24,7 @@ public class HolidayService {
         this.holidayDao = holidayDao;
     }
 
+    @Transactional
     public void create(Holiday holiday) throws NotUniqueDateException {
         logger.debug("Creating holiday '{}'", holiday.getName());
         verifyDateUniqueness(holiday);
@@ -30,12 +32,14 @@ public class HolidayService {
 
     }
 
+    @Transactional
     public Holiday getById(int id) throws EntityNotFoundException {
         logger.debug("Getting holiday with id = {}", id);
         return holidayDao.getById(id).orElseThrow(() ->
             new EntityNotFoundException(format("Holiday with id = %s not found", id)));
     }
 
+    @Transactional
     public void update(Holiday holiday) throws NotUniqueDateException {
         logger.debug("Updating holiday with id = {}", holiday.getId());
         verifyDateUniqueness(holiday);
@@ -43,11 +47,13 @@ public class HolidayService {
 
     }
 
+    @Transactional
     public void delete(int id) {
         logger.debug("Deleting holiday with id = {}", id);
         holidayDao.delete(id);
     }
 
+    @Transactional
     public Page<Holiday> getAll(Pageable pageable) {
         logger.debug("Getting all holidays");
         return holidayDao.getAll(pageable);

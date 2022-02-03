@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
-@Transactional
 public class HibernateVacationDao implements VacationDao {
 
     private SessionFactory sessionFactory;
@@ -53,21 +52,21 @@ public class HibernateVacationDao implements VacationDao {
     }
 
     @Override
-    public Optional<Vacation> getByTeacherAndLessonDate(Teacher teacher, LocalDate lessonDate) {
+    public Optional<Vacation> getByTeacherAndDate(Teacher teacher, LocalDate date) {
         return sessionFactory.getCurrentSession()
             .createNamedQuery("Vacation_getByTeacherAndLessonDate", Vacation.class)
             .setParameter("id", teacher.getId())
-            .setParameter("lessonDate", lessonDate)
+            .setParameter("lessonDate", date)
             .uniqueResultOptional();
     }
 
     @Override
-    public Optional<Vacation> getByTeacherAndVacationDates(Vacation vacation) {
+    public Optional<Vacation> getByTeacherAndVacationDates(Teacher teacher, LocalDate start, LocalDate end) {
         return sessionFactory.getCurrentSession()
             .createNamedQuery("Vacation_getByTeacherAndVacationDates", Vacation.class)
-            .setParameter("id", vacation.getTeacher().getId())
-            .setParameter("start", vacation.getStart())
-            .setParameter("end", vacation.getEnd())
+            .setParameter("id", teacher.getId())
+            .setParameter("start", start)
+            .setParameter("ending", end)
             .uniqueResultOptional();
     }
 

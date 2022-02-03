@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
-@Transactional
 public class HibernateHolidayDao implements HolidayDao {
 
     private SessionFactory sessionFactory;

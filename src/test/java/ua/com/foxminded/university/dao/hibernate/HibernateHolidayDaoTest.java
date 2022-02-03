@@ -30,7 +30,6 @@ import java.util.Optional;
 @ContextConfiguration(classes = {DatabaseConfigTest.class})
 @Sql({"/create_holiday_test.sql"})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-@Transactional
 public class HibernateHolidayDaoTest {
 
     @Autowired
@@ -39,6 +38,7 @@ public class HibernateHolidayDaoTest {
     private HibernateTemplate hibernateTemplate;
 
     @Test
+    @Transactional
     public void givenNewHoliday_whenCreate_thenCreated() {
         Holiday holiday = new Holiday("New Year", LocalDate.of(2021, 12, 31));
 
@@ -48,6 +48,7 @@ public class HibernateHolidayDaoTest {
     }
 
     @Test
+    @Transactional
     public void givenId_whenGetById_thenReturn() {
         Holiday expected = new Holiday("New Year", LocalDate.of(2021, 12, 31));
 
@@ -55,6 +56,7 @@ public class HibernateHolidayDaoTest {
     }
 
     @Test
+    @Transactional
     public void givenUpdatedHolidayAndId_whenUpdate_thenUpdated() {
         Holiday updatedHoliday = new Holiday("Christmas", LocalDate.of(2022, 1, 7));
         updatedHoliday.setId(1);
@@ -65,13 +67,18 @@ public class HibernateHolidayDaoTest {
     }
 
     @Test
+    @Transactional
     public void givenId_whenDelete_thenDeleted() {
-        holidayDao.delete(1);
+        if (hibernateTemplate.get(Holiday.class, 1) != null) {
+            holidayDao.delete(1);
+            hibernateTemplate.clear();
+        }
 
         assertNull(hibernateTemplate.get(Holiday.class, 1));
     }
 
     @Test
+    @Transactional
     public void whenGetAll_thenReturnAllHolidays() {
         Holiday holiday1 = new Holiday("New Year", LocalDate.of(2021, 12, 31));
         Holiday holiday2 = new Holiday("Day of knowledge", LocalDate.of(2021, 9, 1));
@@ -85,6 +92,7 @@ public class HibernateHolidayDaoTest {
     }
 
     @Test
+    @Transactional
     public void givenPageable_whenGetAll_thenReturnAllHolidays() {
         Holiday holiday1 = new Holiday("New Year", LocalDate.of(2021, 12, 31));
         Holiday holiday2 = new Holiday("Day of knowledge", LocalDate.of(2021, 9, 1));
@@ -98,6 +106,7 @@ public class HibernateHolidayDaoTest {
     }
 
     @Test
+    @Transactional
     public void givenHolidayDate_whenGetByDate_thenReturn() {
         LocalDate date = LocalDate.of(2021, 12, 31);
         Holiday expected = new Holiday("New Year", date);
@@ -108,6 +117,7 @@ public class HibernateHolidayDaoTest {
     }
 
     @Test
+    @Transactional
     public void whenCount_thenReturn(){
         assertEquals(2, holidayDao.count());
     }

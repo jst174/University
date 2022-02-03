@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
-@Transactional
 public class HibernateGroupDao implements GroupDao {
 
     private SessionFactory sessionFactory;

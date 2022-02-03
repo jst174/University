@@ -29,7 +29,6 @@ import java.util.Optional;
 @ContextConfiguration(classes = {DatabaseConfigTest.class})
 @Sql({"/create_course_test.sql"})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-@Transactional
 public class HibernateCourseDaoTest {
 
     @Autowired
@@ -38,6 +37,7 @@ public class HibernateCourseDaoTest {
     private HibernateTemplate hibernateTemplate;
 
     @Test
+    @Transactional
     public void givenNewCourse_whenCreate_thenCreated() {
         Course course = new Course("History");
 
@@ -47,6 +47,7 @@ public class HibernateCourseDaoTest {
     }
 
     @Test
+    @Transactional
     public void givenId_whenGetById_thenReturn() {
         Course courseExpected = new Course("History");
 
@@ -54,6 +55,7 @@ public class HibernateCourseDaoTest {
     }
 
     @Test
+    @Transactional
     public void givenUpdatedCourseAndId_whenUpdated_thenUpdated() {
         Course updatedCourse = new Course("Math");
         updatedCourse.setId(1);
@@ -65,13 +67,18 @@ public class HibernateCourseDaoTest {
     }
 
     @Test
+    @Transactional
     public void givenId_whenDelete_thenDeleted() {
-        courseDao.delete(1);
+        if (hibernateTemplate.get(Course.class, 1) != null) {
+            courseDao.delete(1);
+            hibernateTemplate.clear();
+        }
 
         assertNull(hibernateTemplate.get(Course.class, 1));
     }
 
     @Test
+    @Transactional
     public void whenGetAll_thenReturnAllCourses() {
         Course course1 = new Course("History");
         Course course2 = new Course("Music");
@@ -85,6 +92,7 @@ public class HibernateCourseDaoTest {
     }
 
     @Test
+    @Transactional
     public void givenPageable_whenGetAll_thenReturnAllCourses() {
         Course course1 = new Course("History");
         Course course2 = new Course("Music");
@@ -98,6 +106,7 @@ public class HibernateCourseDaoTest {
     }
 
     @Test
+    @Transactional
     public void givenCourseName_whereGetByName_thenReturn() {
         Course courseExpected = new Course("History");
 
@@ -107,6 +116,7 @@ public class HibernateCourseDaoTest {
     }
 
     @Test
+    @Transactional
     public void whenCount_whenReturn(){
         assertEquals(2, courseDao.count());
     }

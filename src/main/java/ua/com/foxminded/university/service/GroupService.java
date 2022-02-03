@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ua.com.foxminded.university.dao.GroupDao;
 import ua.com.foxminded.university.dao.StudentDao;
 import ua.com.foxminded.university.exceptions.EntityNotFoundException;
@@ -28,6 +29,7 @@ public class GroupService {
         this.studentDao = studentDao;
     }
 
+    @Transactional
     public void create(Group group) throws NotUniqueNameException {
         logger.debug("Creating group with name = {}", group.getName());
         verifyNameUniqueness(group);
@@ -35,12 +37,14 @@ public class GroupService {
 
     }
 
+    @Transactional
     public Group getById(int id) throws EntityNotFoundException {
         logger.debug("Getting group with id = {}", id);
         return groupDao.getById(id).orElseThrow(() ->
             new EntityNotFoundException(format("Group with id = %s not found", id)));
     }
 
+    @Transactional
     public void update(Group group) throws NotUniqueNameException {
         logger.debug("Updating group with id = {}", group.getId());
         verifyNameUniqueness(group);
@@ -48,16 +52,19 @@ public class GroupService {
 
     }
 
+    @Transactional
     public void delete(int id) {
         logger.debug("Deleting group with id = {}", id);
         groupDao.delete(id);
     }
 
+    @Transactional
     public Page<Group> getAll(Pageable pageable) {
         logger.debug("Getting all group");
         return groupDao.getAll(pageable);
     }
 
+    @Transactional
     public List<Group> getAll() {
         logger.debug("Getting all group");
         return groupDao.getAll();

@@ -19,7 +19,7 @@ public abstract class Person {
     @Column(name = "last_name")
     private String lastName;
     @DateTimeFormat(iso = DATE)
-    @Column(name = "birthday")
+    @Column(name = "birth_date")
     private LocalDate birthDate;
     @Enumerated(EnumType.STRING)
     private Gender gender;

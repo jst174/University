@@ -31,7 +31,6 @@ import java.util.Optional;
 @ContextConfiguration(classes = {DatabaseConfigTest.class})
 @Sql({"/create_address_test.sql", "/create_teacher_test.sql"})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-@Transactional
 public class HibernateTeacherDaoTest {
 
     @Autowired
@@ -40,6 +39,7 @@ public class HibernateTeacherDaoTest {
     private HibernateTemplate hibernateTemplate;
 
     @Test
+    @Transactional
     public void givenNewTeacher_whenCreate_thenCreated() {
         Teacher teacher = new Teacher(
             "Alex",
@@ -58,11 +58,13 @@ public class HibernateTeacherDaoTest {
     }
 
     @Test
+    @Transactional
     public void givenId_whenGetById_thenReturn() {
         assertEquals(TestData.teacher1, teacherDao.getById(1).get());
     }
 
     @Test
+    @Transactional
     public void givenUpdatedTeacherAndId_whenUpdate_thenUpdated() {
         Teacher updatedTeacher = new Teacher(
             "Alan",
@@ -82,18 +84,24 @@ public class HibernateTeacherDaoTest {
     }
 
     @Test
+    @Transactional
     public void givenId_whenDelete_thenDeleted() {
-        teacherDao.delete(1);
+        if (hibernateTemplate.get(Teacher.class, 1) != null) {
+            teacherDao.delete(1);
+            hibernateTemplate.clear();
+        }
 
         assertNull(hibernateTemplate.get(Teacher.class, 1));
     }
 
     @Test
+    @Transactional
     public void whenGetAll_thenReturnAllTeachers() {
         assertEquals(Arrays.asList(TestData.teacher1, TestData.teacher2), teacherDao.getAll());
     }
 
     @Test
+    @Transactional
     public void givenPageable_whenGetAll_thenReturnAllTeachers() {
         List<Teacher> teachers = Arrays.asList(TestData.teacher1, TestData.teacher2);
         Pageable pageable = PageRequest.of(0, teachers.size());
@@ -103,15 +111,17 @@ public class HibernateTeacherDaoTest {
     }
 
     @Test
-    public void givenFirstNameAndLastName_whenGetByName_thenReturn() {
+    @Transactional
+    public void givenFirstNameAndLastName_whenGetByFirstNameAndLastName_thenReturn() {
         Teacher expected = TestData.teacher1;
 
-        Optional<Teacher> actual = teacherDao.getByName(expected.getFirstName(), expected.getLastName());
+        Optional<Teacher> actual = teacherDao.getByFirstNameAndLastName(expected.getFirstName(), expected.getLastName());
 
         assertEquals(expected, actual.get());
     }
 
     @Test
+    @Transactional
     public void whenCount_thenReturn() {
         assertEquals(2, teacherDao.count());
     }

@@ -28,7 +28,6 @@ import java.util.Optional;
 @ContextConfiguration(classes = {DatabaseConfigTest.class})
 @Sql({"/create_classroom_test.sql"})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-@Transactional
 public class HibernateClassroomDaoTest {
 
     @Autowired
@@ -37,6 +36,7 @@ public class HibernateClassroomDaoTest {
     private HibernateTemplate hibernateTemplate;
 
     @Test
+    @Transactional
     public void givenNewClassroom_whenCreate_thenCreated() {
         Classroom classroom = new Classroom(102, 30);
 
@@ -46,6 +46,7 @@ public class HibernateClassroomDaoTest {
     }
 
     @Test
+    @Transactional
     public void givenId_whenGetById_thenReturn() {
         Classroom expected = new Classroom(102, 30);
 
@@ -53,6 +54,7 @@ public class HibernateClassroomDaoTest {
     }
 
     @Test
+    @Transactional
     public void givenUpdatedClassroomAndId_whenUpdate_thenUpdated() {
         Classroom updatedClassroom = new Classroom(105, 40);
         updatedClassroom.setId(1);
@@ -63,13 +65,18 @@ public class HibernateClassroomDaoTest {
     }
 
     @Test
+    @Transactional
     public void givenId_whenDelete_thenDeleted() {
-        classroomDao.delete(1);
+        if (hibernateTemplate.get(Classroom.class, 1) != null) {
+            classroomDao.delete(1);
+            hibernateTemplate.clear();
+        }
 
         assertNull(hibernateTemplate.get(Classroom.class, 1));
     }
 
     @Test
+    @Transactional
     public void whenGetAll_thenReturnAllClassrooms() {
         Classroom classroom1 = new Classroom(203, 60);
         Classroom classroom2 = new Classroom(102, 30);
@@ -84,6 +91,7 @@ public class HibernateClassroomDaoTest {
     }
 
     @Test
+    @Transactional
     public void whenGetAll_thenReturn() {
         Classroom classroom1 = new Classroom(203, 60);
         Classroom classroom2 = new Classroom(102, 30);
@@ -95,6 +103,7 @@ public class HibernateClassroomDaoTest {
     }
 
     @Test
+    @Transactional
     public void givenClassroomNumber_whereGetByNumber_thenReturn() {
         Classroom expected = new Classroom(102, 30);
 
@@ -104,6 +113,7 @@ public class HibernateClassroomDaoTest {
     }
 
     @Test
+    @Transactional
     public void whenCount_thenReturn() {
         assertEquals(2, classroomDao.count());
     }

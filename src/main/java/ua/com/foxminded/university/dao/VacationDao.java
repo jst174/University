@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public interface VacationDao extends Dao<Vacation> {
 
-    Optional<Vacation> getByTeacherAndLessonDate(Teacher teacher, LocalDate lessonDate);
+    Optional<Vacation> getByTeacherAndDate(Teacher teacher, LocalDate date);
 
-    Optional<Vacation> getByTeacherAndVacationDates(Vacation vacation);
+    Optional<Vacation> getByTeacherAndVacationDates(Teacher teacher, LocalDate start, LocalDate end);
 }
