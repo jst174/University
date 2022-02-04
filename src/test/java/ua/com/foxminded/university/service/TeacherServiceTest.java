@@ -35,7 +35,7 @@ public class TeacherServiceTest {
     @Test
     public void givenNewTeacher_whenCreate_thenCreated() throws NotUniqueNameException {
         Teacher teacher = TestData.teacher1;
-        when(teacherDao.getByName(teacher.getFirstName(), teacher.getLastName())).thenReturn(Optional.empty());
+        when(teacherDao.getByFirstNameAndLastName(teacher.getFirstName(), teacher.getLastName())).thenReturn(Optional.empty());
 
         teacherService.create(teacher);
 
@@ -47,7 +47,7 @@ public class TeacherServiceTest {
         Teacher teacher = new Teacher();
         teacher.setFirstName(TestData.teacher1.getFirstName());
         teacher.setLastName(TestData.teacher1.getLastName());
-        when(teacherDao.getByName(teacher.getFirstName(), teacher.getLastName())).thenReturn(Optional.of(TestData.teacher1));
+        when(teacherDao.getByFirstNameAndLastName(teacher.getFirstName(), teacher.getLastName())).thenReturn(Optional.of(TestData.teacher1));
 
         Exception exception = assertThrows(NotUniqueNameException.class, () -> teacherService.create(teacher));
 
@@ -76,7 +76,7 @@ public class TeacherServiceTest {
 
     @Test
     public void givenExistentTime_whenUpdate_thenUpdated() throws NotUniqueNameException, EntityNotFoundException {
-        when(teacherDao.getByName(TestData.teacher1.getFirstName(), TestData.teacher1.getLastName()))
+        when(teacherDao.getByFirstNameAndLastName(TestData.teacher1.getFirstName(), TestData.teacher1.getLastName()))
             .thenReturn(Optional.of(TestData.teacher1));
 
         teacherService.update(TestData.teacher1);
@@ -86,7 +86,7 @@ public class TeacherServiceTest {
 
     @Test
     public void givenTeacherWithOtherTeacherName_whenUpdate_thenNotUniqueNameExceptionThrow() {
-        when(teacherDao.getByName(TestData.teacher2.getFirstName(), TestData.teacher2.getLastName()))
+        when(teacherDao.getByFirstNameAndLastName(TestData.teacher2.getFirstName(), TestData.teacher2.getLastName()))
             .thenReturn(Optional.of(TestData.teacher1));
 
         Exception exception = assertThrows(NotUniqueNameException.class, () -> teacherService.update(TestData.teacher2));

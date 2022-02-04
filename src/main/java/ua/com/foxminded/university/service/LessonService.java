@@ -5,14 +5,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ua.com.foxminded.university.dao.*;
 import ua.com.foxminded.university.exceptions.*;
 import ua.com.foxminded.university.model.*;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
@@ -24,58 +26,63 @@ public class LessonService {
 
     private LessonDao lessonDao;
     private VacationDao vacationDao;
-    private CourseDao courseDao;
     private HolidayDao holidayDao;
 
     public LessonService(
         LessonDao lessonDao,
         VacationDao vacationDao,
-        CourseDao courseDao,
         HolidayDao holidayDao) {
         this.lessonDao = lessonDao;
         this.vacationDao = vacationDao;
-        this.courseDao = courseDao;
         this.holidayDao = holidayDao;
     }
 
+    @Transactional
     public void create(Lesson lesson) throws NotAvailableTeacherException, NotAvailableGroupException, NotAvailableClassroomException, NotAvailableDayException {
         logger.debug("Creating lesson");
         checkConditions(lesson);
         lessonDao.create(lesson);
     }
 
+    @Transactional
     public Lesson getById(int id) throws EntityNotFoundException {
         logger.debug("Getting lesson with id = {}", id);
         return lessonDao.getById(id).orElseThrow(() ->
             new EntityNotFoundException(format("Lesson with id = %s not found", id)));
     }
 
+    @Transactional
     public void update(Lesson lesson) throws NotAvailableTeacherException, NotAvailableGroupException, NotAvailableClassroomException, NotAvailableDayException {
         logger.debug("Updating lesson with id = {}", lesson.getId());
         checkConditions(lesson);
         lessonDao.update(lesson);
     }
 
+    @Transactional
     public void delete(int id) {
         logger.debug("Deleting lesson with id = {}", id);
         lessonDao.delete(id);
     }
 
+    @Transactional
     public Page<Lesson> getAll(Pageable pageable) {
         logger.debug("Getting all lessons");
         return lessonDao.getAll(pageable);
     }
 
+    @Transactional
     public List<Lesson> getAll() {
         logger.debug("Getting all lessons");
         return lessonDao.getAll();
     }
 
+    @Transactional
     public List<Lesson> getByGroupIdBetweenDates(int groupId, LocalDate fromDate, LocalDate toDate) {
         logger.debug("Getting lesson where group_id = {} and date1 = {}, date2 = {}", groupId, fromDate, toDate);
         return lessonDao.getByGroupIdBetweenDates(groupId, fromDate, toDate);
     }
 
+    @Transactional
     public List<Lesson> getByTeacherIdBetweenDates(int teacherId, LocalDate fromDate, LocalDate toDate) {
         logger.debug("Getting lesson where teacher_id = {} and date1 = {}, date2 = {}", teacherId, fromDate, toDate);
         return lessonDao.getByTeacherIdBetweenDates(teacherId, fromDate, toDate);
@@ -93,7 +100,7 @@ public class LessonService {
     }
 
     private void verifyTeacherVacation(Lesson lesson) throws NotAvailableTeacherException {
-        if (vacationDao.getByTeacherAndLessonDate(lesson.getTeacher(), lesson.getDate()).isPresent()) {
+        if (vacationDao.getByTeacherAndDate(lesson.getTeacher(), lesson.getDate()).isPresent()) {
             throw new NotAvailableTeacherException(format("Teacher %s %s on vacation",
                 lesson.getTeacher().getFirstName(), lesson.getTeacher().getLastName()));
         }
@@ -101,7 +108,7 @@ public class LessonService {
 
     private void verifyTeacherMatchWithCourse(Lesson lesson) throws NotAvailableTeacherException {
         Teacher teacher = lesson.getTeacher();
-        List<Course> teacherCourses = courseDao.getByTeacherId(teacher.getId());
+        List<Course> teacherCourses = lesson.getTeacher().getCourses();
         teacher.setCourses(teacherCourses);
         if (!teacher.getCourses().contains(lesson.getCourse())) {
             throw new NotAvailableTeacherException(format("Teacher %s %s cannot teach %s",
@@ -151,12 +158,19 @@ public class LessonService {
         }
     }
 
-    private void verifyGroupBusyness(Lesson newLesson) throws NotAvailableGroupException {
-        if (lessonDao.getByDateAndTime(newLesson.getDate(), newLesson.getTime())
-            .stream().filter(l -> l.getId() != newLesson.getId())
+    private void verifyGroupBusyness(Lesson lesson) throws NotAvailableGroupException {
+        if (lesson.getGroups().stream()
+            .map(group -> lessonDao.getByDateAndTimeAndGroupId(lesson.getDate(),
+                lesson.getTime(), group.getId()))
+            .flatMap(List::stream)
+            .distinct()
+            .filter(l -> l.getId() != lesson.getId())
             .map(Lesson::getGroups)
-            .anyMatch(groups1 -> groups1.stream().anyMatch(newLesson.getGroups()::contains))) {
-            throw new NotAvailableGroupException("One of the groups already has a lesson at this time");
+            .anyMatch(groups -> groups.stream()
+                .anyMatch(lesson.getGroups()::contains))
+        ) {
+            throw new NotAvailableGroupException(format("One of the groups %s already has a lesson at %s %s",
+                lesson.getGroups(), lesson.getDate(), lesson.getTime().toString()));
         }
     }
 }

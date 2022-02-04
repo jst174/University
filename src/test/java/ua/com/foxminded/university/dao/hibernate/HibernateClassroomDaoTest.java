@@ -1,7 +1,4 @@
-package ua.com.foxminded.university.dao.jdbc;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.springframework.test.jdbc.JdbcTestUtils.*;
+package ua.com.foxminded.university.dao.hibernate;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,11 +7,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.orm.hibernate5.HibernateTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.annotation.Transactional;
 import ua.com.foxminded.university.config.DatabaseConfigTest;
 import ua.com.foxminded.university.dao.ClassroomDao;
 import ua.com.foxminded.university.model.Classroom;
@@ -23,58 +21,61 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {DatabaseConfigTest.class})
 @Sql({"/create_classroom_test.sql"})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public class JdbcClassroomDaoTest {
+public class HibernateClassroomDaoTest {
 
     @Autowired
     private ClassroomDao classroomDao;
     @Autowired
-    private JdbcTemplate jdbcTemplate;
+    private HibernateTemplate hibernateTemplate;
 
     @Test
+    @Transactional
     public void givenNewClassroom_whenCreate_thenCreated() {
         Classroom classroom = new Classroom(102, 30);
-        int expectedRows = countRowsInTable(jdbcTemplate, "classrooms") + 1;
 
         classroomDao.create(classroom);
 
-        assertEquals(expectedRows, countRowsInTable(jdbcTemplate, "classrooms"));
+        assertEquals(classroom, hibernateTemplate.get(Classroom.class, classroom.getId()));
     }
 
     @Test
+    @Transactional
     public void givenId_whenGetById_thenReturn() {
         Classroom expected = new Classroom(102, 30);
 
-        Optional<Classroom> actual = classroomDao.getById(1);
-
-        assertEquals(expected, actual.get());
+        assertEquals(expected, classroomDao.getById(1).get());
     }
 
     @Test
+    @Transactional
     public void givenUpdatedClassroomAndId_whenUpdate_thenUpdated() {
-        String sql = "SELECT COUNT(0) FROM classrooms WHERE number = 105 and capacity = 40";
         Classroom updatedClassroom = new Classroom(105, 40);
         updatedClassroom.setId(1);
-        int expectedRows = countRowsInTableWhere(jdbcTemplate, "classrooms", sql) + 1;
 
         classroomDao.update(updatedClassroom);
 
-        assertEquals(expectedRows, countRowsInTableWhere(jdbcTemplate, "classrooms", sql));
+        assertEquals(updatedClassroom, hibernateTemplate.get(Classroom.class, updatedClassroom.getId()));
     }
 
     @Test
+    @Transactional
     public void givenId_whenDelete_thenDeleted() {
-        int expectedRows = countRowsInTable(jdbcTemplate, "classrooms") - 1;
+        assertNotNull(hibernateTemplate.get(Classroom.class, 1));
 
         classroomDao.delete(1);
 
-        assertEquals(expectedRows, countRowsInTable(jdbcTemplate, "classrooms"));
+        hibernateTemplate.clear();
+        assertNull(hibernateTemplate.get(Classroom.class, 1));
     }
 
     @Test
+    @Transactional
     public void whenGetAll_thenReturnAllClassrooms() {
         Classroom classroom1 = new Classroom(203, 60);
         Classroom classroom2 = new Classroom(102, 30);
@@ -89,6 +90,7 @@ public class JdbcClassroomDaoTest {
     }
 
     @Test
+    @Transactional
     public void whenGetAll_thenReturn() {
         Classroom classroom1 = new Classroom(203, 60);
         Classroom classroom2 = new Classroom(102, 30);
@@ -100,11 +102,18 @@ public class JdbcClassroomDaoTest {
     }
 
     @Test
+    @Transactional
     public void givenClassroomNumber_whereGetByNumber_thenReturn() {
         Classroom expected = new Classroom(102, 30);
 
         Optional<Classroom> actual = classroomDao.findByNumber(102);
 
         assertEquals(expected, actual.get());
+    }
+
+    @Test
+    @Transactional
+    public void whenCount_thenReturn() {
+        assertEquals(2, classroomDao.count());
     }
 }

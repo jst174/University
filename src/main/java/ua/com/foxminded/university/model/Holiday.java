@@ -2,13 +2,24 @@ package ua.com.foxminded.university.model;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.Objects;
 
 import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE;
 
+@NamedQueries({
+    @NamedQuery(name = "Holiday_delete", query = "DELETE FROM Holiday AS h WHERE h.id = :id"),
+    @NamedQuery(name = "Holiday_getAll", query = "SELECT h FROM Holiday AS h"),
+    @NamedQuery(name = "Holiday_countAllRows", query = "SELECT COUNT (h) FROM Holiday AS h"),
+    @NamedQuery(name = "Holiday_getByDate", query = "SELECT h FROM Holiday AS h WHERE h.date = :date")
+})
+@Entity
+@Table(name = "holidays")
 public class Holiday {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String name;
     @DateTimeFormat(iso = DATE)

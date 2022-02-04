@@ -1,12 +1,27 @@
 package ua.com.foxminded.university.model;
 
+import javax.persistence.*;
 import java.util.List;
 import java.util.Objects;
 
+@NamedQueries({
+    @NamedQuery(name = "Group_delete", query = "DELETE FROM Group AS g WHERE g.id = :id"),
+    @NamedQuery(name = "Group_getAll", query = "SELECT g FROM Group AS g"),
+    @NamedQuery(name = "Group_countAllRows", query = "SELECT COUNT (g) FROM Group AS g"),
+    @NamedQuery(name = "Group_getByName", query = "SELECT g FROM Group AS g WHERE g.name = :name")
+})
+@Entity
+@Table(name = "groups")
 public class Group {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String name;
+    @OneToMany(
+        mappedBy = "group",
+        cascade = {CascadeType.PERSIST, CascadeType.MERGE,
+            CascadeType.DETACH, CascadeType.REFRESH})
     private List<Student> students;
 
     public Group() {

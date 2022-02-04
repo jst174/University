@@ -47,7 +47,7 @@ public class LessonServiceTest {
         lessons = new ArrayList<>();
         lessons.add(TestData.lesson1);
         lessons.add(TestData.lesson2);
-        groups = new ArrayList<>(Arrays.asList(TestData.group1, TestData.group2, TestData.group3));
+        groups = Arrays.asList(TestData.group1, TestData.group2, TestData.group3);
     }
 
     @Test
@@ -55,8 +55,11 @@ public class LessonServiceTest {
         Lesson lesson = new Lesson(TestData.course1, TestData.classroom1, TestData.teacher1,
             LocalDate.of(2021, 12, 15), TestData.time1);
         Group group1 = new Group("GD-32");
+        group1.setId(1);
         Group group2 = new Group("GF-65");
+        group2.setId(2);
         Group group3 = new Group("BF-36");
+        group3.setId(3);
         List<Group> groups = new ArrayList<>();
         groups.add(group1);
         groups.add(group2);
@@ -67,9 +70,11 @@ public class LessonServiceTest {
         addStudentToGroup(groups.get(2), 10);
         when(holidayDao.getByDate(lesson.getDate())).thenReturn(Optional.empty());
         when(lessonDao.getByDateAndTimeAndClassroom(lesson.getDate(), lesson.getTime(), lesson.getClassroom())).thenReturn(Optional.empty());
-        when(vacationDao.getByTeacherAndLessonDate(lesson.getTeacher(), lesson.getDate())).thenReturn(Optional.empty());
+        when(vacationDao.getByTeacherAndDate(lesson.getTeacher(), lesson.getDate())).thenReturn(Optional.empty());
         when(lessonDao.getByDateAndTimeAndTeacher(lesson.getDate(), lesson.getTime(), lesson.getTeacher())).thenReturn(Optional.empty());
-        when(lessonDao.getByDateAndTime(lesson.getDate(), lesson.getTime())).thenReturn(lessons);
+        when(lessonDao.getByDateAndTimeAndGroupId(lesson.getDate(), lesson.getTime(), TestData.group1.getId())).thenReturn(lessons);
+        when(lessonDao.getByDateAndTimeAndGroupId(lesson.getDate(), lesson.getTime(), TestData.group2.getId())).thenReturn(lessons);
+        when(lessonDao.getByDateAndTimeAndGroupId(lesson.getDate(), lesson.getTime(), TestData.group3.getId())).thenReturn(lessons);
 
         lessonService.create(lesson);
 
@@ -140,7 +145,7 @@ public class LessonServiceTest {
         when(holidayDao.getByDate(lesson.getDate())).thenReturn(Optional.empty());
         when(lessonDao.getByDateAndTimeAndClassroom(lesson.getDate(), lesson.getTime(), lesson.getClassroom()))
             .thenReturn(Optional.empty());
-        when(vacationDao.getByTeacherAndLessonDate(lesson.getTeacher(), lesson.getDate()))
+        when(vacationDao.getByTeacherAndDate(lesson.getTeacher(), lesson.getDate()))
             .thenReturn(Optional.of(TestData.vacation1));
 
         Exception exception = assertThrows(NotAvailableTeacherException.class, () -> lessonService.create(lesson));
@@ -157,7 +162,7 @@ public class LessonServiceTest {
         when(holidayDao.getByDate(lesson.getDate())).thenReturn(Optional.empty());
         when(lessonDao.getByDateAndTimeAndClassroom(lesson.getDate(), lesson.getTime(), lesson.getClassroom()))
             .thenReturn(Optional.empty());
-        when(vacationDao.getByTeacherAndLessonDate(lesson.getTeacher(), lesson.getDate()))
+        when(vacationDao.getByTeacherAndDate(lesson.getTeacher(), lesson.getDate()))
             .thenReturn(Optional.empty());
         when(lessonDao.getByDateAndTimeAndTeacher(lesson.getDate(), lesson.getTime(), lesson.getTeacher()))
             .thenReturn(Optional.of(TestData.lesson1));
@@ -187,7 +192,7 @@ public class LessonServiceTest {
         when(holidayDao.getByDate(lesson.getDate())).thenReturn(Optional.empty());
         when(lessonDao.getByDateAndTimeAndClassroom(lesson.getDate(), lesson.getTime(), lesson.getClassroom()))
             .thenReturn(Optional.empty());
-        when(vacationDao.getByTeacherAndLessonDate(lesson.getTeacher(), lesson.getDate()))
+        when(vacationDao.getByTeacherAndDate(lesson.getTeacher(), lesson.getDate()))
             .thenReturn(Optional.empty());
         when(lessonDao.getByDateAndTimeAndTeacher(lesson.getDate(), lesson.getTime(), lesson.getTeacher()))
             .thenReturn(Optional.empty());
@@ -211,17 +216,15 @@ public class LessonServiceTest {
         when(holidayDao.getByDate(lesson.getDate())).thenReturn(Optional.empty());
         when(lessonDao.getByDateAndTimeAndClassroom(lesson.getDate(), lesson.getTime(), lesson.getClassroom()))
             .thenReturn(Optional.empty());
-        when(vacationDao.getByTeacherAndLessonDate(lesson.getTeacher(), lesson.getDate()))
+        when(vacationDao.getByTeacherAndDate(lesson.getTeacher(), lesson.getDate()))
             .thenReturn(Optional.empty());
         when(lessonDao.getByDateAndTimeAndTeacher(lesson.getDate(), lesson.getTime(), lesson.getTeacher()))
             .thenReturn(Optional.empty());
-        when(lessonDao.getByDateAndTime(lesson.getDate(), lesson.getTime()))
-            .thenReturn(lessons);
-        when(courseDao.getByTeacherId(lesson.getTeacher().getId())).thenReturn(TestData.teacher1.getCourses());
+        when(lessonDao.getByDateAndTimeAndGroupId(lesson.getDate(), lesson.getTime(), TestData.group1.getId())).thenReturn(lessons);
 
         Exception exception = assertThrows(NotAvailableGroupException.class, () -> lessonService.create(lesson));
 
-        String expectedMessage = "One of the groups already has a lesson at this time";
+        String expectedMessage = "One of the groups [MH-12, LF-43, DF-32] already has a lesson at 2021-10-26 08:00-09:30";
         verify(lessonDao, never()).create(lesson);
         assertEquals(expectedMessage, exception.getMessage());
     }
@@ -261,11 +264,13 @@ public class LessonServiceTest {
         when(holidayDao.getByDate(lesson.getDate())).thenReturn(Optional.empty());
         when(lessonDao.getByDateAndTimeAndClassroom(lesson.getDate(), lesson.getTime(), lesson.getClassroom()))
             .thenReturn(Optional.of(lesson));
-        when(vacationDao.getByTeacherAndLessonDate(lesson.getTeacher(), lesson.getDate()))
+        when(vacationDao.getByTeacherAndDate(lesson.getTeacher(), lesson.getDate()))
             .thenReturn(Optional.empty());
         when(lessonDao.getByDateAndTimeAndTeacher(lesson.getDate(), lesson.getTime(), lesson.getTeacher()))
             .thenReturn(Optional.of(lesson));
-        when(lessonDao.getByDateAndTime(lesson.getDate(), lesson.getTime())).thenReturn(lessons);
+        when(lessonDao.getByDateAndTimeAndGroupId(lesson.getDate(), lesson.getTime(), TestData.group1.getId())).thenReturn(lessons);
+        when(lessonDao.getByDateAndTimeAndGroupId(lesson.getDate(), lesson.getTime(), TestData.group2.getId())).thenReturn(lessons);
+        when(lessonDao.getByDateAndTimeAndGroupId(lesson.getDate(), lesson.getTime(), TestData.group3.getId())).thenReturn(lessons);
 
         lessonService.update(lesson);
 
@@ -336,7 +341,7 @@ public class LessonServiceTest {
         when(holidayDao.getByDate(lesson.getDate())).thenReturn(Optional.empty());
         when(lessonDao.getByDateAndTimeAndClassroom(lesson.getDate(), lesson.getTime(), lesson.getClassroom()))
             .thenReturn(Optional.of(lesson));
-        when(vacationDao.getByTeacherAndLessonDate(lesson.getTeacher(), lesson.getDate()))
+        when(vacationDao.getByTeacherAndDate(lesson.getTeacher(), lesson.getDate()))
             .thenReturn(Optional.of(TestData.vacation1));
 
         Exception exception = assertThrows(NotAvailableTeacherException.class, () -> lessonService.update(lesson));
@@ -352,7 +357,7 @@ public class LessonServiceTest {
         when(holidayDao.getByDate(lesson.getDate())).thenReturn(Optional.empty());
         when(lessonDao.getByDateAndTimeAndClassroom(lesson.getDate(), lesson.getTime(), lesson.getClassroom()))
             .thenReturn(Optional.of(lesson));
-        when(vacationDao.getByTeacherAndLessonDate(lesson.getTeacher(), lesson.getDate()))
+        when(vacationDao.getByTeacherAndDate(lesson.getTeacher(), lesson.getDate()))
             .thenReturn(Optional.empty());
         when(lessonDao.getByDateAndTimeAndTeacher(lesson.getDate(), lesson.getTime(), lesson.getTeacher()))
             .thenReturn(Optional.of(TestData.lesson2));
@@ -381,7 +386,7 @@ public class LessonServiceTest {
         when(holidayDao.getByDate(lesson.getDate())).thenReturn(Optional.empty());
         when(lessonDao.getByDateAndTimeAndClassroom(lesson.getDate(), lesson.getTime(), lesson.getClassroom()))
             .thenReturn(Optional.of(lesson));
-        when(vacationDao.getByTeacherAndLessonDate(lesson.getTeacher(), lesson.getDate()))
+        when(vacationDao.getByTeacherAndDate(lesson.getTeacher(), lesson.getDate()))
             .thenReturn(Optional.empty());
         when(lessonDao.getByDateAndTimeAndTeacher(lesson.getDate(), lesson.getTime(), lesson.getTeacher()))
             .thenReturn(Optional.of(lesson));
@@ -403,12 +408,13 @@ public class LessonServiceTest {
         when(holidayDao.getByDate(lesson.getDate())).thenReturn(Optional.empty());
         when(lessonDao.getByDateAndTimeAndClassroom(lesson.getDate(), lesson.getTime(), lesson.getClassroom()))
             .thenReturn(Optional.of(lesson));
-        when(vacationDao.getByTeacherAndLessonDate(lesson.getTeacher(), lesson.getDate()))
+        when(vacationDao.getByTeacherAndDate(lesson.getTeacher(), lesson.getDate()))
             .thenReturn(Optional.empty());
         when(lessonDao.getByDateAndTimeAndTeacher(lesson.getDate(), lesson.getTime(), lesson.getTeacher()))
             .thenReturn(Optional.of(lesson));
-        when(lessonDao.getByDateAndTime(lesson.getDate(), lesson.getTime()))
-            .thenReturn(lessons);
+        when(lessonDao.getByDateAndTimeAndGroupId(lesson.getDate(), lesson.getTime(), TestData.group1.getId())).thenReturn(lessons);
+        when(lessonDao.getByDateAndTimeAndGroupId(lesson.getDate(), lesson.getTime(), TestData.group2.getId())).thenReturn(lessons);
+        when(lessonDao.getByDateAndTimeAndGroupId(lesson.getDate(), lesson.getTime(), TestData.group3.getId())).thenReturn(lessons);
 
         Exception exception = assertThrows(NotAvailableGroupException.class, () -> lessonService.update(lesson));
 

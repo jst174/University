@@ -2,16 +2,30 @@ package ua.com.foxminded.university.model;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.persistence.*;
 import java.time.LocalTime;
 import java.util.Objects;
 
 import static org.springframework.format.annotation.DateTimeFormat.ISO.TIME;
 
+@NamedQueries({
+    @NamedQuery(name = "Time_delete", query = "DELETE FROM Time AS t WHERE t.id = :id"),
+    @NamedQuery(name = "Time_getAll", query = "SELECT t FROM Time AS t"),
+    @NamedQuery(name = "Time_countAllRows", query = "SELECT COUNT(t) FROM Time AS t"),
+    @NamedQuery(name = "Time_getByTime", query = "SELECT t FROM Time AS t " +
+        "WHERE t.startTime = :start AND t.endTime = :end")
+})
+@Entity
+@Table(name = "times")
 public class Time {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+    @Column(name = "start")
     @DateTimeFormat(iso = TIME)
     private LocalTime startTime;
+    @Column(name = "ending")
     @DateTimeFormat(iso = TIME)
     private LocalTime endTime;
 
@@ -63,10 +77,7 @@ public class Time {
 
     @Override
     public String toString() {
-        return "Time{" +
-            "startTime=" + startTime +
-            ", endTime=" + endTime +
-            '}';
+        return startTime + "-" + endTime;
     }
 
     public static class Builder {

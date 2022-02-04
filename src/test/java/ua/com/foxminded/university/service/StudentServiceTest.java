@@ -49,8 +49,8 @@ public class StudentServiceTest {
 
     @Test
     public void givenNewStudent_whenCreate_thenCreated() throws NotAvailableGroupException, NotUniqueNameException {
-        when(studentDao.getByGroupId(1)).thenReturn(students);
-        when(studentDao.getByName(TestData.student1.getFirstName(), TestData.student1.getLastName())).thenReturn(Optional.empty());
+        when(studentDao.getByFirstNameAndLastName(TestData.student1.getFirstName(), TestData.student1.getLastName())).thenReturn(Optional.empty());
+        TestData.group1.setStudents(Arrays.asList(TestData.student1, TestData.student2));
 
         studentService.create(TestData.student1);
 
@@ -62,7 +62,7 @@ public class StudentServiceTest {
         Student student = new Student();
         student.setFirstName(TestData.student1.getFirstName());
         student.setLastName(TestData.student1.getLastName());
-        when(studentDao.getByName(student.getFirstName(), student.getLastName())).thenReturn(Optional.of(TestData.student1));
+        when(studentDao.getByFirstNameAndLastName(student.getFirstName(), student.getLastName())).thenReturn(Optional.of(TestData.student1));
 
         Exception exception = assertThrows(NotUniqueNameException.class, () -> studentService.create(student));
 
@@ -74,8 +74,8 @@ public class StudentServiceTest {
 
     @Test
     public void givenNotAvailableGroup_whenCreate_thenNotAvailableGroupExceptionThrow() {
-        when(studentDao.getByName(TestData.student1.getFirstName(), TestData.student1.getLastName())).thenReturn(Optional.empty());
-        when(studentDao.getByGroupId(1)).thenReturn(generateStudents());
+        when(studentDao.getByFirstNameAndLastName(TestData.student1.getFirstName(), TestData.student1.getLastName())).thenReturn(Optional.empty());
+        TestData.group1.setStudents(generateStudents());
 
         Exception exception = assertThrows(NotAvailableGroupException.class, () -> studentService.create(TestData.student1));
 
@@ -103,8 +103,8 @@ public class StudentServiceTest {
 
     @Test
     public void givenExistentStudent_whenUpdate_thenUpdated() throws NotAvailableGroupException, NotUniqueNameException, EntityNotFoundException {
-        when(studentDao.getByName(TestData.student1.getFirstName(), TestData.student1.getLastName())).thenReturn(Optional.of(TestData.student1));
-        when(studentDao.getByGroupId(1)).thenReturn(students);
+        when(studentDao.getByFirstNameAndLastName(TestData.student1.getFirstName(), TestData.student1.getLastName())).thenReturn(Optional.of(TestData.student1));
+        TestData.group1.setStudents(students);
 
         studentService.update(TestData.student1);
 
@@ -113,7 +113,7 @@ public class StudentServiceTest {
 
     @Test
     public void givenStudentWithOtherStudentName_whenUpdate_thenNotUniqueNameExceptionThrow() {
-        when(studentDao.getByName(TestData.student2.getFirstName(), TestData.student2.getLastName())).thenReturn(Optional.of(TestData.student1));
+        when(studentDao.getByFirstNameAndLastName(TestData.student2.getFirstName(), TestData.student2.getLastName())).thenReturn(Optional.of(TestData.student1));
 
         Exception exception = assertThrows(NotUniqueNameException.class, () -> studentService.update(TestData.student2));
 
@@ -125,8 +125,8 @@ public class StudentServiceTest {
 
     @Test
     public void givenNotAvailableGroup_whenUpdate_thenNotAvailableGroupExceptionThrow() {
-        when(studentDao.getByName(TestData.student1.getFirstName(), TestData.student1.getLastName())).thenReturn(Optional.of(TestData.student1));
-        when(studentDao.getByGroupId(1)).thenReturn(generateStudents());
+        when(studentDao.getByFirstNameAndLastName(TestData.student1.getFirstName(), TestData.student1.getLastName())).thenReturn(Optional.of(TestData.student1));
+        TestData.group1.setStudents(generateStudents());
 
         Exception exception = assertThrows(NotAvailableGroupException.class, () -> studentService.update(TestData.student1));
 
@@ -152,12 +152,6 @@ public class StudentServiceTest {
         assertEquals(studentPage, studentService.getAll(pageable));
     }
 
-    @Test
-    public void givenGroupId_whenGetByGroupId_thenReturn() {
-        when(studentDao.getByGroupId(1)).thenReturn(students);
-
-        assertEquals(students, studentService.getByGroupId(1));
-    }
 
     private List<Student> generateStudents() {
         List<Student> students = new ArrayList<>();

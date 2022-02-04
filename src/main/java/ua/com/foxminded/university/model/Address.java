@@ -1,14 +1,26 @@
 package ua.com.foxminded.university.model;
 
+import javax.persistence.*;
 import java.util.Objects;
 
+@NamedQueries({
+    @NamedQuery(name = "Address_delete", query = "DELETE FROM Address where id = :id"),
+    @NamedQuery(name = "Address_getAll", query = "SELECT a FROM Address a"),
+    @NamedQuery(name = "Address_countAllRows", query = "SELECT COUNT (a) FROM Address a")
+})
+@Entity
+@Table(name = "addresses")
 public class Address {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String country;
     private String city;
     private String street;
+    @Column(name = "house_number")
     private String houseNumber;
+    @Column(name = "apartment_number")
     private String apartmentNumber;
     private String postcode;
 
@@ -141,6 +153,18 @@ public class Address {
         public Builder setPostcode(String postcode){
             address.setPostcode(postcode);
             return this;
+        }
+
+        public Builder clone(Address address){
+            Builder builder = new Builder();
+            builder.setId(address.getId());
+            builder.setCountry(address.getCountry());
+            builder.setCity(address.getCity());
+            builder.setStreet(address.getStreet());
+            builder.setHouseNumber(address.getHouseNumber());
+            builder.setApartmentNumber(address.getApartmentNumber());
+            builder.setPostcode(address.getPostcode());
+            return builder;
         }
 
         public Address build(){

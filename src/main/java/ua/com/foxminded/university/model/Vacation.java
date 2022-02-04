@@ -2,28 +2,43 @@ package ua.com.foxminded.university.model;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.persistence.*;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.Objects;
 
 import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE;
 
+@NamedQueries({
+    @NamedQuery(name = "Vacation_delete", query = "DELETE FROM Vacation AS v WHERE v.id = :id"),
+    @NamedQuery(name = "Vacation_getAll", query = "SELECT v FROM Vacation AS v"),
+    @NamedQuery(name = "Vacation_countAllRows", query = "SELECT COUNT (v) FROM Vacation AS v"),
+    @NamedQuery(name = "Vacation_getByTeacherAndDate", query = "SELECT v FROM Vacation AS v " +
+        "WHERE v.teacher.id=:id AND :date BETWEEN v.start AND v.ending"),
+    @NamedQuery(name = "Vacation_getByTeacherAndVacationDates", query = "SELECT v FROM Vacation AS v " +
+        "WHERE v.teacher.id=:id AND v.start = :start AND v.ending = :ending")
+})
+@Entity
+@Table(name = "vacations")
 public class Vacation {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     @DateTimeFormat(iso = DATE)
     private LocalDate start;
     @DateTimeFormat(iso = DATE)
-    private LocalDate end;
+    private LocalDate ending;
+    @ManyToOne
+    @JoinColumn(name = "teacher_id")
     private Teacher teacher;
 
     public Vacation() {
 
     }
 
-    public Vacation(LocalDate start, LocalDate end, Teacher teacher) {
+    public Vacation(LocalDate start, LocalDate ending, Teacher teacher) {
         this.start = start;
-        this.end = end;
+        this.ending = ending;
         this.teacher = teacher;
     }
 
@@ -43,12 +58,12 @@ public class Vacation {
         this.start = start;
     }
 
-    public LocalDate getEnd() {
-        return end;
+    public LocalDate getEnding() {
+        return ending;
     }
 
-    public void setEnd(LocalDate end) {
-        this.end = end;
+    public void setEnding(LocalDate end) {
+        this.ending = end;
     }
 
     public Teacher getTeacher() {
@@ -63,7 +78,7 @@ public class Vacation {
     public String toString() {
         return "Vacation{" +
             "start=" + start +
-            ", end=" + end +
+            ", end=" + ending +
             '}';
     }
 
@@ -72,12 +87,12 @@ public class Vacation {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Vacation vacation = (Vacation) o;
-        return Objects.equals(start, vacation.start) && Objects.equals(end, vacation.end);
+        return Objects.equals(start, vacation.start) && Objects.equals(ending, vacation.ending);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(start, end);
+        return Objects.hash(start, ending);
     }
 
     public static class Builder {
@@ -99,7 +114,7 @@ public class Vacation {
         }
 
         public Builder setEnd(LocalDate end) {
-            vacation.setEnd(end);
+            vacation.setEnding(end);
             return this;
         }
 
@@ -112,7 +127,7 @@ public class Vacation {
             Builder builder = new Builder();
             builder.setId(vacation.getId());
             builder.setStart(vacation.getStart());
-            builder.setEnd(vacation.getEnd());
+            builder.setEnd(vacation.getEnding());
             builder.setTeacher(vacation.getTeacher());
             return builder;
         }

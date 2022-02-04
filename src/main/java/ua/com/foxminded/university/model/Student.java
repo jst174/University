@@ -1,12 +1,25 @@
 package ua.com.foxminded.university.model;
 
+import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 
+@NamedQueries({
+    @NamedQuery(name = "Student_delete", query = "DELETE FROM Student AS s WHERE s.id = :id"),
+    @NamedQuery(name = "Student_getAll", query = "SELECT s FROM Student  AS s"),
+    @NamedQuery(name = "Student_countAllRows", query = "SELECT COUNT (s) FROM Student AS s"),
+    @NamedQuery(name = "Student_getByFirstNameAndLastName", query = "SELECT s FROM Student AS s " +
+        "WHERE s.firstName =: firstName and s.lastName = :lastName")
+})
+@Entity
+@Table(name = "students")
 public class Student extends Person {
 
-    private int id;
+    @ManyToOne(cascade = {
+        CascadeType.PERSIST, CascadeType.MERGE,
+        CascadeType.DETACH, CascadeType.REFRESH})
+    @JoinColumn(name = "group_id")
     private Group group;
 
     public Student() {
@@ -16,14 +29,6 @@ public class Student extends Person {
     public Student(String firstName, String lastName, LocalDate birthDate, Gender gender, Address address,
                    String phoneNumber, String email) {
         super(firstName, lastName, birthDate, gender, address, phoneNumber, email);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public Group getGroup() {

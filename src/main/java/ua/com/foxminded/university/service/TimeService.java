@@ -4,9 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ua.com.foxminded.university.dao.TimeDao;
 import ua.com.foxminded.university.exceptions.EntityNotFoundException;
 import ua.com.foxminded.university.exceptions.NotAvailableTimeException;
@@ -32,6 +31,7 @@ public class TimeService {
         this.timeDao = timeDao;
     }
 
+    @Transactional
     public void create(Time time) throws NotUniqueTimeException, NotAvailableTimeException {
         logger.debug("Creating time {} - {}", time.getStartTime(), time.getEndTime());
         verifyTimeUniqueness(time);
@@ -40,12 +40,14 @@ public class TimeService {
         timeDao.create(time);
     }
 
+    @Transactional
     public Time getById(int id) throws EntityNotFoundException {
         logger.debug("Getting time with id = {}", id);
         return timeDao.getById(id).orElseThrow(() ->
             new EntityNotFoundException(format("Time with id = %s not found", id)));
     }
 
+    @Transactional
     public void update(Time time) throws NotUniqueTimeException, NotAvailableTimeException {
         logger.debug("Updating time with id = {}", time.getId());
         verifyTimeUniqueness(time);
@@ -54,11 +56,13 @@ public class TimeService {
         timeDao.update(time);
     }
 
+    @Transactional
     public void delete(int id) {
         logger.debug("Deleting time with id = {}", id);
         timeDao.delete(id);
     }
 
+    @Transactional
     public List<Time> getAll() {
         logger.debug("Getting all times");
         return timeDao.getAll();

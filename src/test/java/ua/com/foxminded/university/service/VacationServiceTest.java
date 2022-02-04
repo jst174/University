@@ -57,9 +57,10 @@ public class VacationServiceTest {
             LocalDate.of(2021, 3, 1),
             LocalDate.of(2021, 3, 10),
             TestData.teacher1);
+        TestData.teacher1.setVacations(vacations);
         when(teacherService.getById(vacation.getTeacher().getId())).thenReturn(TestData.teacher1);
-        when(vacationDao.getByTeacherAndVacationDates(vacation)).thenReturn(Optional.empty());
-        when(vacationDao.getByTeacherId(vacation.getTeacher().getId())).thenReturn(vacations);
+        when(vacationDao.getByTeacherAndVacationDates(TestData.teacher1,
+            vacation.getStart(), vacation.getEnding())).thenReturn(Optional.empty());
 
         vacationService.create(vacation);
 
@@ -73,8 +74,9 @@ public class VacationServiceTest {
             LocalDate.of(2021, 4, 30),
             TestData.teacher1);
         when(teacherService.getById(vacation.getTeacher().getId())).thenReturn(TestData.teacher1);
-        when(vacationDao.getByTeacherAndVacationDates(vacation)).thenReturn(Optional.empty());
-        when(vacationDao.getByTeacherId(vacation.getTeacher().getId())).thenReturn(vacations);
+        when(vacationDao.getByTeacherAndVacationDates(TestData.teacher1,
+            vacation.getStart(), vacation.getEnding())).thenReturn(Optional.empty());
+        TestData.teacher1.setVacations(vacations);
 
         Exception exception = assertThrows(NotAvailablePeriodException.class, () -> vacationService.create(vacation));
 
@@ -85,12 +87,13 @@ public class VacationServiceTest {
     }
 
     @Test
-    public void givenExistentVacation_whenCreate_thenNotUniqueVacationDatesExceptionThrow() throws EntityNotFoundException {
+    public void givenExistentVacation_whenCreate_thenNotUniqueVacationDatesExceptionThrow() {
         Vacation vacation = new Vacation();
         vacation.setStart(TestData.vacation1.getStart());
-        vacation.setEnd(TestData.vacation1.getEnd());
+        vacation.setEnding(TestData.vacation1.getEnding());
         vacation.setTeacher(TestData.vacation1.getTeacher());
-        when(vacationDao.getByTeacherAndVacationDates(vacation)).thenReturn(Optional.of(TestData.vacation1));
+        when(vacationDao.getByTeacherAndVacationDates(TestData.teacher1,
+            vacation.getStart(), vacation.getEnding())).thenReturn(Optional.of(TestData.vacation1));
 
         Exception exception = assertThrows(NotUniqueVacationDatesException.class, () -> vacationService.create(vacation));
 
@@ -118,9 +121,10 @@ public class VacationServiceTest {
 
     @Test
     public void givenExistentVacation_whenUpdate_thenUpdated() throws NotAvailablePeriodException, NotUniqueVacationDatesException, EntityNotFoundException {
-        when(vacationDao.getByTeacherAndVacationDates(TestData.vacation1)).thenReturn(Optional.of(TestData.vacation1));
-        when(vacationDao.getByTeacherId(TestData.vacation1.getTeacher().getId())).thenReturn(vacations);
+        when(vacationDao.getByTeacherAndVacationDates(TestData.teacher1,
+            TestData.vacation1.getStart(), TestData.vacation1.getEnding())).thenReturn(Optional.of(TestData.vacation1));
         when(teacherService.getById(TestData.vacation1.getTeacher().getId())).thenReturn(TestData.teacher1);
+        TestData.teacher1.setVacations(vacations);
 
         vacationService.update(TestData.vacation1);
 
@@ -129,7 +133,8 @@ public class VacationServiceTest {
 
     @Test
     public void givenVacationWithOtherVacationTeacherAndVacationDates_whenUpdate_thenNotUniqueVacationDatesExceptionThrow() {
-        when(vacationDao.getByTeacherAndVacationDates(TestData.vacation2)).thenReturn(Optional.of(TestData.vacation1));
+        when(vacationDao.getByTeacherAndVacationDates(TestData.teacher1,
+            TestData.vacation2.getStart(), TestData.vacation2.getEnding())).thenReturn(Optional.of(TestData.vacation1));
 
         Exception exception = assertThrows(NotUniqueVacationDatesException.class, () -> vacationService.update(TestData.vacation2));
 
@@ -142,10 +147,10 @@ public class VacationServiceTest {
     public void givenVacationWithNotAcceptablePeriod_whenUpdate_thenNotAvailablePeriodExceptionThrow() throws EntityNotFoundException {
         Vacation vacation = new Vacation();
         vacation.setStart(LocalDate.of(2021, 1, 1));
-        vacation.setEnd(LocalDate.of(2021, 1, 26));
+        vacation.setEnding(LocalDate.of(2021, 1, 26));
         vacation.setTeacher(TestData.teacher1);
-        when(vacationDao.getByTeacherAndVacationDates(vacation)).thenReturn(Optional.of(vacation));
-        when(vacationDao.getByTeacherId(1)).thenReturn(vacations);
+        TestData.teacher1.setVacations(vacations);
+        when(vacationDao.getByTeacherAndVacationDates(TestData.teacher1, vacation.getStart(), vacation.getEnding())).thenReturn(Optional.of(vacation));
         when(teacherService.getById(vacation.getTeacher().getId())).thenReturn(TestData.teacher1);
 
         Exception exception = assertThrows(NotAvailablePeriodException.class, () -> vacationService.update(vacation));
@@ -161,13 +166,6 @@ public class VacationServiceTest {
         vacationService.delete(1);
 
         verify(vacationDao).delete(1);
-    }
-
-    @Test
-    public void givenExistentTeacherId_whenGetByTeacherId_whenReturn() {
-        when(vacationDao.getByTeacherId(1)).thenReturn(vacations);
-
-        assertEquals(vacations, vacationService.getByTeacherId(1));
     }
 
     @Test

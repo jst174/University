@@ -122,14 +122,6 @@ public class CourseServiceTest {
         assertEquals(courses, courseService.getAll());
     }
 
-    @Test
-    public void givenExistentTeacherId_whenGetByTeacherId_whenReturn() {
-        List<Course> courses = Arrays.asList(TestData.course1, TestData.course2);
-        when(courseDao.getByTeacherId(1)).thenReturn(courses);
-
-        assertEquals(courses, courseService.getByTeacherId(1));
-    }
-
     interface TestData {
         Course course1 = new Course.Builder()
             .setName("Math")
