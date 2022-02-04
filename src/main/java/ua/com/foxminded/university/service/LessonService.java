@@ -169,7 +169,7 @@ public class LessonService {
             .anyMatch(groups -> groups.stream()
                 .anyMatch(lesson.getGroups()::contains))
         ) {
-            throw new NotAvailableGroupException(format("Groups: %s already has a lesson at %s %s",
+            throw new NotAvailableGroupException(format("One of the groups %s already has a lesson at %s %s",
                 lesson.getGroups(), lesson.getDate(), lesson.getTime().toString()));
         }
     }

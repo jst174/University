@@ -224,7 +224,7 @@ public class LessonServiceTest {
 
         Exception exception = assertThrows(NotAvailableGroupException.class, () -> lessonService.create(lesson));
 
-        String expectedMessage = "Groups: [MH-12, LF-43, DF-32] already has a lesson at 2021-10-26 08:00-09:30";
+        String expectedMessage = "One of the groups [MH-12, LF-43, DF-32] already has a lesson at 2021-10-26 08:00-09:30";
         verify(lessonDao, never()).create(lesson);
         assertEquals(expectedMessage, exception.getMessage());
     }
