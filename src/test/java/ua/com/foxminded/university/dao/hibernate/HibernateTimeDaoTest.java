@@ -1,8 +1,5 @@
 package ua.com.foxminded.university.dao.hibernate;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +21,8 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 
 @ExtendWith(SpringExtension.class)
@@ -69,11 +68,11 @@ public class HibernateTimeDaoTest {
     @Test
     @Transactional
     public void givenId_whenDelete_thenDeleted() {
-        if (hibernateTemplate.get(Time.class, 1) != null) {
-            timeDao.delete(1);
-            hibernateTemplate.clear();
-        }
+        assertNotNull(hibernateTemplate.get(Time.class, 1));
 
+        timeDao.delete(1);
+
+        hibernateTemplate.clear();
         assertNull(hibernateTemplate.get(Time.class, 1));
     }
 

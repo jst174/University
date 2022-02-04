@@ -47,7 +47,7 @@ public class LessonServiceTest {
         lessons = new ArrayList<>();
         lessons.add(TestData.lesson1);
         lessons.add(TestData.lesson2);
-        groups = new ArrayList<>(Arrays.asList(TestData.group1, TestData.group2, TestData.group3));
+        groups = Arrays.asList(TestData.group1, TestData.group2, TestData.group3);
     }
 
     @Test
@@ -55,8 +55,11 @@ public class LessonServiceTest {
         Lesson lesson = new Lesson(TestData.course1, TestData.classroom1, TestData.teacher1,
             LocalDate.of(2021, 12, 15), TestData.time1);
         Group group1 = new Group("GD-32");
+        group1.setId(1);
         Group group2 = new Group("GF-65");
+        group2.setId(2);
         Group group3 = new Group("BF-36");
+        group3.setId(3);
         List<Group> groups = new ArrayList<>();
         groups.add(group1);
         groups.add(group2);
@@ -218,12 +221,10 @@ public class LessonServiceTest {
         when(lessonDao.getByDateAndTimeAndTeacher(lesson.getDate(), lesson.getTime(), lesson.getTeacher()))
             .thenReturn(Optional.empty());
         when(lessonDao.getByDateAndTimeAndGroupId(lesson.getDate(), lesson.getTime(), TestData.group1.getId())).thenReturn(lessons);
-        when(lessonDao.getByDateAndTimeAndGroupId(lesson.getDate(), lesson.getTime(), TestData.group2.getId())).thenReturn(lessons);
-        when(lessonDao.getByDateAndTimeAndGroupId(lesson.getDate(), lesson.getTime(), TestData.group3.getId())).thenReturn(lessons);
 
         Exception exception = assertThrows(NotAvailableGroupException.class, () -> lessonService.create(lesson));
 
-        String expectedMessage = "One of the groups already has a lesson at this time";
+        String expectedMessage = "Groups: [MH-12, LF-43, DF-32] already has a lesson at 2021-10-26 08:00-09:30";
         verify(lessonDao, never()).create(lesson);
         assertEquals(expectedMessage, exception.getMessage());
     }

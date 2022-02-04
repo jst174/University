@@ -9,13 +9,13 @@ import java.util.Objects;
 import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE;
 
 @NamedQueries({
-        @NamedQuery(name = "Vacation_delete", query = "DELETE FROM Vacation AS v WHERE v.id = :id"),
-        @NamedQuery(name = "Vacation_getAll", query = "SELECT v FROM Vacation AS v"),
-        @NamedQuery(name = "Vacation_countAllRows", query = "SELECT COUNT (v) FROM Vacation AS v"),
-        @NamedQuery(name = "Vacation_getByTeacherAndLessonDate", query = "SELECT v FROM Vacation AS v " +
-                "WHERE v.teacher.id=:id AND :lessonDate BETWEEN v.start AND v.ending"),
-        @NamedQuery(name = "Vacation_getByTeacherAndVacationDates", query = "SELECT v FROM Vacation AS v " +
-                "WHERE v.teacher.id=:id AND v.start = :start AND v.ending = :ending")
+    @NamedQuery(name = "Vacation_delete", query = "DELETE FROM Vacation AS v WHERE v.id = :id"),
+    @NamedQuery(name = "Vacation_getAll", query = "SELECT v FROM Vacation AS v"),
+    @NamedQuery(name = "Vacation_countAllRows", query = "SELECT COUNT (v) FROM Vacation AS v"),
+    @NamedQuery(name = "Vacation_getByTeacherAndDate", query = "SELECT v FROM Vacation AS v " +
+        "WHERE v.teacher.id=:id AND :date BETWEEN v.start AND v.ending"),
+    @NamedQuery(name = "Vacation_getByTeacherAndVacationDates", query = "SELECT v FROM Vacation AS v " +
+        "WHERE v.teacher.id=:id AND v.start = :start AND v.ending = :ending")
 })
 @Entity
 @Table(name = "vacations")
@@ -77,9 +77,9 @@ public class Vacation {
     @Override
     public String toString() {
         return "Vacation{" +
-                "start=" + start +
-                ", end=" + ending +
-                '}';
+            "start=" + start +
+            ", end=" + ending +
+            '}';
     }
 
     @Override

@@ -5,7 +5,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 import ua.com.foxminded.university.dao.VacationDao;
 import ua.com.foxminded.university.model.Teacher;
 import ua.com.foxminded.university.model.Vacation;
@@ -54,9 +53,9 @@ public class HibernateVacationDao implements VacationDao {
     @Override
     public Optional<Vacation> getByTeacherAndDate(Teacher teacher, LocalDate date) {
         return sessionFactory.getCurrentSession()
-            .createNamedQuery("Vacation_getByTeacherAndLessonDate", Vacation.class)
+            .createNamedQuery("Vacation_getByTeacherAndDate", Vacation.class)
             .setParameter("id", teacher.getId())
-            .setParameter("lessonDate", date)
+            .setParameter("date", date)
             .uniqueResultOptional();
     }
 

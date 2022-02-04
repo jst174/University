@@ -1,8 +1,5 @@
 package ua.com.foxminded.university.dao.hibernate;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +19,8 @@ import ua.com.foxminded.university.model.Group;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 
 @ExtendWith(SpringExtension.class)
@@ -68,11 +67,11 @@ public class HibernateGroupDaoTest {
     @Test
     @Transactional
     public void givenId_whenDelete_thenDeleted() {
-        if (hibernateTemplate.get(Group.class, 1) != null) {
-            groupDao.delete(1);
-            hibernateTemplate.clear();
-        }
+        assertNotNull(hibernateTemplate.get(Group.class, 1));
 
+        groupDao.delete(1);
+
+        hibernateTemplate.clear();
         assertNull(hibernateTemplate.get(Group.class, 1));
     }
 
@@ -126,7 +125,7 @@ public class HibernateGroupDaoTest {
 
     @Test
     @Transactional
-    public void whenCount_whenReturn(){
+    public void whenCount_whenReturn() {
         assertEquals(5, groupDao.count());
     }
 }

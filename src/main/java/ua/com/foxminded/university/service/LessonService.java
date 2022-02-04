@@ -158,18 +158,19 @@ public class LessonService {
         }
     }
 
-    private void verifyGroupBusyness(Lesson newLesson) throws NotAvailableGroupException {
-        Set<Lesson> lessons = new HashSet<>();
-        for (Group group : newLesson.getGroups()) {
-            List<Lesson> lessonList = lessonDao.getByDateAndTimeAndGroupId(newLesson.getDate(),
-                newLesson.getTime(), group.getId());
-            lessons.addAll(lessonList);
-        }
-        if (lessons.stream()
-            .filter(l -> l.getId() != newLesson.getId())
+    private void verifyGroupBusyness(Lesson lesson) throws NotAvailableGroupException {
+        if (lesson.getGroups().stream()
+            .map(group -> lessonDao.getByDateAndTimeAndGroupId(lesson.getDate(),
+                lesson.getTime(), group.getId()))
+            .flatMap(List::stream)
+            .distinct()
+            .filter(l -> l.getId() != lesson.getId())
             .map(Lesson::getGroups)
-            .anyMatch(groups1 -> groups1.stream().anyMatch(newLesson.getGroups()::contains))) {
-            throw new NotAvailableGroupException("One of the groups already has a lesson at this time");
+            .anyMatch(groups -> groups.stream()
+                .anyMatch(lesson.getGroups()::contains))
+        ) {
+            throw new NotAvailableGroupException(format("Groups: %s already has a lesson at %s %s",
+                lesson.getGroups(), lesson.getDate(), lesson.getTime().toString()));
         }
     }
 }

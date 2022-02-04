@@ -70,11 +70,11 @@ public class HibernateAddressDaoTest {
     @Test
     @Transactional
     public void givenId_whenDelete_thenDeleted() {
-        if (hibernateTemplate.get(Address.class, TestData.address1.getId()) != null) {
-            addressDao.delete(TestData.address1.getId());
-            hibernateTemplate.clear();
-        }
+        assertNotNull(hibernateTemplate.get(Address.class, 1));
 
+        addressDao.delete(TestData.address1.getId());
+
+        hibernateTemplate.clear();
         assertNull(hibernateTemplate.get(Address.class, TestData.address1.getId()));
     }
 

@@ -1,8 +1,5 @@
 package ua.com.foxminded.university.dao.hibernate;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +20,8 @@ import ua.com.foxminded.university.model.Course;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 
 @ExtendWith(SpringExtension.class)
@@ -69,11 +68,11 @@ public class HibernateCourseDaoTest {
     @Test
     @Transactional
     public void givenId_whenDelete_thenDeleted() {
-        if (hibernateTemplate.get(Course.class, 1) != null) {
-            courseDao.delete(1);
-            hibernateTemplate.clear();
-        }
+        assertNotNull(hibernateTemplate.get(Course.class, 1));
 
+        courseDao.delete(1);
+
+        hibernateTemplate.clear();
         assertNull(hibernateTemplate.get(Course.class, 1));
     }
 
@@ -117,7 +116,7 @@ public class HibernateCourseDaoTest {
 
     @Test
     @Transactional
-    public void whenCount_whenReturn(){
+    public void whenCount_whenReturn() {
         assertEquals(2, courseDao.count());
     }
 }

@@ -77,10 +77,7 @@ public class Time {
 
     @Override
     public String toString() {
-        return "Time{" +
-            "startTime=" + startTime +
-            ", endTime=" + endTime +
-            '}';
+        return startTime + "-" + endTime;
     }
 
     public static class Builder {
