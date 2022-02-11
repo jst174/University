@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 
 import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE;
 
-@Controller
+@RestController
 @RequestMapping("/teachers")
 public class TeacherController {
 

@@ -1,42 +1,42 @@
 package ua.com.foxminded.university.dao.hibernate;
 
-import org.hibernate.SessionFactory;
+import org.hibernate.Session;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 import ua.com.foxminded.university.dao.GroupDao;
 import ua.com.foxminded.university.model.Group;
 
+import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.Optional;
 
 @Component
 public class HibernateGroupDao implements GroupDao {
 
-    private SessionFactory sessionFactory;
+    private final EntityManager entityManager;
 
-    public HibernateGroupDao(SessionFactory sessionFactory) {
-        this.sessionFactory = sessionFactory;
+    public HibernateGroupDao(EntityManager entityManager) {
+        this.entityManager = entityManager;
     }
 
     public void create(Group group) {
-        sessionFactory.getCurrentSession().save(group);
+        entityManager.unwrap(Session.class).save(group);
     }
 
     public Optional<Group> getById(int id) {
-        return sessionFactory.getCurrentSession()
+        return entityManager.unwrap(Session.class)
             .byId(Group.class)
             .loadOptional(id);
     }
 
     public void update(Group group) {
-        sessionFactory.getCurrentSession().update(group);
+        entityManager.unwrap(Session.class).update(group);
     }
 
     public void delete(int id) {
-        sessionFactory.getCurrentSession()
+        entityManager.unwrap(Session.class)
             .getNamedQuery("Group_delete")
             .setParameter("id", id)
             .executeUpdate();
@@ -44,14 +44,14 @@ public class HibernateGroupDao implements GroupDao {
 
     @Override
     public List<Group> getAll() {
-        return sessionFactory.getCurrentSession()
+        return entityManager.unwrap(Session.class)
             .createNamedQuery("Group_getAll", Group.class)
             .list();
     }
 
     @Override
     public Optional<Group> getByName(String name) {
-        return sessionFactory.getCurrentSession()
+        return entityManager.unwrap(Session.class)
             .createNamedQuery("Group_getByName", Group.class)
             .setParameter("name", name)
             .uniqueResultOptional();
@@ -59,7 +59,7 @@ public class HibernateGroupDao implements GroupDao {
 
     @Override
     public Page<Group> getAll(Pageable pageable) {
-        List<Group> groups = sessionFactory.getCurrentSession()
+        List<Group> groups = entityManager.unwrap(Session.class)
             .createNamedQuery("Group_getAll", Group.class)
             .setFirstResult((int) pageable.getOffset())
             .setMaxResults(pageable.getPageSize())
@@ -69,7 +69,7 @@ public class HibernateGroupDao implements GroupDao {
 
     @Override
     public Long count() {
-        return sessionFactory.getCurrentSession()
+        return entityManager.unwrap(Session.class)
             .createNamedQuery("Group_countAllRows", Long.class)
             .getSingleResult();
     }

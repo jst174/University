@@ -1,45 +1,43 @@
 package ua.com.foxminded.university.dao.hibernate;
 
-import org.hibernate.SessionFactory;
+import org.hibernate.Session;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-import ua.com.foxminded.university.dao.AddressDao;
 import ua.com.foxminded.university.dao.TeacherDao;
 import ua.com.foxminded.university.model.Teacher;
 
+import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.Optional;
 
 @Component
 public class HibernateTeacherDao implements TeacherDao {
 
-    private SessionFactory sessionFactory;
-    private AddressDao addressDao;
+    private final EntityManager entityManager;
 
-    public HibernateTeacherDao(SessionFactory sessionFactory, AddressDao addressDao) {
-        this.sessionFactory = sessionFactory;
-        this.addressDao = addressDao;
+    public HibernateTeacherDao(EntityManager entityManager) {
+
+        this.entityManager = entityManager;
     }
 
     public void create(Teacher teacher) {
-        sessionFactory.getCurrentSession().save(teacher);
+        entityManager.unwrap(Session.class).save(teacher);
     }
 
     public Optional<Teacher> getById(int id) {
-        return sessionFactory.getCurrentSession()
+        return entityManager.unwrap(Session.class)
             .byId(Teacher.class)
             .loadOptional(id);
     }
 
     public void update(Teacher updatedTeacher) {
-        sessionFactory.getCurrentSession().update(updatedTeacher);
+        entityManager.unwrap(Session.class).update(updatedTeacher);
     }
 
     public void delete(int id) {
-        sessionFactory.getCurrentSession()
+        entityManager.unwrap(Session.class)
             .getNamedQuery("Teacher_delete")
             .setParameter("id", id)
             .executeUpdate();
@@ -47,14 +45,14 @@ public class HibernateTeacherDao implements TeacherDao {
 
     @Override
     public List<Teacher> getAll() {
-        return sessionFactory.getCurrentSession()
+        return entityManager.unwrap(Session.class)
             .createNamedQuery("Teacher_getAll", Teacher.class)
             .list();
     }
 
     @Override
     public Optional<Teacher> getByFirstNameAndLastName(String firstName, String lastName) {
-        return sessionFactory.getCurrentSession()
+        return entityManager.unwrap(Session.class)
             .createNamedQuery("Teacher_getByFirstNameAndLastName", Teacher.class)
             .setParameter("firstName", firstName)
             .setParameter("lastName", lastName)
@@ -63,7 +61,7 @@ public class HibernateTeacherDao implements TeacherDao {
 
     @Override
     public Page<Teacher> getAll(Pageable pageable) {
-        List<Teacher> teachers = sessionFactory.getCurrentSession()
+        List<Teacher> teachers = entityManager.unwrap(Session.class)
             .createNamedQuery("Teacher_getAll", Teacher.class)
             .setFirstResult((int) pageable.getOffset())
             .setMaxResults(pageable.getPageSize())
@@ -73,7 +71,7 @@ public class HibernateTeacherDao implements TeacherDao {
 
     @Override
     public Long count() {
-        return sessionFactory.getCurrentSession()
+        return entityManager.unwrap(Session.class)
             .createNamedQuery("Teacher_countAllRows", Long.class)
             .getSingleResult();
     }

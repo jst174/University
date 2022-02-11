@@ -1,15 +1,15 @@
 package ua.com.foxminded.university.dao.hibernate;
 
-import org.hibernate.SessionFactory;
+import org.hibernate.Session;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
-import org.springframework.transaction.annotation.Transactional;
 import ua.com.foxminded.university.dao.HolidayDao;
 import ua.com.foxminded.university.model.Holiday;
 
+import javax.persistence.EntityManager;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -17,26 +17,26 @@ import java.util.Optional;
 @Component
 public class HibernateHolidayDao implements HolidayDao {
 
-    private SessionFactory sessionFactory;
+    private final EntityManager entityManager;
 
-    public HibernateHolidayDao(SessionFactory sessionFactory) {
-        this.sessionFactory = sessionFactory;
+    public HibernateHolidayDao(EntityManager entityManager) {
+        this.entityManager = entityManager;
     }
 
     public void create(Holiday holiday) {
-        sessionFactory.getCurrentSession().save(holiday);
+        entityManager.unwrap(Session.class).save(holiday);
     }
 
     public Optional<Holiday> getById(int id) {
-        return sessionFactory.getCurrentSession().byId(Holiday.class).loadOptional(id);
+        return entityManager.unwrap(Session.class).byId(Holiday.class).loadOptional(id);
     }
 
     public void update(Holiday holiday) {
-        sessionFactory.getCurrentSession().update(holiday);
+        entityManager.unwrap(Session.class).update(holiday);
     }
 
     public void delete(int id) {
-        sessionFactory.getCurrentSession()
+        entityManager.unwrap(Session.class)
             .getNamedQuery("Holiday_delete")
             .setParameter("id", id)
             .executeUpdate();
@@ -44,14 +44,14 @@ public class HibernateHolidayDao implements HolidayDao {
 
     @Override
     public List<Holiday> getAll() {
-        return sessionFactory.getCurrentSession()
+        return entityManager.unwrap(Session.class)
             .createNamedQuery("Holiday_getAll", Holiday.class)
             .list();
     }
 
     @Override
     public Page<Holiday> getAll(Pageable pageable) {
-        List<Holiday> holidays = sessionFactory.getCurrentSession()
+        List<Holiday> holidays = entityManager.unwrap(Session.class)
             .createNamedQuery("Holiday_getAll", Holiday.class)
             .setFirstResult((int) pageable.getOffset())
             .setMaxResults(pageable.getPageSize())
@@ -61,14 +61,14 @@ public class HibernateHolidayDao implements HolidayDao {
 
     @Override
     public Long count() {
-        return sessionFactory.getCurrentSession()
+        return entityManager.unwrap(Session.class)
             .createNamedQuery("Holiday_countAllRows", Long.class)
             .getSingleResult();
     }
 
     @Override
     public Optional<Holiday> getByDate(LocalDate date) {
-        return sessionFactory.getCurrentSession()
+        return entityManager.unwrap(Session.class)
             .createNamedQuery("Holiday_getByDate", Holiday.class)
             .setParameter("date", date)
             .uniqueResultOptional();

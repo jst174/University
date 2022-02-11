@@ -11,7 +11,7 @@ import ua.com.foxminded.university.model.Vacation;
 import ua.com.foxminded.university.service.TeacherService;
 import ua.com.foxminded.university.service.VacationService;
 
-@Controller
+@RestController
 @RequestMapping("/vacations")
 public class VacationController {
 

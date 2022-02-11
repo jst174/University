@@ -3,6 +3,7 @@ package ua.com.foxminded.university.dao.hibernate;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -22,7 +23,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-
+@SpringBootTest
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {DatabaseConfigTest.class})
 @Sql({"/create_address_test.sql"})

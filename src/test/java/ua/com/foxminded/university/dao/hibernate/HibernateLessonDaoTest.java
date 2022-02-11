@@ -28,7 +28,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {DatabaseConfigTest.class})
 @Sql({"/create_lesson_test.sql"})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class HibernateLessonDaoTest {
