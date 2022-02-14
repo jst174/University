@@ -1,6 +1,6 @@
 package ua.com.foxminded.university.dao.hibernate;
 
-import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -8,35 +8,34 @@ import org.springframework.stereotype.Component;
 import ua.com.foxminded.university.dao.ClassroomDao;
 import ua.com.foxminded.university.model.Classroom;
 
-import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.Optional;
 
 @Component
 public class HibernateClassroomDao implements ClassroomDao {
 
-    private final EntityManager entityManager;
+    private final SessionFactory sessionFactory;
 
-    public HibernateClassroomDao(EntityManager entityManager) {
-        this.entityManager = entityManager;
+    public HibernateClassroomDao(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
     }
 
     public void create(Classroom classroom) {
-        entityManager.unwrap(Session.class).save(classroom);
+        sessionFactory.getCurrentSession().save(classroom);
     }
 
     public Optional<Classroom> getById(int id) {
-        return entityManager.unwrap(Session.class)
+        return sessionFactory.getCurrentSession()
             .byId(Classroom.class)
             .loadOptional(id);
     }
 
     public void update(Classroom classroom) {
-        entityManager.unwrap(Session.class).update(classroom);
+        sessionFactory.getCurrentSession().update(classroom);
     }
 
     public void delete(int id) {
-        entityManager.unwrap(Session.class)
+        sessionFactory.getCurrentSession()
             .getNamedQuery("Classroom_delete")
             .setParameter("id", id)
             .executeUpdate();
@@ -44,14 +43,14 @@ public class HibernateClassroomDao implements ClassroomDao {
 
     @Override
     public List<Classroom> getAll() {
-        return entityManager.unwrap(Session.class)
+        return sessionFactory.getCurrentSession()
             .createNamedQuery("Classroom_getAll", Classroom.class)
             .list();
     }
 
     @Override
     public Page<Classroom> getAll(Pageable pageable) {
-        List<Classroom> classrooms = entityManager.unwrap(Session.class)
+        List<Classroom> classrooms = sessionFactory.getCurrentSession()
             .createNamedQuery("Classroom_getAll", Classroom.class)
             .setFirstResult((int) pageable.getOffset())
             .setMaxResults(pageable.getPageSize())
@@ -61,7 +60,7 @@ public class HibernateClassroomDao implements ClassroomDao {
 
     @Override
     public Optional<Classroom> findByNumber(int number) {
-        return entityManager.unwrap(Session.class)
+        return sessionFactory.getCurrentSession()
             .createNamedQuery("Classroom_getByNumber", Classroom.class)
             .setParameter("number", number)
             .uniqueResultOptional();
@@ -69,7 +68,7 @@ public class HibernateClassroomDao implements ClassroomDao {
 
     @Override
     public Long count() {
-        return entityManager.unwrap(Session.class)
+        return sessionFactory.getCurrentSession()
             .createNamedQuery("Classroom_countAllRows", Long.class)
             .getSingleResult();
     }

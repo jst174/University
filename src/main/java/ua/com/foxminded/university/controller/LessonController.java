@@ -17,7 +17,7 @@ import java.util.List;
 
 import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE;
 
-@RestController
+@Controller
 @RequestMapping("/lessons")
 public class LessonController {
 

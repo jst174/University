@@ -1,6 +1,7 @@
 package ua.com.foxminded.university.dao.hibernate;
 
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -17,28 +18,28 @@ import java.util.Optional;
 @Component
 public class HibernateVacationDao implements VacationDao {
 
-    private final EntityManager entityManager;
+    private final SessionFactory sessionFactory;
 
-    public HibernateVacationDao(EntityManager entityManager) {
-        this.entityManager = entityManager;
+    public HibernateVacationDao(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
     }
 
     public void create(Vacation vacation) {
-        entityManager.unwrap(Session.class).save(vacation);
+        sessionFactory.getCurrentSession().save(vacation);
     }
 
     public Optional<Vacation> getById(int id) {
-        return entityManager.unwrap(Session.class)
+        return sessionFactory.getCurrentSession()
             .byId(Vacation.class)
             .loadOptional(id);
     }
 
     public void update(Vacation vacation) {
-        entityManager.unwrap(Session.class).update(vacation);
+        sessionFactory.getCurrentSession().update(vacation);
     }
 
     public void delete(int id) {
-        entityManager.unwrap(Session.class)
+        sessionFactory.getCurrentSession()
             .getNamedQuery("Vacation_delete")
             .setParameter("id", id)
             .executeUpdate();
@@ -46,14 +47,14 @@ public class HibernateVacationDao implements VacationDao {
 
     @Override
     public List<Vacation> getAll() {
-        return entityManager.unwrap(Session.class)
+        return sessionFactory.getCurrentSession()
             .createNamedQuery("Vacation_getAll", Vacation.class)
             .list();
     }
 
     @Override
     public Optional<Vacation> getByTeacherAndDate(Teacher teacher, LocalDate date) {
-        return entityManager.unwrap(Session.class)
+        return sessionFactory.getCurrentSession()
             .createNamedQuery("Vacation_getByTeacherAndDate", Vacation.class)
             .setParameter("id", teacher.getId())
             .setParameter("date", date)
@@ -62,7 +63,7 @@ public class HibernateVacationDao implements VacationDao {
 
     @Override
     public Optional<Vacation> getByTeacherAndVacationDates(Teacher teacher, LocalDate start, LocalDate end) {
-        return entityManager.unwrap(Session.class)
+        return sessionFactory.getCurrentSession()
             .createNamedQuery("Vacation_getByTeacherAndVacationDates", Vacation.class)
             .setParameter("id", teacher.getId())
             .setParameter("start", start)
@@ -72,7 +73,7 @@ public class HibernateVacationDao implements VacationDao {
 
     @Override
     public Page<Vacation> getAll(Pageable pageable) {
-        List<Vacation> vacations = entityManager.unwrap(Session.class)
+        List<Vacation> vacations = sessionFactory.getCurrentSession()
             .createNamedQuery("Vacation_getAll", Vacation.class)
             .setFirstResult((int) pageable.getOffset())
             .setMaxResults(pageable.getPageSize())
@@ -82,7 +83,7 @@ public class HibernateVacationDao implements VacationDao {
 
     @Override
     public Long count() {
-        return entityManager.unwrap(Session.class)
+        return sessionFactory.getCurrentSession()
             .createNamedQuery("Vacation_countAllRows", Long.class)
             .getSingleResult();
     }

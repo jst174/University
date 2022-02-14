@@ -9,7 +9,7 @@ import ua.com.foxminded.university.exceptions.NotUniqueDateException;
 import ua.com.foxminded.university.model.Holiday;
 import ua.com.foxminded.university.service.HolidayService;
 
-@RestController
+@Controller
 @RequestMapping("/holidays")
 public class HolidayController {
 

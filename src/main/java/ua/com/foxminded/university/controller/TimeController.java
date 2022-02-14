@@ -9,7 +9,7 @@ import ua.com.foxminded.university.exceptions.NotUniqueTimeException;
 import ua.com.foxminded.university.model.Time;
 import ua.com.foxminded.university.service.TimeService;
 
-@RestController
+@Controller
 @RequestMapping("/times")
 public class TimeController {
 

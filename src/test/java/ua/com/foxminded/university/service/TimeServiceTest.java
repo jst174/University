@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@PropertySource("classpath:application.properties")
+@PropertySource("classpath:app.properties")
 public class TimeServiceTest {
 
     @Mock

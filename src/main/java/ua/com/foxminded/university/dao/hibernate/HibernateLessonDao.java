@@ -1,6 +1,6 @@
 package ua.com.foxminded.university.dao.hibernate;
 
-import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -10,7 +10,6 @@ import ua.com.foxminded.university.dao.LessonDao;
 import ua.com.foxminded.university.model.*;
 import ua.com.foxminded.university.model.Time;
 
-import javax.persistence.EntityManager;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -18,29 +17,29 @@ import java.util.Optional;
 @Component
 public class HibernateLessonDao implements LessonDao {
 
-    private final EntityManager entityManager;
+    private final SessionFactory sessionFactory;
 
-    public HibernateLessonDao(EntityManager entityManager) {
-        this.entityManager = entityManager;
+    public HibernateLessonDao(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
     }
 
     public void create(Lesson lesson) {
-        entityManager.unwrap(Session.class).save(lesson);
+        sessionFactory.getCurrentSession().save(lesson);
     }
 
     public Optional<Lesson> getById(int id) {
-        return entityManager.unwrap(Session.class)
+        return sessionFactory.getCurrentSession()
             .byId(Lesson.class)
             .loadOptional(id);
     }
 
     @Override
     public void update(Lesson lesson) {
-        entityManager.unwrap(Session.class).update(lesson);
+        sessionFactory.getCurrentSession().update(lesson);
     }
 
     public void delete(int id) {
-        entityManager.unwrap(Session.class)
+        sessionFactory.getCurrentSession()
             .getNamedQuery("Lesson_delete")
             .setParameter("id", id)
             .executeUpdate();
@@ -48,14 +47,14 @@ public class HibernateLessonDao implements LessonDao {
 
     @Override
     public List<Lesson> getAll() {
-        return entityManager.unwrap(Session.class)
+        return sessionFactory.getCurrentSession()
             .createNamedQuery("Lesson_getAll", Lesson.class)
             .list();
     }
 
     @Override
     public Optional<Lesson> getByDateAndTimeAndTeacher(LocalDate date, Time time, Teacher teacher) {
-        return entityManager.unwrap(Session.class)
+        return sessionFactory.getCurrentSession()
             .createNamedQuery("Lesson_getByDateAndTimeAndTeacher", Lesson.class)
             .setParameter("date", date)
             .setParameter("timeId", time.getId())
@@ -65,7 +64,7 @@ public class HibernateLessonDao implements LessonDao {
 
     @Override
     public Optional<Lesson> getByDateAndTimeAndClassroom(LocalDate date, Time time, Classroom classroom) {
-        return entityManager.unwrap(Session.class)
+        return sessionFactory.getCurrentSession()
             .createNamedQuery("Lesson_getByDateAndTimeAndClassroom", Lesson.class)
             .setParameter("date", date)
             .setParameter("timeId", time.getId())
@@ -75,7 +74,7 @@ public class HibernateLessonDao implements LessonDao {
 
     @Override
     public List<Lesson> getByDateAndTimeAndGroupId(LocalDate date, Time time, int groupId) {
-        return entityManager.unwrap(Session.class)
+        return sessionFactory.getCurrentSession()
             .createNamedQuery("Lesson_getByDateAndTimeAndGroupId", Lesson.class)
             .setParameter("time", time)
             .setParameter("date", date)
@@ -85,7 +84,7 @@ public class HibernateLessonDao implements LessonDao {
 
     @Override
     public List<Lesson> getByGroupIdBetweenDates(int groupId, LocalDate fromDate, LocalDate toDate) {
-        return entityManager.unwrap(Session.class)
+        return sessionFactory.getCurrentSession()
             .createNamedQuery("Lesson_getByGroupIdBetweenDates", Lesson.class)
             .setParameter("groupId", groupId)
             .setParameter("fromDate", fromDate)
@@ -95,7 +94,7 @@ public class HibernateLessonDao implements LessonDao {
 
     @Override
     public List<Lesson> getByTeacherIdBetweenDates(int teacherId, LocalDate fromDate, LocalDate toDate) {
-        return entityManager.unwrap(Session.class)
+        return sessionFactory.getCurrentSession()
             .createNamedQuery("Lesson_getByTeacherIdBetweenDates", Lesson.class)
             .setParameter("teacherId", teacherId)
             .setParameter("fromDate", fromDate)
@@ -105,7 +104,7 @@ public class HibernateLessonDao implements LessonDao {
 
     @Override
     public Page<Lesson> getAll(Pageable pageable) {
-        List<Lesson> lessons = entityManager.unwrap(Session.class)
+        List<Lesson> lessons = sessionFactory.getCurrentSession()
             .createNamedQuery("Lesson_getAll", Lesson.class)
             .setFirstResult((int) pageable.getOffset())
             .setMaxResults(pageable.getPageSize())
@@ -115,7 +114,7 @@ public class HibernateLessonDao implements LessonDao {
 
     @Override
     public Long count() {
-        return entityManager.unwrap(Session.class)
+        return sessionFactory.getCurrentSession()
             .createNamedQuery("Lesson_countAllRows", Long.class)
             .getSingleResult();
     }

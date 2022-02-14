@@ -1,6 +1,6 @@
 package ua.com.foxminded.university.dao.hibernate;
 
-import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -8,35 +8,34 @@ import org.springframework.stereotype.Component;
 import ua.com.foxminded.university.dao.CourseDao;
 import ua.com.foxminded.university.model.Course;
 
-import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.Optional;
 
 @Component
 public class HibernateCourseDao implements CourseDao {
 
-    private final EntityManager entityManager;
+    private final SessionFactory sessionFactory;
 
-    public HibernateCourseDao(EntityManager entityManager) {
-        this.entityManager = entityManager;
+    public HibernateCourseDao(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
     }
 
     public void create(Course course) {
-        entityManager.unwrap(Session.class).save(course);
+        sessionFactory.getCurrentSession().save(course);
     }
 
     public Optional<Course> getById(int id) {
-        return entityManager.unwrap(Session.class)
+        return sessionFactory.getCurrentSession()
             .byId(Course.class)
             .loadOptional(id);
     }
 
     public void update(Course course) {
-        entityManager.unwrap(Session.class).update(course);
+        sessionFactory.getCurrentSession().update(course);
     }
 
     public void delete(int id) {
-        entityManager.unwrap(Session.class)
+        sessionFactory.getCurrentSession()
             .getNamedQuery("Course_delete")
             .setParameter("id", id)
             .executeUpdate();
@@ -44,14 +43,14 @@ public class HibernateCourseDao implements CourseDao {
 
     @Override
     public List<Course> getAll() {
-        return entityManager.unwrap(Session.class)
+        return sessionFactory.getCurrentSession()
             .createNamedQuery("Course_getAll", Course.class)
             .list();
     }
 
     @Override
     public Optional<Course> getByName(String name) {
-        return entityManager.unwrap(Session.class)
+        return sessionFactory.getCurrentSession()
             .createNamedQuery("Course_getByName", Course.class)
             .setParameter("name", name)
             .uniqueResultOptional();
@@ -59,7 +58,7 @@ public class HibernateCourseDao implements CourseDao {
 
     @Override
     public Page<Course> getAll(Pageable pageable) {
-        List<Course> courses = entityManager.unwrap(Session.class)
+        List<Course> courses = sessionFactory.getCurrentSession()
             .createNamedQuery("Course_getAll", Course.class)
             .setFirstResult((int) pageable.getOffset())
             .setMaxResults(pageable.getPageSize())
@@ -69,7 +68,7 @@ public class HibernateCourseDao implements CourseDao {
 
     @Override
     public Long count() {
-        return entityManager.unwrap(Session.class)
+        return sessionFactory.getCurrentSession()
             .createNamedQuery("Course_countAllRows", Long.class)
             .getSingleResult();
     }

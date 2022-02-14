@@ -3,6 +3,7 @@ package ua.com.foxminded.university.dao.hibernate;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -24,7 +25,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 
 
-@ExtendWith(SpringExtension.class)
+@SpringBootTest
 @Sql({"/create_course_test.sql"})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class HibernateCourseDaoTest {

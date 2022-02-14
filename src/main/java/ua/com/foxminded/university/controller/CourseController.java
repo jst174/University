@@ -9,7 +9,7 @@ import ua.com.foxminded.university.exceptions.NotUniqueNameException;
 import ua.com.foxminded.university.model.Course;
 import ua.com.foxminded.university.service.CourseService;
 
-@RestController
+@Controller
 @RequestMapping("/courses")
 public class CourseController {
 

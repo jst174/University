@@ -17,7 +17,7 @@ import java.util.List;
 import static java.lang.String.format;
 import static java.time.temporal.ChronoUnit.MINUTES;
 
-@PropertySource("classpath:application.properties")
+@PropertySource("classpath:app.properties")
 @Service
 public class TimeService {
 

@@ -12,7 +12,7 @@ import ua.com.foxminded.university.model.Student;
 import ua.com.foxminded.university.service.GroupService;
 import ua.com.foxminded.university.service.StudentService;
 
-@RestController
+@Controller
 @RequestMapping("/students")
 public class StudentController {
 

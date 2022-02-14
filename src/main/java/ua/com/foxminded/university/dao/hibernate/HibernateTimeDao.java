@@ -1,6 +1,6 @@
 package ua.com.foxminded.university.dao.hibernate;
 
-import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 import ua.com.foxminded.university.dao.TimeDao;
 import ua.com.foxminded.university.model.Time;
 
-import javax.persistence.EntityManager;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
@@ -16,28 +15,28 @@ import java.util.Optional;
 @Component
 public class HibernateTimeDao implements TimeDao {
 
-    private final EntityManager entityManager;
+    private final SessionFactory sessionFactory;
 
-    public HibernateTimeDao(EntityManager entityManager) {
-        this.entityManager = entityManager;
+    public HibernateTimeDao(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
     }
 
     public void create(Time time) {
-        entityManager.unwrap(Session.class).save(time);
+        sessionFactory.getCurrentSession().save(time);
     }
 
     public Optional<Time> getById(int id) {
-        return entityManager.unwrap(Session.class)
+        return sessionFactory.getCurrentSession()
             .byId(Time.class)
             .loadOptional(id);
     }
 
     public void update(Time time) {
-        entityManager.unwrap(Session.class).update(time);
+        sessionFactory.getCurrentSession().update(time);
     }
 
     public void delete(int id) {
-        entityManager.unwrap(Session.class)
+        sessionFactory.getCurrentSession()
             .getNamedQuery("Time_delete")
             .setParameter("id", id)
             .executeUpdate();
@@ -45,14 +44,14 @@ public class HibernateTimeDao implements TimeDao {
 
     @Override
     public List<Time> getAll() {
-        return entityManager.unwrap(Session.class)
+        return sessionFactory.getCurrentSession()
             .createNamedQuery("Time_getAll", Time.class)
             .list();
     }
 
     @Override
     public Page<Time> getAll(Pageable pageable) {
-        List<Time> times = entityManager.unwrap(Session.class)
+        List<Time> times = sessionFactory.getCurrentSession()
             .createNamedQuery("Time_getAll", Time.class)
             .setFirstResult((int) pageable.getOffset())
             .setMaxResults(pageable.getPageSize())
@@ -62,14 +61,14 @@ public class HibernateTimeDao implements TimeDao {
 
     @Override
     public Long count() {
-        return entityManager.unwrap(Session.class)
+        return sessionFactory.getCurrentSession()
             .createNamedQuery("Time_countAllRows", Long.class)
             .getSingleResult();
     }
 
     @Override
     public Optional<Time> getByTime(LocalTime start, LocalTime end) {
-        return entityManager.unwrap(Session.class)
+        return sessionFactory.getCurrentSession()
             .createNamedQuery("Time_getByTime", Time.class)
             .setParameter("start", start)
             .setParameter("end", end)
