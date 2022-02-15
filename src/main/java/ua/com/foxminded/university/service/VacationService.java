@@ -3,6 +3,7 @@ package ua.com.foxminded.university.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -22,13 +23,13 @@ import static java.lang.String.format;
 import static java.time.temporal.ChronoUnit.DAYS;
 
 @Service
+@ConfigurationProperties(prefix = "app")
 public class VacationService {
 
     private static final Logger logger = LoggerFactory.getLogger(VacationService.class);
 
     private VacationDao vacationDao;
     private TeacherService teacherService;
-    @Value("#{${maxPeriodsVacation}}")
     private Map<AcademicDegree, Integer> maxPeriodsVacation;
 
     public VacationService(VacationDao vacationDao, TeacherService teacherService) {

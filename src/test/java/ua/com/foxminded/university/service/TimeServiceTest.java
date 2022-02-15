@@ -25,7 +25,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@PropertySource("classpath:app.properties")
 public class TimeServiceTest {
 
     @Mock
@@ -33,11 +32,10 @@ public class TimeServiceTest {
     @InjectMocks
     private TimeService timeService;
     private List<Time> times;
-    @Value("${lesson.min.duration}")
-    private int minLessonDuration;
 
     @BeforeEach
     public void setUp() throws IOException {
+        int minLessonDuration = 30;
         ReflectionTestUtils.setField(timeService, "minLessonDuration", minLessonDuration);
         times = new ArrayList<>();
         Time time1 = new Time(LocalTime.of(8, 0), LocalTime.of(9, 30));

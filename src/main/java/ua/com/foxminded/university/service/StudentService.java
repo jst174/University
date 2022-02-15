@@ -22,7 +22,7 @@ public class StudentService {
     private static final Logger logger = LoggerFactory.getLogger(StudentService.class);
 
     private StudentDao studentDao;
-    @Value("${max.group.size}")
+    @Value("${app.maxGroupSize}")
     private int maxGroupSize;
 
     public StudentService(StudentDao studentDao) {

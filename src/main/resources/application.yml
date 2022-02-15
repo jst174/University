@@ -3,6 +3,11 @@ spring:
     url: jdbc:postgresql://localhost:5432/university
     username: postgres
     password: 1234
+  data:
+    web:
+      pageable:
+        default-page-size: 10
+        one-indexed-parameters: true
 
 logging:
   file:
@@ -20,3 +25,13 @@ logging:
       max-file-size: 10MB
       total-size-cap: 2GB
       max-history: 10
+
+app:
+  maxGroupSize: 30
+  minLessonDuration: 30
+  maxPeriodsVacation:
+    ASSOCIATE: 15
+    BACHELOR: 20
+    MASTER: 25
+    DOCTORAL: 30
+

@@ -3,7 +3,7 @@ package ua.com.foxminded.university.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.com.foxminded.university.dao.TimeDao;
@@ -17,14 +17,13 @@ import java.util.List;
 import static java.lang.String.format;
 import static java.time.temporal.ChronoUnit.MINUTES;
 
-@PropertySource("classpath:app.properties")
 @Service
 public class TimeService {
 
     private static final Logger logger = LoggerFactory.getLogger(TimeService.class);
 
     private TimeDao timeDao;
-    @Value("${lesson.min.duration}")
+    @Value("${app.minLessonDuration}")
     private int minLessonDuration;
 
     public TimeService(TimeDao timeDao) {

@@ -2,7 +2,6 @@ package ua.com.foxminded.university.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
@@ -11,9 +10,8 @@ import javax.sql.DataSource;
 import java.util.Properties;
 
 @Configuration
-@ComponentScan("ua.com.foxminded.university")
-@PropertySource("classpath:db.properties")
-public class AppConfig {
+@PropertySource("classpath:hibernate.properties")
+public class HibernateConfig {
 
     @Value("${hibernate.dialect}")
     private String hibernateDialect;
