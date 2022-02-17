@@ -26,9 +26,9 @@ logging:
       total-size-cap: 2GB
       max-history: 10
 
-app:
+university:
   maxGroupSize: 30
-  minLessonDuration: 30
+  minLessonDurationInMinutes: 30
   maxPeriodsVacation:
     ASSOCIATE: 15
     BACHELOR: 20

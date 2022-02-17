@@ -2,7 +2,6 @@ package ua.com.foxminded.university.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -13,6 +12,7 @@ import ua.com.foxminded.university.exceptions.NotAvailableGroupException;
 import ua.com.foxminded.university.exceptions.NotUniqueNameException;
 import ua.com.foxminded.university.model.Group;
 import ua.com.foxminded.university.model.Student;
+import ua.com.foxminded.university.properties.UniversityProperties;
 
 import static java.lang.String.format;
 
@@ -22,11 +22,11 @@ public class StudentService {
     private static final Logger logger = LoggerFactory.getLogger(StudentService.class);
 
     private StudentDao studentDao;
-    @Value("${app.maxGroupSize}")
-    private int maxGroupSize;
+    private UniversityProperties universityProperties;
 
-    public StudentService(StudentDao studentDao) {
+    public StudentService(StudentDao studentDao, UniversityProperties universityProperties) {
         this.studentDao = studentDao;
+        this.universityProperties = universityProperties;
     }
 
     @Transactional
@@ -75,7 +75,7 @@ public class StudentService {
 
     private void verifyGroupAvailability(Group group) throws NotAvailableGroupException {
         int groupSize = group.getStudents().size();
-        if (groupSize >= maxGroupSize) {
+        if (groupSize >= universityProperties.getMaxGroupSize()) {
             throw new NotAvailableGroupException(format("Group with name %s not available. " +
                 "Max group size = %s has already been reached", group.getName(), groupSize));
         }
