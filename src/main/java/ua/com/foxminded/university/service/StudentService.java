@@ -6,13 +6,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ua.com.foxminded.university.config.UniversityConfigProperties;
 import ua.com.foxminded.university.dao.StudentDao;
 import ua.com.foxminded.university.exceptions.EntityNotFoundException;
 import ua.com.foxminded.university.exceptions.NotAvailableGroupException;
 import ua.com.foxminded.university.exceptions.NotUniqueNameException;
 import ua.com.foxminded.university.model.Group;
 import ua.com.foxminded.university.model.Student;
-import ua.com.foxminded.university.properties.UniversityProperties;
 
 import static java.lang.String.format;
 
@@ -22,9 +22,9 @@ public class StudentService {
     private static final Logger logger = LoggerFactory.getLogger(StudentService.class);
 
     private StudentDao studentDao;
-    private UniversityProperties universityProperties;
+    private UniversityConfigProperties universityProperties;
 
-    public StudentService(StudentDao studentDao, UniversityProperties universityProperties) {
+    public StudentService(StudentDao studentDao, UniversityConfigProperties universityProperties) {
         this.studentDao = studentDao;
         this.universityProperties = universityProperties;
     }

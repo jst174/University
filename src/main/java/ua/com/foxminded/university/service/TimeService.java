@@ -4,12 +4,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ua.com.foxminded.university.config.UniversityConfigProperties;
 import ua.com.foxminded.university.dao.TimeDao;
 import ua.com.foxminded.university.exceptions.EntityNotFoundException;
 import ua.com.foxminded.university.exceptions.NotAvailableTimeException;
 import ua.com.foxminded.university.exceptions.NotUniqueTimeException;
 import ua.com.foxminded.university.model.Time;
-import ua.com.foxminded.university.properties.UniversityProperties;
 
 import java.util.List;
 
@@ -22,9 +22,9 @@ public class TimeService {
     private static final Logger logger = LoggerFactory.getLogger(TimeService.class);
 
     private TimeDao timeDao;
-    private UniversityProperties universityProperties;
+    private UniversityConfigProperties universityProperties;
 
-    public TimeService(TimeDao timeDao, UniversityProperties universityProperties) {
+    public TimeService(TimeDao timeDao, UniversityConfigProperties universityProperties) {
         this.timeDao = timeDao;
         this.universityProperties = universityProperties;
     }

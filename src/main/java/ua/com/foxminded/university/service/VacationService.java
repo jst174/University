@@ -2,6 +2,7 @@ package ua.com.foxminded.university.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -10,13 +11,11 @@ import ua.com.foxminded.university.dao.VacationDao;
 import ua.com.foxminded.university.exceptions.EntityNotFoundException;
 import ua.com.foxminded.university.exceptions.NotAvailablePeriodException;
 import ua.com.foxminded.university.exceptions.NotUniqueVacationDatesException;
-import ua.com.foxminded.university.model.AcademicDegree;
 import ua.com.foxminded.university.model.Teacher;
 import ua.com.foxminded.university.model.Vacation;
-import ua.com.foxminded.university.properties.UniversityProperties;
+import ua.com.foxminded.university.config.UniversityConfigProperties;
 
 import java.util.List;
-import java.util.Map;
 
 import static java.lang.String.format;
 import static java.time.temporal.ChronoUnit.DAYS;
@@ -28,9 +27,9 @@ public class VacationService {
 
     private VacationDao vacationDao;
     private TeacherService teacherService;
-    private UniversityProperties universityProperties;
+    private UniversityConfigProperties universityProperties;
 
-    public VacationService(VacationDao vacationDao, TeacherService teacherService, UniversityProperties universityProperties) {
+    public VacationService(VacationDao vacationDao, TeacherService teacherService, UniversityConfigProperties universityProperties) {
         this.vacationDao = vacationDao;
         this.teacherService = teacherService;
         this.universityProperties = universityProperties;

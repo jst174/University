@@ -6,10 +6,17 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import ua.com.foxminded.university.dao.StudentDao;
 import ua.com.foxminded.university.exceptions.EntityNotFoundException;
@@ -18,6 +25,7 @@ import ua.com.foxminded.university.exceptions.NotUniqueNameException;
 import ua.com.foxminded.university.model.Gender;
 import ua.com.foxminded.university.model.Group;
 import ua.com.foxminded.university.model.Student;
+import ua.com.foxminded.university.config.UniversityConfigProperties;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -33,8 +41,9 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 public class StudentServiceTest {
 
-    private static final int maxGroupSize = 30;
-
+    private int maxGroupSize;
+    @Mock
+    private UniversityConfigProperties universityProperties;
     @Mock
     private StudentDao studentDao;
     @InjectMocks
@@ -43,7 +52,8 @@ public class StudentServiceTest {
 
     @BeforeEach
     public void setUp() throws IOException {
-        ReflectionTestUtils.setField(studentService, "maxGroupSize", maxGroupSize);
+        when(universityProperties.getMaxGroupSize()).thenReturn(30);
+        maxGroupSize = universityProperties.getMaxGroupSize();
         students = Arrays.asList(TestData.student1, TestData.student2);
     }
 

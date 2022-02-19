@@ -9,6 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.test.util.ReflectionTestUtils;
+import ua.com.foxminded.university.config.UniversityConfigProperties;
 import ua.com.foxminded.university.dao.TimeDao;
 import ua.com.foxminded.university.exceptions.EntityNotFoundException;
 import ua.com.foxminded.university.exceptions.NotAvailableTimeException;
@@ -29,14 +30,17 @@ public class TimeServiceTest {
 
     @Mock
     private TimeDao timeDao;
+    @Mock
+    private UniversityConfigProperties universityConfigProperties;
     @InjectMocks
     private TimeService timeService;
     private List<Time> times;
+    private int minLessonDuration;
 
     @BeforeEach
     public void setUp() throws IOException {
-        int minLessonDuration = 30;
-        ReflectionTestUtils.setField(timeService, "minLessonDuration", minLessonDuration);
+        when(universityConfigProperties.getMinLessonDurationInMinutes()).thenReturn(30);
+        minLessonDuration = universityConfigProperties.getMinLessonDurationInMinutes();
         times = new ArrayList<>();
         Time time1 = new Time(LocalTime.of(8, 0), LocalTime.of(9, 30));
         time1.setId(1);

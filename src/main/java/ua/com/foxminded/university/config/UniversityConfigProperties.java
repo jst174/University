@@ -1,14 +1,12 @@
-package ua.com.foxminded.university.properties;
+package ua.com.foxminded.university.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
 import ua.com.foxminded.university.model.AcademicDegree;
 
 import java.util.Map;
 
-@Configuration
 @ConfigurationProperties(prefix = "university")
-public class UniversityProperties {
+public class UniversityConfigProperties {
 
     private int maxGroupSize;
     private int minLessonDurationInMinutes;
