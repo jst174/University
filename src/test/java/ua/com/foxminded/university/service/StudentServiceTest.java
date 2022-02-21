@@ -41,7 +41,6 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 public class StudentServiceTest {
 
-    private int maxGroupSize;
     @Mock
     private UniversityConfigProperties universityProperties;
     @Mock
@@ -52,13 +51,12 @@ public class StudentServiceTest {
 
     @BeforeEach
     public void setUp() throws IOException {
-        when(universityProperties.getMaxGroupSize()).thenReturn(30);
-        maxGroupSize = universityProperties.getMaxGroupSize();
         students = Arrays.asList(TestData.student1, TestData.student2);
     }
 
     @Test
     public void givenNewStudent_whenCreate_thenCreated() throws NotAvailableGroupException, NotUniqueNameException {
+        when(universityProperties.getMaxGroupSize()).thenReturn(30);
         when(studentDao.getByFirstNameAndLastName(TestData.student1.getFirstName(), TestData.student1.getLastName())).thenReturn(Optional.empty());
         TestData.group1.setStudents(Arrays.asList(TestData.student1, TestData.student2));
 
@@ -84,6 +82,7 @@ public class StudentServiceTest {
 
     @Test
     public void givenNotAvailableGroup_whenCreate_thenNotAvailableGroupExceptionThrow() {
+        when(universityProperties.getMaxGroupSize()).thenReturn(30);
         when(studentDao.getByFirstNameAndLastName(TestData.student1.getFirstName(), TestData.student1.getLastName())).thenReturn(Optional.empty());
         TestData.group1.setStudents(generateStudents());
 
@@ -113,6 +112,7 @@ public class StudentServiceTest {
 
     @Test
     public void givenExistentStudent_whenUpdate_thenUpdated() throws NotAvailableGroupException, NotUniqueNameException, EntityNotFoundException {
+        when(universityProperties.getMaxGroupSize()).thenReturn(30);
         when(studentDao.getByFirstNameAndLastName(TestData.student1.getFirstName(), TestData.student1.getLastName())).thenReturn(Optional.of(TestData.student1));
         TestData.group1.setStudents(students);
 
@@ -135,6 +135,7 @@ public class StudentServiceTest {
 
     @Test
     public void givenNotAvailableGroup_whenUpdate_thenNotAvailableGroupExceptionThrow() {
+        when(universityProperties.getMaxGroupSize()).thenReturn(30);
         when(studentDao.getByFirstNameAndLastName(TestData.student1.getFirstName(), TestData.student1.getLastName())).thenReturn(Optional.of(TestData.student1));
         TestData.group1.setStudents(generateStudents());
 
@@ -165,7 +166,7 @@ public class StudentServiceTest {
 
     private List<Student> generateStudents() {
         List<Student> students = new ArrayList<>();
-        for (int i = 0; i < maxGroupSize; i++) {
+        for (int i = 0; i < universityProperties.getMaxGroupSize(); i++) {
             students.add(TestData.student1);
         }
         return students;

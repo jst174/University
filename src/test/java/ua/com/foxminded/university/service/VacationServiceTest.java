@@ -42,20 +42,20 @@ public class VacationServiceTest {
     private TeacherService teacherService;
     @InjectMocks
     private VacationService vacationService;
-    private Map<AcademicDegree, Integer> maxPeriodsVacation;
     private List<Vacation> vacations;
+    private Map<AcademicDegree, Integer> periods;
 
 
     @BeforeEach
     public void setUp() throws IOException {
-        Map<AcademicDegree, Integer> periods = new HashMap<>();
+        periods = new HashMap<>();
         periods.put(AcademicDegree.ASSOCIATE, 15);
         periods.put(AcademicDegree.BACHELOR, 20);
         periods.put(AcademicDegree.MASTER, 25);
         periods.put(AcademicDegree.DOCTORAL, 30);
-        when(universityConfigProperties.getMaxPeriodsVacation()).thenReturn(periods);
-        maxPeriodsVacation = universityConfigProperties.getMaxPeriodsVacation();
-        vacations = new ArrayList<>(Arrays.asList(TestData.vacation1, TestData.vacation2));
+        vacations = new ArrayList<>();
+        vacations.add(TestData.vacation1);
+        vacations.add(TestData.vacation2);
     }
 
     @Test
@@ -68,6 +68,7 @@ public class VacationServiceTest {
         when(teacherService.getById(vacation.getTeacher().getId())).thenReturn(TestData.teacher1);
         when(vacationDao.getByTeacherAndVacationDates(TestData.teacher1,
             vacation.getStart(), vacation.getEnding())).thenReturn(Optional.empty());
+        when(universityConfigProperties.getMaxPeriodsVacation()).thenReturn(periods);
 
         vacationService.create(vacation);
 
@@ -84,6 +85,7 @@ public class VacationServiceTest {
         when(vacationDao.getByTeacherAndVacationDates(TestData.teacher1,
             vacation.getStart(), vacation.getEnding())).thenReturn(Optional.empty());
         TestData.teacher1.setVacations(vacations);
+        when(universityConfigProperties.getMaxPeriodsVacation()).thenReturn(periods);
 
         Exception exception = assertThrows(NotAvailablePeriodException.class, () -> vacationService.create(vacation));
 
@@ -131,6 +133,7 @@ public class VacationServiceTest {
         when(vacationDao.getByTeacherAndVacationDates(TestData.teacher1,
             TestData.vacation1.getStart(), TestData.vacation1.getEnding())).thenReturn(Optional.of(TestData.vacation1));
         when(teacherService.getById(TestData.vacation1.getTeacher().getId())).thenReturn(TestData.teacher1);
+        when(universityConfigProperties.getMaxPeriodsVacation()).thenReturn(periods);
         TestData.teacher1.setVacations(vacations);
 
         vacationService.update(TestData.vacation1);
@@ -159,6 +162,7 @@ public class VacationServiceTest {
         TestData.teacher1.setVacations(vacations);
         when(vacationDao.getByTeacherAndVacationDates(TestData.teacher1, vacation.getStart(), vacation.getEnding())).thenReturn(Optional.of(vacation));
         when(teacherService.getById(vacation.getTeacher().getId())).thenReturn(TestData.teacher1);
+        when(universityConfigProperties.getMaxPeriodsVacation()).thenReturn(periods);
 
         Exception exception = assertThrows(NotAvailablePeriodException.class, () -> vacationService.update(vacation));
 
