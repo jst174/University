@@ -5,8 +5,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-import ua.com.foxminded.university.dao.AddressDao;
 import ua.com.foxminded.university.dao.TeacherDao;
 import ua.com.foxminded.university.model.Teacher;
 
@@ -16,12 +14,11 @@ import java.util.Optional;
 @Component
 public class HibernateTeacherDao implements TeacherDao {
 
-    private SessionFactory sessionFactory;
-    private AddressDao addressDao;
+    private final SessionFactory sessionFactory;
 
-    public HibernateTeacherDao(SessionFactory sessionFactory, AddressDao addressDao) {
+    public HibernateTeacherDao(SessionFactory sessionFactory) {
+
         this.sessionFactory = sessionFactory;
-        this.addressDao = addressDao;
     }
 
     public void create(Teacher teacher) {

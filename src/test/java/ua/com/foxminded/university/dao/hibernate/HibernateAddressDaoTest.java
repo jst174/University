@@ -3,6 +3,9 @@ package ua.com.foxminded.university.dao.hibernate;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -17,17 +20,17 @@ import ua.com.foxminded.university.config.DatabaseConfigTest;
 import ua.com.foxminded.university.dao.AddressDao;
 import ua.com.foxminded.university.model.Address;
 
+import javax.persistence.EntityManager;
 import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {DatabaseConfigTest.class})
+@SpringBootTest
 @Sql({"/create_address_test.sql"})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class HibernateAddressDaoTest {
+
 
     @Autowired
     private AddressDao addressDao;
@@ -42,7 +45,7 @@ public class HibernateAddressDaoTest {
 
         addressDao.create(address);
 
-        assertEquals(address, hibernateTemplate.get(Address.class, address.getId()));
+        assertEquals(address, hibernateTemplate.get(Address.class, 3));
     }
 
     @Test

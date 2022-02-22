@@ -17,7 +17,7 @@ import java.util.Optional;
 @Component
 public class HibernateLessonDao implements LessonDao {
 
-    private SessionFactory sessionFactory;
+    private final SessionFactory sessionFactory;
 
     public HibernateLessonDao(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;

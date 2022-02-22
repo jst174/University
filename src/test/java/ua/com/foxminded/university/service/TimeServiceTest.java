@@ -8,19 +8,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
-import ua.com.foxminded.university.config.AppConfig;
+import ua.com.foxminded.university.config.UniversityConfigProperties;
 import ua.com.foxminded.university.dao.TimeDao;
 import ua.com.foxminded.university.exceptions.EntityNotFoundException;
 import ua.com.foxminded.university.exceptions.NotAvailableTimeException;
 import ua.com.foxminded.university.exceptions.NotUniqueTimeException;
-import ua.com.foxminded.university.model.Group;
 import ua.com.foxminded.university.model.Time;
 
 import java.io.IOException;
@@ -33,20 +26,18 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@PropertySource("classpath:application.properties")
 public class TimeServiceTest {
 
     @Mock
     private TimeDao timeDao;
+    @Mock
+    private UniversityConfigProperties universityConfigProperties;
     @InjectMocks
     private TimeService timeService;
     private List<Time> times;
-    @Value("${lesson.min.duration}")
-    private int minLessonDuration;
 
     @BeforeEach
     public void setUp() throws IOException {
-        ReflectionTestUtils.setField(timeService, "minLessonDuration", minLessonDuration);
         times = new ArrayList<>();
         Time time1 = new Time(LocalTime.of(8, 0), LocalTime.of(9, 30));
         time1.setId(1);
@@ -61,6 +52,7 @@ public class TimeServiceTest {
         LocalTime start = LocalTime.of(12, 0);
         LocalTime end = LocalTime.of(13, 30);
         Time time = new Time(start, end);
+        when(universityConfigProperties.getMinLessonDurationInMinutes()).thenReturn(30);
         when(timeDao.getByTime(start, end)).thenReturn(Optional.empty());
         when(timeDao.getAll()).thenReturn(times);
 
@@ -86,6 +78,7 @@ public class TimeServiceTest {
         LocalTime start = LocalTime.of(12, 0);
         LocalTime end = LocalTime.of(12, 20);
         Time time = new Time(start, end);
+        when(universityConfigProperties.getMinLessonDurationInMinutes()).thenReturn(30);
         when(timeDao.getByTime(start, end)).thenReturn(Optional.empty());
 
         Exception exception = assertThrows(NotAvailableTimeException.class, () -> timeService.create(time));
@@ -100,6 +93,7 @@ public class TimeServiceTest {
         LocalTime start = LocalTime.of(8, 20);
         LocalTime end = LocalTime.of(9, 20);
         Time time = new Time(start, end);
+        when(universityConfigProperties.getMinLessonDurationInMinutes()).thenReturn(30);
         when(timeDao.getByTime(start, end)).thenReturn(Optional.empty());
         when(timeDao.getAll()).thenReturn(times);
 
@@ -133,6 +127,7 @@ public class TimeServiceTest {
         Time time = times.get(0);
         time.setStartTime(LocalTime.of(12, 0));
         time.setEndTime(LocalTime.of(13, 30));
+        when(universityConfigProperties.getMinLessonDurationInMinutes()).thenReturn(30);
         when(timeDao.getByTime(time.getStartTime(), time.getEndTime())).thenReturn(Optional.of(time));
         when(timeDao.getAll()).thenReturn(times);
 
@@ -160,6 +155,7 @@ public class TimeServiceTest {
         Time time = times.get(0);
         time.setStartTime(LocalTime.of(8, 0));
         time.setEndTime(LocalTime.of(8, 20));
+        when(universityConfigProperties.getMinLessonDurationInMinutes()).thenReturn(30);
         when(timeDao.getByTime(time.getStartTime(), time.getEndTime())).thenReturn(Optional.of(time));
 
         Exception exception = assertThrows(NotAvailableTimeException.class, () -> timeService.update(time));
@@ -176,6 +172,7 @@ public class TimeServiceTest {
         Time time = times.get(1);
         time.setStartTime(start);
         time.setEndTime(end);
+        when(universityConfigProperties.getMinLessonDurationInMinutes()).thenReturn(30);
         when(timeDao.getByTime(time.getStartTime(), time.getEndTime())).thenReturn(Optional.of(time));
         when(timeDao.getAll()).thenReturn(times);
 

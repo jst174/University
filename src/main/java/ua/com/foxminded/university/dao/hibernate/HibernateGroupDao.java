@@ -5,7 +5,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 import ua.com.foxminded.university.dao.GroupDao;
 import ua.com.foxminded.university.model.Group;
 
@@ -15,7 +14,7 @@ import java.util.Optional;
 @Component
 public class HibernateGroupDao implements GroupDao {
 
-    private SessionFactory sessionFactory;
+    private final SessionFactory sessionFactory;
 
     public HibernateGroupDao(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;

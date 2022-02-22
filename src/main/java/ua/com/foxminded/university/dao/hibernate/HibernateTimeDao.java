@@ -5,7 +5,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 import ua.com.foxminded.university.dao.TimeDao;
 import ua.com.foxminded.university.model.Time;
 
@@ -16,7 +15,7 @@ import java.util.Optional;
 @Component
 public class HibernateTimeDao implements TimeDao {
 
-    private SessionFactory sessionFactory;
+    private final SessionFactory sessionFactory;
 
     public HibernateTimeDao(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;

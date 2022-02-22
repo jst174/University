@@ -1,0 +1,37 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/university
+    username: postgres
+    password: 1234
+  data:
+    web:
+      pageable:
+        default-page-size: 10
+        one-indexed-parameters: true
+
+logging:
+  file:
+    name: logs/app.log
+  level:
+    root: DEBUG
+    org.org.springframework: WARN
+    org.hibernate: ERROR
+  pattern:
+    console: '%d{HH:mm:ss.SSS} [%thread] %-5level %logger{100} - %msg%n'
+    file: '%d{HH:mm:ss.SSS} [%thread] %-5level %logger{100} - %msg%n'
+  logback:
+    rollingpolicy:
+      file-name-pattern: logs/archived/app.%d{yyyy-MM-dd}.%i.log.gz
+      max-file-size: 10MB
+      total-size-cap: 2GB
+      max-history: 10
+
+university:
+  maxGroupSize: 30
+  minLessonDurationInMinutes: 30
+  maxPeriodsVacation:
+    ASSOCIATE: 15
+    BACHELOR: 20
+    MASTER: 25
+    DOCTORAL: 30
+

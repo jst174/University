@@ -2,11 +2,11 @@ package ua.com.foxminded.university.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ua.com.foxminded.university.config.UniversityConfigProperties;
 import ua.com.foxminded.university.dao.StudentDao;
 import ua.com.foxminded.university.exceptions.EntityNotFoundException;
 import ua.com.foxminded.university.exceptions.NotAvailableGroupException;
@@ -22,11 +22,11 @@ public class StudentService {
     private static final Logger logger = LoggerFactory.getLogger(StudentService.class);
 
     private StudentDao studentDao;
-    @Value("${max.group.size}")
-    private int maxGroupSize;
+    private UniversityConfigProperties universityProperties;
 
-    public StudentService(StudentDao studentDao) {
+    public StudentService(StudentDao studentDao, UniversityConfigProperties universityProperties) {
         this.studentDao = studentDao;
+        this.universityProperties = universityProperties;
     }
 
     @Transactional
@@ -75,7 +75,7 @@ public class StudentService {
 
     private void verifyGroupAvailability(Group group) throws NotAvailableGroupException {
         int groupSize = group.getStudents().size();
-        if (groupSize >= maxGroupSize) {
+        if (groupSize >= universityProperties.getMaxGroupSize()) {
             throw new NotAvailableGroupException(format("Group with name %s not available. " +
                 "Max group size = %s has already been reached", group.getName(), groupSize));
         }

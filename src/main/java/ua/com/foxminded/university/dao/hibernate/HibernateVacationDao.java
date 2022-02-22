@@ -1,5 +1,6 @@
 package ua.com.foxminded.university.dao.hibernate;
 
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -9,6 +10,7 @@ import ua.com.foxminded.university.dao.VacationDao;
 import ua.com.foxminded.university.model.Teacher;
 import ua.com.foxminded.university.model.Vacation;
 
+import javax.persistence.EntityManager;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -16,7 +18,7 @@ import java.util.Optional;
 @Component
 public class HibernateVacationDao implements VacationDao {
 
-    private SessionFactory sessionFactory;
+    private final SessionFactory sessionFactory;
 
     public HibernateVacationDao(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;

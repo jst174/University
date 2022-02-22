@@ -2,10 +2,9 @@ package ua.com.foxminded.university.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ua.com.foxminded.university.config.UniversityConfigProperties;
 import ua.com.foxminded.university.dao.TimeDao;
 import ua.com.foxminded.university.exceptions.EntityNotFoundException;
 import ua.com.foxminded.university.exceptions.NotAvailableTimeException;
@@ -17,18 +16,17 @@ import java.util.List;
 import static java.lang.String.format;
 import static java.time.temporal.ChronoUnit.MINUTES;
 
-@PropertySource("classpath:application.properties")
 @Service
 public class TimeService {
 
     private static final Logger logger = LoggerFactory.getLogger(TimeService.class);
 
     private TimeDao timeDao;
-    @Value("${lesson.min.duration}")
-    private int minLessonDuration;
+    private UniversityConfigProperties universityProperties;
 
-    public TimeService(TimeDao timeDao) {
+    public TimeService(TimeDao timeDao, UniversityConfigProperties universityProperties) {
         this.timeDao = timeDao;
+        this.universityProperties = universityProperties;
     }
 
     @Transactional
@@ -78,10 +76,11 @@ public class TimeService {
     }
 
     private void verifyLessonDuration(Time time) throws NotAvailableTimeException {
+        int minLessonDurationInMinutes = universityProperties.getMinLessonDurationInMinutes();
         if (MINUTES.between(time.getStartTime(), time.getEndTime())
-            < minLessonDuration) {
+            < minLessonDurationInMinutes) {
             throw new NotAvailableTimeException(format("Duration less than %s minute(s)",
-                minLessonDuration));
+                minLessonDurationInMinutes));
         }
     }
 

@@ -14,7 +14,7 @@ import java.util.Optional;
 @Component
 public class HibernateAddressDao implements AddressDao {
 
-    private SessionFactory sessionFactory;
+    private final SessionFactory sessionFactory;
 
     public HibernateAddressDao(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;

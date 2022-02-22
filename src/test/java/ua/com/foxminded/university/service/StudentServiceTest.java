@@ -6,10 +6,17 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import ua.com.foxminded.university.dao.StudentDao;
 import ua.com.foxminded.university.exceptions.EntityNotFoundException;
@@ -18,6 +25,7 @@ import ua.com.foxminded.university.exceptions.NotUniqueNameException;
 import ua.com.foxminded.university.model.Gender;
 import ua.com.foxminded.university.model.Group;
 import ua.com.foxminded.university.model.Student;
+import ua.com.foxminded.university.config.UniversityConfigProperties;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -33,8 +41,8 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 public class StudentServiceTest {
 
-    private static final int maxGroupSize = 30;
-
+    @Mock
+    private UniversityConfigProperties universityProperties;
     @Mock
     private StudentDao studentDao;
     @InjectMocks
@@ -43,12 +51,12 @@ public class StudentServiceTest {
 
     @BeforeEach
     public void setUp() throws IOException {
-        ReflectionTestUtils.setField(studentService, "maxGroupSize", maxGroupSize);
         students = Arrays.asList(TestData.student1, TestData.student2);
     }
 
     @Test
     public void givenNewStudent_whenCreate_thenCreated() throws NotAvailableGroupException, NotUniqueNameException {
+        when(universityProperties.getMaxGroupSize()).thenReturn(30);
         when(studentDao.getByFirstNameAndLastName(TestData.student1.getFirstName(), TestData.student1.getLastName())).thenReturn(Optional.empty());
         TestData.group1.setStudents(Arrays.asList(TestData.student1, TestData.student2));
 
@@ -74,6 +82,7 @@ public class StudentServiceTest {
 
     @Test
     public void givenNotAvailableGroup_whenCreate_thenNotAvailableGroupExceptionThrow() {
+        when(universityProperties.getMaxGroupSize()).thenReturn(30);
         when(studentDao.getByFirstNameAndLastName(TestData.student1.getFirstName(), TestData.student1.getLastName())).thenReturn(Optional.empty());
         TestData.group1.setStudents(generateStudents());
 
@@ -103,6 +112,7 @@ public class StudentServiceTest {
 
     @Test
     public void givenExistentStudent_whenUpdate_thenUpdated() throws NotAvailableGroupException, NotUniqueNameException, EntityNotFoundException {
+        when(universityProperties.getMaxGroupSize()).thenReturn(30);
         when(studentDao.getByFirstNameAndLastName(TestData.student1.getFirstName(), TestData.student1.getLastName())).thenReturn(Optional.of(TestData.student1));
         TestData.group1.setStudents(students);
 
@@ -125,6 +135,7 @@ public class StudentServiceTest {
 
     @Test
     public void givenNotAvailableGroup_whenUpdate_thenNotAvailableGroupExceptionThrow() {
+        when(universityProperties.getMaxGroupSize()).thenReturn(30);
         when(studentDao.getByFirstNameAndLastName(TestData.student1.getFirstName(), TestData.student1.getLastName())).thenReturn(Optional.of(TestData.student1));
         TestData.group1.setStudents(generateStudents());
 
@@ -155,7 +166,7 @@ public class StudentServiceTest {
 
     private List<Student> generateStudents() {
         List<Student> students = new ArrayList<>();
-        for (int i = 0; i < maxGroupSize; i++) {
+        for (int i = 0; i < universityProperties.getMaxGroupSize(); i++) {
             students.add(TestData.student1);
         }
         return students;
