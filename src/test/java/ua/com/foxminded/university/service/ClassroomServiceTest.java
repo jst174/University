@@ -49,7 +49,7 @@ public class ClassroomServiceTest {
 
         classroomService.createClassroom(classroom);
 
-        verify(classroomDao).create(classroom);
+        verify(classroomDao).save(classroom);
     }
 
     @Test
@@ -60,7 +60,7 @@ public class ClassroomServiceTest {
         Exception exception = assertThrows(NotUniqueNameException.class, () -> classroomService.createClassroom(classroom));
 
         String expectedMessage = "Classroom with number = 101 already exist";
-        verify(classroomDao, never()).create(classroom);
+        verify(classroomDao, never()).save(classroom);
         assertEquals(expectedMessage, exception.getMessage());
     }
 
@@ -69,14 +69,14 @@ public class ClassroomServiceTest {
     public void givenExistClassroomId_whenGetById_thenReturn() throws EntityNotFoundException {
         Classroom classroom = classrooms.get(0);
 
-        when(classroomDao.getById(1)).thenReturn(Optional.of(classroom));
+        when(classroomDao.findById(1)).thenReturn(Optional.of(classroom));
 
         assertEquals(classroom, classroomService.getById(1));
     }
 
     @Test
     public void givenNotExistentClassroomId_whenGetById_thenEntityNotFoundExceptionThrow() {
-        when(classroomDao.getById(20)).thenReturn(Optional.empty());
+        when(classroomDao.findById(20)).thenReturn(Optional.empty());
 
         Exception exception = assertThrows(EntityNotFoundException.class, () -> classroomService.getById(20));
 
@@ -91,7 +91,7 @@ public class ClassroomServiceTest {
 
         classroomService.update(classroom);
 
-        verify(classroomDao).update(classroom);
+        verify(classroomDao).save(classroom);
     }
 
     @Test
@@ -104,7 +104,7 @@ public class ClassroomServiceTest {
         Exception exception = assertThrows(NotUniqueNameException.class, () -> classroomService.update(classroom1));
 
         String expectedMessage = "Classroom with number = 202 already exist";
-        verify(classroomDao, never()).update(classroom1);
+        verify(classroomDao, never()).save(classroom1);
         assertEquals(expectedMessage, exception.getMessage());
     }
 
@@ -112,7 +112,7 @@ public class ClassroomServiceTest {
     public void givenExistentId_whenDelete_thenDeleted() {
         classroomService.delete(1);
 
-        verify(classroomDao).delete(1);
+        verify(classroomDao).deleteById(1);
     }
 
     @Test
@@ -120,14 +120,14 @@ public class ClassroomServiceTest {
         Pageable pageable = PageRequest.of(1, 10);
         Page<Classroom> classroomPage =
             new PageImpl<Classroom>(classrooms, pageable, classrooms.size());
-        when(classroomDao.getAll(pageable)).thenReturn(classroomPage);
+        when(classroomDao.findAll(pageable)).thenReturn(classroomPage);
 
         assertEquals(classroomPage, classroomService.getAll(pageable));
     }
 
     @Test
     public void whenGetAll_thenReturn() {
-        when(classroomDao.getAll()).thenReturn(classrooms);
+        when(classroomDao.findAll()).thenReturn(classrooms);
 
         assertEquals(classrooms, classroomService.getAll());
     }

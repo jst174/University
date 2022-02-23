@@ -1,13 +1,16 @@
 package ua.com.foxminded.university.dao;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import ua.com.foxminded.university.model.Student;
 
-import java.util.List;
 import java.util.Optional;
 
-public interface StudentDao extends Dao<Student> {
+public interface StudentDao extends JpaRepository<Student, Integer> {
 
-    Optional<Student> getByFirstNameAndLastName(String firstName, String lastName);
+    @Query("SELECT s FROM Student s WHERE s.firstName = :firstName and s.lastName = :lastName")
+    Optional<Student> findByFirstNameAndLastName(
+        @Param("firstName") String firstName,
+        @Param("lastName") String lastName);
 }

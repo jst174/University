@@ -6,13 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-@NamedQueries({
-    @NamedQuery(name = "Teacher_delete", query = "DELETE FROM Teacher AS t WHERE t.id = :id"),
-    @NamedQuery(name = "Teacher_getAll", query = "SELECT t FROM Teacher AS t"),
-    @NamedQuery(name = "Teacher_countAllRows", query = "SELECT COUNT (t) FROM Teacher AS t"),
-    @NamedQuery(name = "Teacher_getByFirstNameAndLastName", query = "SELECT t FROM Teacher AS t " +
-        "WHERE t.firstName =: firstName and t.lastName = :lastName")
-})
 @Entity
 @Table(name = "teachers")
 public class Teacher extends Person {

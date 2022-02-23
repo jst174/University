@@ -9,23 +9,6 @@ import java.util.Objects;
 
 import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE;
 
-@NamedQueries({
-    @NamedQuery(name = "Lesson_delete", query = "DELETE FROM Lesson AS l WHERE l.id = :id"),
-    @NamedQuery(name = "Lesson_getAll", query = "SELECT l FROM Lesson AS l"),
-    @NamedQuery(name = "Lesson_countAllRows", query = "SELECT COUNT (l) FROM Lesson AS l"),
-    @NamedQuery(name = "Lesson_getByDateAndTime", query = "SELECT l FROM Lesson AS l " +
-        "WHERE l.date=:date AND l.time.id=:timeId"),
-    @NamedQuery(name = "Lesson_getByDateAndTimeAndClassroom", query = "SELECT l FROM Lesson AS l " +
-        "WHERE l.date=:date AND l.time.id=:timeId AND l.classroom.id=:classroomId"),
-    @NamedQuery(name = "Lesson_getByDateAndTimeAndTeacher", query = "SELECT l FROM Lesson AS l " +
-        "WHERE l.date=:date AND l.time.id=:timeId AND l.teacher.id=:teacherId"),
-    @NamedQuery(name = "Lesson_getByDateAndTimeAndGroupId", query = "SELECT l FROM Lesson AS l " +
-        "inner join l.groups AS g WHERE g.id=:groupId AND l.date=:date AND l.time=:time"),
-    @NamedQuery(name = "Lesson_getByGroupIdBetweenDates", query = "SELECT l FROM Lesson AS l " +
-        "inner join l.groups AS g WHERE g.id=:groupId AND l.date BETWEEN :fromDate AND :toDate"),
-    @NamedQuery(name = "Lesson_getByTeacherIdBetweenDates", query = "SELECT l FROM Lesson AS l " +
-        "WHERE l.teacher.id=:teacherId AND l.date BETWEEN :fromDate AND :toDate")
-})
 @Entity
 @Table(name = "lessons")
 public class Lesson {

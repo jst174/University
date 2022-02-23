@@ -38,35 +38,35 @@ public class GroupServiceTest {
     @Test
     public void givenNewGroup_whenCreate_thenCreated() throws NotUniqueNameException {
         Group group = new Group("GD-22");
-        when(groupDao.getByName(group.getName())).thenReturn(Optional.empty());
+        when(groupDao.findByName(group.getName())).thenReturn(Optional.empty());
 
         groupService.create(group);
 
-        verify(groupDao).create(group);
+        verify(groupDao).save(group);
     }
 
     @Test
     public void givenGroupWithExistentName_whenCreate_thenNotUniqueNameExceptionThrow() {
         Group group = new Group(TestData.group1.getName());
-        when(groupDao.getByName(group.getName())).thenReturn(Optional.of(TestData.group1));
+        when(groupDao.findByName(group.getName())).thenReturn(Optional.of(TestData.group1));
 
         Exception exception = assertThrows(NotUniqueNameException.class, () -> groupService.create(group));
 
         String expectedMessage = "Group with name = ND-12 already exist";
-        verify(groupDao, never()).create(group);
+        verify(groupDao, never()).save(group);
         assertEquals(expectedMessage, exception.getMessage());
     }
 
     @Test
     public void givenExistentGroupId_whenGetById_thenReturn() throws EntityNotFoundException {
-        when(groupDao.getById(1)).thenReturn(Optional.of(TestData.group1));
+        when(groupDao.findById(1)).thenReturn(Optional.of(TestData.group1));
 
         assertEquals(TestData.group1, groupService.getById(1));
     }
 
     @Test
     public void givenNotExistentGroupId_whenGetById_thenEntityNotFoundExceptionThrow() {
-        when(groupDao.getById(20)).thenReturn(Optional.empty());
+        when(groupDao.findById(20)).thenReturn(Optional.empty());
 
         Exception exception = assertThrows(EntityNotFoundException.class, () -> groupService.getById(20));
 
@@ -76,21 +76,21 @@ public class GroupServiceTest {
 
     @Test
     public void givenExistentGroup_whenUpdate_thenUpdated() throws NotUniqueNameException {
-        when(groupDao.getByName(TestData.group1.getName())).thenReturn(Optional.of(TestData.group1));
+        when(groupDao.findByName(TestData.group1.getName())).thenReturn(Optional.of(TestData.group1));
 
         groupService.update(TestData.group1);
 
-        verify(groupDao).update(TestData.group1);
+        verify(groupDao).save(TestData.group1);
     }
 
     @Test
     public void givenGroupWithOtherGroupName_whenUpdate_thenNotUniqueNameExceptionThrow() {
-        when(groupDao.getByName(TestData.group2.getName())).thenReturn(Optional.of(TestData.group1));
+        when(groupDao.findByName(TestData.group2.getName())).thenReturn(Optional.of(TestData.group1));
 
         Exception exception = assertThrows(NotUniqueNameException.class, () -> groupService.update(TestData.group2));
 
         String expectedMessage = "Group with name = FR-32 already exist";
-        verify(groupDao, never()).update(TestData.group2);
+        verify(groupDao, never()).save(TestData.group2);
         assertEquals(expectedMessage, exception.getMessage());
     }
 
@@ -98,7 +98,7 @@ public class GroupServiceTest {
     public void givenExistentGroupId_whenDelete_thenDeleted() {
         groupService.delete(1);
 
-        verify(groupDao).delete(1);
+        verify(groupDao).deleteById(1);
     }
 
     @Test
@@ -106,7 +106,7 @@ public class GroupServiceTest {
         List<Group> groups = Arrays.asList(TestData.group1, TestData.group2);
         Pageable pageable = PageRequest.of(1, 10);
         Page<Group> groupPage = new PageImpl<Group>(groups, pageable, groups.size());
-        when(groupDao.getAll(pageable)).thenReturn(groupPage);
+        when(groupDao.findAll(pageable)).thenReturn(groupPage);
 
         assertEquals(groupPage, groupService.getAll(pageable));
     }
@@ -114,7 +114,7 @@ public class GroupServiceTest {
     @Test
     public void whenGetAll_thenReturn() {
         List<Group> groups = Arrays.asList(TestData.group1, TestData.group2);
-        when(groupDao.getAll()).thenReturn(groups);
+        when(groupDao.findAll()).thenReturn(groups);
 
         assertEquals(groups, groupService.getAll());
     }

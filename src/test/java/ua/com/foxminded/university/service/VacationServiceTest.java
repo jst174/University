@@ -66,13 +66,13 @@ public class VacationServiceTest {
             TestData.teacher1);
         TestData.teacher1.setVacations(vacations);
         when(teacherService.getById(vacation.getTeacher().getId())).thenReturn(TestData.teacher1);
-        when(vacationDao.getByTeacherAndVacationDates(TestData.teacher1,
+        when(vacationDao.findByTeacherAndVacationDates(TestData.teacher1.getId(),
             vacation.getStart(), vacation.getEnding())).thenReturn(Optional.empty());
         when(universityConfigProperties.getMaxPeriodsVacation()).thenReturn(periods);
 
         vacationService.create(vacation);
 
-        verify(vacationDao).create(vacation);
+        verify(vacationDao).save(vacation);
     }
 
     @Test
@@ -82,7 +82,7 @@ public class VacationServiceTest {
             LocalDate.of(2021, 4, 30),
             TestData.teacher1);
         when(teacherService.getById(vacation.getTeacher().getId())).thenReturn(TestData.teacher1);
-        when(vacationDao.getByTeacherAndVacationDates(TestData.teacher1,
+        when(vacationDao.findByTeacherAndVacationDates(TestData.teacher1.getId(),
             vacation.getStart(), vacation.getEnding())).thenReturn(Optional.empty());
         TestData.teacher1.setVacations(vacations);
         when(universityConfigProperties.getMaxPeriodsVacation()).thenReturn(periods);
@@ -91,7 +91,7 @@ public class VacationServiceTest {
 
         String expectedMessage = "Vacation with period = 60 days not available. " +
             "The sum of all vacations = 70 is longer than the maximum allowed = 30";
-        verify(vacationDao, never()).create(vacation);
+        verify(vacationDao, never()).save(vacation);
         assertEquals(expectedMessage, exception.getMessage());
     }
 
@@ -101,26 +101,26 @@ public class VacationServiceTest {
         vacation.setStart(TestData.vacation1.getStart());
         vacation.setEnding(TestData.vacation1.getEnding());
         vacation.setTeacher(TestData.vacation1.getTeacher());
-        when(vacationDao.getByTeacherAndVacationDates(TestData.teacher1,
+        when(vacationDao.findByTeacherAndVacationDates(TestData.teacher1.getId(),
             vacation.getStart(), vacation.getEnding())).thenReturn(Optional.of(TestData.vacation1));
 
         Exception exception = assertThrows(NotUniqueVacationDatesException.class, () -> vacationService.create(vacation));
 
         String expectedMessage = "Teacher's vacation with start = 2021-11-05 and end = 2021-11-10 already exist";
-        verify(vacationDao, never()).create(vacation);
+        verify(vacationDao, never()).save(vacation);
         assertEquals(expectedMessage, exception.getMessage());
     }
 
     @Test
     public void givenExistentId_whenGetById_thenReturn() throws EntityNotFoundException {
-        when(vacationDao.getById(1)).thenReturn(Optional.of(TestData.vacation1));
+        when(vacationDao.findById(1)).thenReturn(Optional.of(TestData.vacation1));
 
         assertEquals(TestData.vacation1, vacationService.getById(1));
     }
 
     @Test
     public void givenNotExistentId_whenGetById_thenEntityNotFoundExceptionThrow() {
-        when(vacationDao.getById(20)).thenReturn(Optional.empty());
+        when(vacationDao.findById(20)).thenReturn(Optional.empty());
 
         Exception exception = assertThrows(EntityNotFoundException.class, () -> vacationService.getById(20));
 
@@ -130,7 +130,7 @@ public class VacationServiceTest {
 
     @Test
     public void givenExistentVacation_whenUpdate_thenUpdated() throws NotAvailablePeriodException, NotUniqueVacationDatesException, EntityNotFoundException {
-        when(vacationDao.getByTeacherAndVacationDates(TestData.teacher1,
+        when(vacationDao.findByTeacherAndVacationDates(TestData.teacher1.getId(),
             TestData.vacation1.getStart(), TestData.vacation1.getEnding())).thenReturn(Optional.of(TestData.vacation1));
         when(teacherService.getById(TestData.vacation1.getTeacher().getId())).thenReturn(TestData.teacher1);
         when(universityConfigProperties.getMaxPeriodsVacation()).thenReturn(periods);
@@ -138,18 +138,18 @@ public class VacationServiceTest {
 
         vacationService.update(TestData.vacation1);
 
-        verify(vacationDao).update(TestData.vacation1);
+        verify(vacationDao).save(TestData.vacation1);
     }
 
     @Test
     public void givenVacationWithOtherVacationTeacherAndVacationDates_whenUpdate_thenNotUniqueVacationDatesExceptionThrow() {
-        when(vacationDao.getByTeacherAndVacationDates(TestData.teacher1,
+        when(vacationDao.findByTeacherAndVacationDates(TestData.teacher1.getId(),
             TestData.vacation2.getStart(), TestData.vacation2.getEnding())).thenReturn(Optional.of(TestData.vacation1));
 
         Exception exception = assertThrows(NotUniqueVacationDatesException.class, () -> vacationService.update(TestData.vacation2));
 
         String expectedMessage = "Teacher's vacation with start = 2021-05-05 and end = 2021-05-10 already exist";
-        verify(vacationDao, never()).update(TestData.vacation2);
+        verify(vacationDao, never()).save(TestData.vacation2);
         assertEquals(expectedMessage, exception.getMessage());
     }
 
@@ -160,7 +160,7 @@ public class VacationServiceTest {
         vacation.setEnding(LocalDate.of(2021, 1, 26));
         vacation.setTeacher(TestData.teacher1);
         TestData.teacher1.setVacations(vacations);
-        when(vacationDao.getByTeacherAndVacationDates(TestData.teacher1, vacation.getStart(), vacation.getEnding())).thenReturn(Optional.of(vacation));
+        when(vacationDao.findByTeacherAndVacationDates(TestData.teacher1.getId(), vacation.getStart(), vacation.getEnding())).thenReturn(Optional.of(vacation));
         when(teacherService.getById(vacation.getTeacher().getId())).thenReturn(TestData.teacher1);
         when(universityConfigProperties.getMaxPeriodsVacation()).thenReturn(periods);
 
@@ -168,7 +168,7 @@ public class VacationServiceTest {
 
         String expectedMessage = "Vacation with period = 25 days not available. " +
             "The sum of all vacations = 35 is longer than the maximum allowed = 30";
-        verify(vacationDao, never()).update(vacation);
+        verify(vacationDao, never()).save(vacation);
         assertEquals(expectedMessage, exception.getMessage());
     }
 
@@ -176,7 +176,7 @@ public class VacationServiceTest {
     public void givenExistentId_whenDelete_thenDeleted() {
         vacationService.delete(1);
 
-        verify(vacationDao).delete(1);
+        verify(vacationDao).deleteById(1);
     }
 
     @Test
@@ -184,7 +184,7 @@ public class VacationServiceTest {
         Pageable pageable = PageRequest.of(1, 10);
         Page<Vacation> vacationPage =
             new PageImpl<Vacation>(vacations, pageable, vacations.size());
-        when(vacationDao.getAll(pageable)).thenReturn(vacationPage);
+        when(vacationDao.findAll(pageable)).thenReturn(vacationPage);
 
         assertEquals(vacationPage, vacationService.getAll(pageable));
     }

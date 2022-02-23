@@ -1,14 +1,24 @@
 package ua.com.foxminded.university.dao;
 
-import ua.com.foxminded.university.model.Teacher;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import ua.com.foxminded.university.model.Vacation;
 
 import java.time.LocalDate;
 import java.util.Optional;
 
-public interface VacationDao extends Dao<Vacation> {
+public interface VacationDao extends JpaRepository<Vacation, Integer> {
 
-    Optional<Vacation> getByTeacherAndDate(Teacher teacher, LocalDate date);
+    @Query("SELECT v FROM Vacation v WHERE v.teacher.id=:id AND v.start = :start AND v.ending = :ending")
+    Optional<Vacation> findByTeacherAndVacationDates(
+        @Param("id") int id,
+        @Param("start") LocalDate start,
+        @Param("ending") LocalDate ending);
 
-    Optional<Vacation> getByTeacherAndVacationDates(Teacher teacher, LocalDate start, LocalDate end);
+    @Query("SELECT v FROM Vacation v WHERE v.teacher.id=:id AND :date BETWEEN v.start AND v.ending")
+    Optional<Vacation> findByTeacherAndDate(
+        @Param("id") int id,
+        @Param("date") LocalDate date
+    );
 }

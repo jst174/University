@@ -36,29 +36,29 @@ public class CourseServiceTest {
     @Test
     public void givenNewCourse_whenCreate_thenCreated() throws NotUniqueNameException {
         Course course = new Course("History");
-        when(courseDao.getByName(course.getName())).thenReturn(Optional.empty());
+        when(courseDao.findByName(course.getName())).thenReturn(Optional.empty());
 
         courseService.create(course);
 
-        verify(courseDao).create(course);
+        verify(courseDao).save(course);
     }
 
     @Test
     public void givenCourseWithExistentName_whenCreate_thenNotUniqueNameExceptionThrow() {
         Course course = new Course(TestData.course1.getName());
-        when(courseDao.getByName(course.getName())).thenReturn(Optional.of(TestData.course1));
+        when(courseDao.findByName(course.getName())).thenReturn(Optional.of(TestData.course1));
 
         Exception exception = assertThrows(NotUniqueNameException.class, () -> courseService.create(course));
 
         String expectedMessage = "Course with name = Math already exist";
-        verify(courseDao, never()).create(course);
+        verify(courseDao, never()).save(course);
         assertEquals(expectedMessage, exception.getMessage());
     }
 
 
     @Test
     public void givenExistentId_whenGetById_thenReturn() throws EntityNotFoundException {
-        when(courseDao.getById(1)).thenReturn(Optional.of(TestData.course1));
+        when(courseDao.findById(1)).thenReturn(Optional.of(TestData.course1));
 
         assertEquals(TestData.course1, courseService.getById(1));
 
@@ -66,7 +66,7 @@ public class CourseServiceTest {
 
     @Test
     public void givenNotExistentCourseId_whenGetById_thenEntityNotFoundExceptionThrow() {
-        when(courseDao.getById(20)).thenReturn(Optional.empty());
+        when(courseDao.findById(20)).thenReturn(Optional.empty());
 
         Exception exception = assertThrows(EntityNotFoundException.class, () -> courseService.getById(20));
 
@@ -76,11 +76,11 @@ public class CourseServiceTest {
 
     @Test
     public void givenExistentCourse_whenUpdate_thenUpdated() throws NotUniqueNameException {
-        when(courseDao.getByName(TestData.course1.getName())).thenReturn(Optional.of(TestData.course1));
+        when(courseDao.findByName(TestData.course1.getName())).thenReturn(Optional.of(TestData.course1));
 
         courseService.update(TestData.course1);
 
-        verify(courseDao).update(TestData.course1);
+        verify(courseDao).save(TestData.course1);
     }
 
     @Test
@@ -88,12 +88,12 @@ public class CourseServiceTest {
         Course course1 = TestData.course1;
         Course course2 = TestData.course2;
         course1.setName(course2.getName());
-        when(courseDao.getByName(course1.getName())).thenReturn(Optional.of(course2));
+        when(courseDao.findByName(course1.getName())).thenReturn(Optional.of(course2));
 
         Exception exception = assertThrows(NotUniqueNameException.class, () -> courseService.update(course1));
 
         String expectedMessage = "Course with name = Physics already exist";
-        verify(courseDao, never()).update(course1);
+        verify(courseDao, never()).save(course1);
         assertEquals(expectedMessage, exception.getMessage());
     }
 
@@ -101,7 +101,7 @@ public class CourseServiceTest {
     public void givenExistentCourse_whenDelete_thenDeleted() {
         courseService.delete(1);
 
-        verify(courseDao).delete(1);
+        verify(courseDao).deleteById(1);
     }
 
     @Test
@@ -109,7 +109,7 @@ public class CourseServiceTest {
         List<Course> courses = Arrays.asList(TestData.course1, TestData.course2);
         Pageable pageable = PageRequest.of(1, 10);
         Page<Course> coursePage = new PageImpl<Course>(courses, pageable, courses.size());
-        when(courseDao.getAll(pageable)).thenReturn(coursePage);
+        when(courseDao.findAll(pageable)).thenReturn(coursePage);
 
         assertEquals(coursePage, courseService.getAll(pageable));
     }
@@ -117,7 +117,7 @@ public class CourseServiceTest {
     @Test
     public void whenGetAll_thenReturn() {
         List<Course> courses = Arrays.asList(TestData.course1, TestData.course2);
-        when(courseDao.getAll()).thenReturn(courses);
+        when(courseDao.findAll()).thenReturn(courses);
 
         assertEquals(courses, courseService.getAll());
     }

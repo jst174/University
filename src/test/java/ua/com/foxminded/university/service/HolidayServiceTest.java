@@ -48,36 +48,36 @@ public class HolidayServiceTest {
     public void givenNewHoliday_whenCreate_thenCreated() throws NotUniqueDateException {
         LocalDate date = LocalDate.of(2022, 3, 8);
         Holiday holiday = new Holiday("Women's Day", date);
-        when(holidayDao.getByDate(holiday.getDate())).thenReturn(Optional.empty());
+        when(holidayDao.findByDate(holiday.getDate())).thenReturn(Optional.empty());
 
         holidayService.create(holiday);
 
-        verify(holidayDao).create(holiday);
+        verify(holidayDao).save(holiday);
     }
 
     @Test
     public void givenHolidayWithOtherHolidayDate_whenCreate_thenNotUniqueDateExceptionThrow() {
         Holiday holiday = new Holiday("holiday", holidays.get(0).getDate());
-        when(holidayDao.getByDate(holiday.getDate())).thenReturn(Optional.of(holidays.get(0)));
+        when(holidayDao.findByDate(holiday.getDate())).thenReturn(Optional.of(holidays.get(0)));
 
         Exception exception = assertThrows(NotUniqueDateException.class, () -> holidayService.create(holiday));
 
         String expectedMessage = "Holiday with date = 2022-01-01 already exist";
-        verify(holidayDao, never()).create(holiday);
+        verify(holidayDao, never()).save(holiday);
         assertEquals(expectedMessage, exception.getMessage());
     }
 
     @Test
     public void givenExistentHolidayId_whenGetById_thenReturn() throws EntityNotFoundException {
         Holiday holiday = holidays.get(0);
-        when(holidayDao.getById(1)).thenReturn(Optional.of(holiday));
+        when(holidayDao.findById(1)).thenReturn(Optional.of(holiday));
 
         assertEquals(holiday, holidayService.getById(1));
     }
 
     @Test
     public void givenNotExistentHolidayId_whenGetById_thenEntityNotFoundExceptionThrow() {
-        when(holidayDao.getById(20)).thenReturn(Optional.empty());
+        when(holidayDao.findById(20)).thenReturn(Optional.empty());
 
         Exception exception = assertThrows(EntityNotFoundException.class, () -> holidayService.getById(20));
 
@@ -88,11 +88,11 @@ public class HolidayServiceTest {
     @Test
     public void givenExistentHoliday_whenUpdate_thenUpdated() throws NotUniqueDateException {
         Holiday holiday = holidays.get(0);
-        when(holidayDao.getByDate(holiday.getDate())).thenReturn(Optional.of(holiday));
+        when(holidayDao.findByDate(holiday.getDate())).thenReturn(Optional.of(holiday));
 
         holidayService.update(holiday);
 
-        verify(holidayDao).update(holiday);
+        verify(holidayDao).save(holiday);
     }
 
     @Test
@@ -100,12 +100,12 @@ public class HolidayServiceTest {
         Holiday holiday1 = holidays.get(0);
         Holiday holiday2 = holidays.get(1);
         holiday1.setDate(holiday2.getDate());
-        when(holidayDao.getByDate(holiday1.getDate())).thenReturn(Optional.of(holiday2));
+        when(holidayDao.findByDate(holiday1.getDate())).thenReturn(Optional.of(holiday2));
 
         Exception exception = assertThrows(NotUniqueDateException.class, () -> holidayService.update(holiday1));
 
         String expectedMessage = "Holiday with date = 2022-01-07 already exist";
-        verify(holidayDao, never()).update(holiday1);
+        verify(holidayDao, never()).save(holiday1);
         assertEquals(expectedMessage, exception.getMessage());
     }
 
@@ -113,14 +113,14 @@ public class HolidayServiceTest {
     public void givenExistentHolidayId_whenDelete_thenDeleted() {
         holidayService.delete(1);
 
-        verify(holidayDao).delete(1);
+        verify(holidayDao).deleteById(1);
     }
 
     @Test
     public void whenGetAll_thenReturn() {
         Pageable pageable = PageRequest.of(1, 10);
         Page<Holiday> holidayPage = new PageImpl<Holiday>(holidays, pageable, holidays.size());
-        when(holidayDao.getAll(pageable)).thenReturn(holidayPage);
+        when(holidayDao.findAll(pageable)).thenReturn(holidayPage);
 
         assertEquals(holidayPage, holidayService.getAll(pageable));
     }
