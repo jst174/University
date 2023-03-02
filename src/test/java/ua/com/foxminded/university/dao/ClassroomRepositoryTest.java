@@ -9,23 +9,26 @@ import ua.com.foxminded.university.model.Classroom;
 
 import java.util.Optional;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
-@Sql({"/create_classroom_test.sql"})
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public class ClassroomDaoTest {
+public class ClassroomRepositoryTest {
 
     @Autowired
-    private ClassroomDao classroomDao;
+    private ClassroomRepository classroomRepository;
+
+
 
     @Test
     public void givenClassroomNumber_whereGetByNumber_thenReturn() {
         Classroom expected = new Classroom(102, 30);
 
-        Optional<Classroom> actual = classroomDao.findByNumber(102);
+        classroomRepository.save(expected);
 
-        assertEquals(expected, actual.get());
+        Optional<Classroom> actual = classroomRepository.findByNumber(102);
+
+        assertThat(actual.get()).isEqualTo(expected);
     }
 
 }

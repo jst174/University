@@ -3,6 +3,12 @@ spring:
     url: jdbc:postgresql://localhost:5432/university
     username: postgres
     password: 1234
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
   data:
     web:
       pageable:

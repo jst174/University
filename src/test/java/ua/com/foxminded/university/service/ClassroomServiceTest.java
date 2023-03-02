@@ -13,7 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import ua.com.foxminded.university.dao.ClassroomDao;
+import ua.com.foxminded.university.dao.ClassroomRepository;
 import ua.com.foxminded.university.exceptions.EntityNotFoundException;
 import ua.com.foxminded.university.exceptions.NotUniqueNameException;
 import ua.com.foxminded.university.model.Classroom;
@@ -26,7 +26,7 @@ import java.util.Optional;
 public class ClassroomServiceTest {
 
     @Mock
-    private ClassroomDao classroomDao;
+    private ClassroomRepository classroomRepository;
     @InjectMocks
     private ClassroomService classroomService;
     private List<Classroom> classrooms;
@@ -45,22 +45,22 @@ public class ClassroomServiceTest {
     @Test
     public void givenNewClassroom_whenCreateClassroom_thenCreated() throws NotUniqueNameException {
         Classroom classroom = new Classroom(102, 30);
-        when(classroomDao.findByNumber(classroom.getNumber())).thenReturn(Optional.empty());
+        when(classroomRepository.findByNumber(classroom.getNumber())).thenReturn(Optional.empty());
 
         classroomService.createClassroom(classroom);
 
-        verify(classroomDao).save(classroom);
+        verify(classroomRepository).save(classroom);
     }
 
     @Test
     public void givenClassroomWithExistentNumber_whenCreateClassroom_thenNotUniqueNameExceptionThrow() {
         Classroom classroom = new Classroom(classrooms.get(0).getNumber(), 40);
-        when(classroomDao.findByNumber(classroom.getNumber())).thenReturn(Optional.of(classrooms.get(0)));
+        when(classroomRepository.findByNumber(classroom.getNumber())).thenReturn(Optional.of(classrooms.get(0)));
 
         Exception exception = assertThrows(NotUniqueNameException.class, () -> classroomService.createClassroom(classroom));
 
         String expectedMessage = "Classroom with number = 101 already exist";
-        verify(classroomDao, never()).save(classroom);
+        verify(classroomRepository, never()).save(classroom);
         assertEquals(expectedMessage, exception.getMessage());
     }
 
@@ -69,14 +69,14 @@ public class ClassroomServiceTest {
     public void givenExistClassroomId_whenGetById_thenReturn() throws EntityNotFoundException {
         Classroom classroom = classrooms.get(0);
 
-        when(classroomDao.findById(1)).thenReturn(Optional.of(classroom));
+        when(classroomRepository.findById(1)).thenReturn(Optional.of(classroom));
 
         assertEquals(classroom, classroomService.getById(1));
     }
 
     @Test
     public void givenNotExistentClassroomId_whenGetById_thenEntityNotFoundExceptionThrow() {
-        when(classroomDao.findById(20)).thenReturn(Optional.empty());
+        when(classroomRepository.findById(20)).thenReturn(Optional.empty());
 
         Exception exception = assertThrows(EntityNotFoundException.class, () -> classroomService.getById(20));
 
@@ -87,11 +87,11 @@ public class ClassroomServiceTest {
     @Test
     public void givenExistentClassroom_whenUpdate_thenUpdated() throws NotUniqueNameException {
         Classroom classroom = classrooms.get(0);
-        when(classroomDao.findByNumber(classroom.getNumber())).thenReturn(Optional.of(classroom));
+        when(classroomRepository.findByNumber(classroom.getNumber())).thenReturn(Optional.of(classroom));
 
         classroomService.update(classroom);
 
-        verify(classroomDao).save(classroom);
+        verify(classroomRepository).save(classroom);
     }
 
     @Test
@@ -99,12 +99,12 @@ public class ClassroomServiceTest {
         Classroom classroom1 = classrooms.get(0);
         classroom1.setNumber(202);
         Classroom classroom2 = classrooms.get(1);
-        when(classroomDao.findByNumber(classroom1.getNumber())).thenReturn(Optional.of(classroom2));
+        when(classroomRepository.findByNumber(classroom1.getNumber())).thenReturn(Optional.of(classroom2));
 
         Exception exception = assertThrows(NotUniqueNameException.class, () -> classroomService.update(classroom1));
 
         String expectedMessage = "Classroom with number = 202 already exist";
-        verify(classroomDao, never()).save(classroom1);
+        verify(classroomRepository, never()).save(classroom1);
         assertEquals(expectedMessage, exception.getMessage());
     }
 
@@ -112,7 +112,7 @@ public class ClassroomServiceTest {
     public void givenExistentId_whenDelete_thenDeleted() {
         classroomService.delete(1);
 
-        verify(classroomDao).deleteById(1);
+        verify(classroomRepository).deleteById(1);
     }
 
     @Test
@@ -120,14 +120,14 @@ public class ClassroomServiceTest {
         Pageable pageable = PageRequest.of(1, 10);
         Page<Classroom> classroomPage =
             new PageImpl<Classroom>(classrooms, pageable, classrooms.size());
-        when(classroomDao.findAll(pageable)).thenReturn(classroomPage);
+        when(classroomRepository.findAll(pageable)).thenReturn(classroomPage);
 
         assertEquals(classroomPage, classroomService.getAll(pageable));
     }
 
     @Test
     public void whenGetAll_thenReturn() {
-        when(classroomDao.findAll()).thenReturn(classrooms);
+        when(classroomRepository.findAll()).thenReturn(classrooms);
 
         assertEquals(classrooms, classroomService.getAll());
     }

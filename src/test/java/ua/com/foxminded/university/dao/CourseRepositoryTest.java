@@ -5,23 +5,27 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
-import ua.com.foxminded.university.model.Group;
+import ua.com.foxminded.university.model.Course;
+
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 
 @DataJpaTest
-@Sql({"/create_lesson_test.sql"})
+@Sql({"/create_course_test.sql"})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public class GroupDaoTest {
+public class CourseRepositoryTest {
 
     @Autowired
-    private GroupDao groupDao;
+    private CourseRepository courseRepository;
 
     @Test
-    public void givenGroupName_whenGetByName_thenReturn() {
-        Group group = new Group("MH-12");
+    public void givenCourseName_whereGetByName_thenReturn() {
+        Course courseExpected = new Course("History");
 
-        assertEquals(group, groupDao.findByName("MH-12").get());
+        Optional<Course> courseActual = courseRepository.findByName("History");
+
+        assertEquals(courseExpected, courseActual.get());
     }
 }

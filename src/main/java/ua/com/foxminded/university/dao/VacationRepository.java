@@ -8,10 +8,9 @@ import ua.com.foxminded.university.model.Vacation;
 import java.time.LocalDate;
 import java.util.Optional;
 
-public interface VacationDao extends JpaRepository<Vacation, Integer> {
+public interface VacationRepository extends JpaRepository<Vacation, Integer> {
 
-    @Query("SELECT v FROM Vacation v WHERE v.teacher.id=:id AND v.start = :start AND v.ending = :ending")
-    Optional<Vacation> findByTeacherAndVacationDates(
+    Optional<Vacation> findByTeacherIdAndStartAndEnding(
         @Param("id") int id,
         @Param("start") LocalDate start,
         @Param("ending") LocalDate ending);

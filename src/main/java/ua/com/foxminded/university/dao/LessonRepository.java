@@ -9,7 +9,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-public interface LessonDao extends JpaRepository<Lesson, Integer> {
+public interface LessonRepository extends JpaRepository<Lesson, Integer> {
 
     @Query("SELECT l FROM Lesson l inner join l.groups g " +
         "WHERE g.id=:groupId AND l.date BETWEEN :fromDate AND :toDate")
@@ -27,15 +27,13 @@ public interface LessonDao extends JpaRepository<Lesson, Integer> {
         @Param("toDate") LocalDate toDate
     );
 
-    @Query("SELECT l FROM Lesson l WHERE l.date=:date AND l.time.id=:timeId AND l.teacher.id=:teacherId")
-    Optional<Lesson> findByDateAndTimeAndTeacher(
+    Optional<Lesson> findByDateAndTimeIdAndTeacherId(
         @Param("date") LocalDate date,
         @Param("timeId") int timeId,
         @Param("teacherId") int teacherId
     );
 
-    @Query("SELECT l FROM Lesson l WHERE l.date=:date AND l.time.id=:timeId AND l.classroom.id=:classroomId")
-    Optional<Lesson> findByDateAndTimeAndClassroom(
+    Optional<Lesson> findByDateAndTimeIdAndClassroomId(
         @Param("date") LocalDate date,
         @Param("timeId") int timeId,
         @Param("classroomId") int classroomId

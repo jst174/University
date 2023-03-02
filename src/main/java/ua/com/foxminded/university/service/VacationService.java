@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import ua.com.foxminded.university.dao.VacationDao;
+import ua.com.foxminded.university.dao.VacationRepository;
 import ua.com.foxminded.university.exceptions.EntityNotFoundException;
 import ua.com.foxminded.university.exceptions.NotAvailablePeriodException;
 import ua.com.foxminded.university.exceptions.NotUniqueVacationDatesException;
@@ -23,12 +23,12 @@ public class VacationService {
 
     private static final Logger logger = LoggerFactory.getLogger(VacationService.class);
 
-    private VacationDao vacationDao;
+    private VacationRepository vacationRepository;
     private TeacherService teacherService;
     private UniversityConfigProperties universityProperties;
 
-    public VacationService(VacationDao vacationDao, TeacherService teacherService, UniversityConfigProperties universityProperties) {
-        this.vacationDao = vacationDao;
+    public VacationService(VacationRepository vacationRepository, TeacherService teacherService, UniversityConfigProperties universityProperties) {
+        this.vacationRepository = vacationRepository;
         this.teacherService = teacherService;
         this.universityProperties = universityProperties;
     }
@@ -37,12 +37,12 @@ public class VacationService {
         logger.debug("Creating vacation where start = {} and end = {}", vacation.getStart(), vacation.getEnding());
         verifyUniqueness(vacation);
         verifyPeriodAvailability(vacation);
-        vacationDao.save(vacation);
+        vacationRepository.save(vacation);
     }
 
     public Vacation getById(int id) throws EntityNotFoundException {
         logger.debug("Getting vacation with id = {}", id);
-        return vacationDao.findById(id).orElseThrow(() ->
+        return vacationRepository.findById(id).orElseThrow(() ->
             new EntityNotFoundException(format("Vacation with id = %s not not found", id)));
     }
 
@@ -50,21 +50,21 @@ public class VacationService {
         logger.debug("Updating vacation with id = {}", vacation.getId());
         verifyUniqueness(vacation);
         verifyPeriodAvailability(vacation);
-        vacationDao.save(vacation);
+        vacationRepository.save(vacation);
     }
 
     public void delete(int id) {
         logger.debug("Deleting vacation with id = {}", id);
-        vacationDao.deleteById(id);
+        vacationRepository.deleteById(id);
     }
 
     public Page<Vacation> getAll(Pageable pageable) {
         logger.debug("Getting all vacations");
-        return vacationDao.findAll(pageable);
+        return vacationRepository.findAll(pageable);
     }
 
     private void verifyUniqueness(Vacation vacation) throws NotUniqueVacationDatesException {
-        if (vacationDao.findByTeacherAndVacationDates(vacation.getTeacher().getId(), vacation.getStart(), vacation.getEnding())
+        if (vacationRepository.findByTeacherIdAndStartAndEnding(vacation.getTeacher().getId(), vacation.getStart(), vacation.getEnding())
             .filter(v -> v.getId() != vacation.getId())
             .isPresent()) {
             throw new NotUniqueVacationDatesException(format("Teacher's vacation with start = %s and end = %s already exist",

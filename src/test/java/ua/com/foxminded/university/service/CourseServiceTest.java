@@ -1,6 +1,5 @@
 package ua.com.foxminded.university.service;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -10,14 +9,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import ua.com.foxminded.university.dao.CourseDao;
+import ua.com.foxminded.university.dao.CourseRepository;
 import ua.com.foxminded.university.exceptions.EntityNotFoundException;
 import ua.com.foxminded.university.exceptions.NotUniqueNameException;
 import ua.com.foxminded.university.model.Course;
-import ua.com.foxminded.university.model.Teacher;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -29,36 +25,36 @@ import static org.mockito.Mockito.*;
 public class CourseServiceTest {
 
     @Mock
-    private CourseDao courseDao;
+    private CourseRepository courseRepository;
     @InjectMocks
     private CourseService courseService;
 
     @Test
     public void givenNewCourse_whenCreate_thenCreated() throws NotUniqueNameException {
         Course course = new Course("History");
-        when(courseDao.findByName(course.getName())).thenReturn(Optional.empty());
+        when(courseRepository.findByName(course.getName())).thenReturn(Optional.empty());
 
         courseService.create(course);
 
-        verify(courseDao).save(course);
+        verify(courseRepository).save(course);
     }
 
     @Test
     public void givenCourseWithExistentName_whenCreate_thenNotUniqueNameExceptionThrow() {
         Course course = new Course(TestData.course1.getName());
-        when(courseDao.findByName(course.getName())).thenReturn(Optional.of(TestData.course1));
+        when(courseRepository.findByName(course.getName())).thenReturn(Optional.of(TestData.course1));
 
         Exception exception = assertThrows(NotUniqueNameException.class, () -> courseService.create(course));
 
         String expectedMessage = "Course with name = Math already exist";
-        verify(courseDao, never()).save(course);
+        verify(courseRepository, never()).save(course);
         assertEquals(expectedMessage, exception.getMessage());
     }
 
 
     @Test
     public void givenExistentId_whenGetById_thenReturn() throws EntityNotFoundException {
-        when(courseDao.findById(1)).thenReturn(Optional.of(TestData.course1));
+        when(courseRepository.findById(1)).thenReturn(Optional.of(TestData.course1));
 
         assertEquals(TestData.course1, courseService.getById(1));
 
@@ -66,7 +62,7 @@ public class CourseServiceTest {
 
     @Test
     public void givenNotExistentCourseId_whenGetById_thenEntityNotFoundExceptionThrow() {
-        when(courseDao.findById(20)).thenReturn(Optional.empty());
+        when(courseRepository.findById(20)).thenReturn(Optional.empty());
 
         Exception exception = assertThrows(EntityNotFoundException.class, () -> courseService.getById(20));
 
@@ -76,11 +72,11 @@ public class CourseServiceTest {
 
     @Test
     public void givenExistentCourse_whenUpdate_thenUpdated() throws NotUniqueNameException {
-        when(courseDao.findByName(TestData.course1.getName())).thenReturn(Optional.of(TestData.course1));
+        when(courseRepository.findByName(TestData.course1.getName())).thenReturn(Optional.of(TestData.course1));
 
         courseService.update(TestData.course1);
 
-        verify(courseDao).save(TestData.course1);
+        verify(courseRepository).save(TestData.course1);
     }
 
     @Test
@@ -88,12 +84,12 @@ public class CourseServiceTest {
         Course course1 = TestData.course1;
         Course course2 = TestData.course2;
         course1.setName(course2.getName());
-        when(courseDao.findByName(course1.getName())).thenReturn(Optional.of(course2));
+        when(courseRepository.findByName(course1.getName())).thenReturn(Optional.of(course2));
 
         Exception exception = assertThrows(NotUniqueNameException.class, () -> courseService.update(course1));
 
         String expectedMessage = "Course with name = Physics already exist";
-        verify(courseDao, never()).save(course1);
+        verify(courseRepository, never()).save(course1);
         assertEquals(expectedMessage, exception.getMessage());
     }
 
@@ -101,7 +97,7 @@ public class CourseServiceTest {
     public void givenExistentCourse_whenDelete_thenDeleted() {
         courseService.delete(1);
 
-        verify(courseDao).deleteById(1);
+        verify(courseRepository).deleteById(1);
     }
 
     @Test
@@ -109,7 +105,7 @@ public class CourseServiceTest {
         List<Course> courses = Arrays.asList(TestData.course1, TestData.course2);
         Pageable pageable = PageRequest.of(1, 10);
         Page<Course> coursePage = new PageImpl<Course>(courses, pageable, courses.size());
-        when(courseDao.findAll(pageable)).thenReturn(coursePage);
+        when(courseRepository.findAll(pageable)).thenReturn(coursePage);
 
         assertEquals(coursePage, courseService.getAll(pageable));
     }
@@ -117,7 +113,7 @@ public class CourseServiceTest {
     @Test
     public void whenGetAll_thenReturn() {
         List<Course> courses = Arrays.asList(TestData.course1, TestData.course2);
-        when(courseDao.findAll()).thenReturn(courses);
+        when(courseRepository.findAll()).thenReturn(courses);
 
         assertEquals(courses, courseService.getAll());
     }

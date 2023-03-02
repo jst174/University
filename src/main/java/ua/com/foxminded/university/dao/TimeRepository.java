@@ -8,9 +8,8 @@ import ua.com.foxminded.university.model.Time;
 import java.time.LocalTime;
 import java.util.Optional;
 
-public interface TimeDao extends JpaRepository<Time, Integer> {
+public interface TimeRepository extends JpaRepository<Time, Integer> {
 
-    @Query("SELECT t FROM Time t WHERE t.startTime = :start AND t.endTime = :end")
-    Optional<Time> findByTime(@Param("start") LocalTime start,
-                              @Param("end") LocalTime end);
+    Optional<Time> findByStartTimeAndEndTime(@Param("start") LocalTime start,
+                                             @Param("end") LocalTime end);
 }

@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import ua.com.foxminded.university.config.UniversityConfigProperties;
-import ua.com.foxminded.university.dao.TimeDao;
+import ua.com.foxminded.university.dao.TimeRepository;
 import ua.com.foxminded.university.exceptions.EntityNotFoundException;
 import ua.com.foxminded.university.exceptions.NotAvailableTimeException;
 import ua.com.foxminded.university.exceptions.NotUniqueTimeException;
@@ -20,11 +20,11 @@ public class TimeService {
 
     private static final Logger logger = LoggerFactory.getLogger(TimeService.class);
 
-    private TimeDao timeDao;
+    private TimeRepository timeRepository;
     private UniversityConfigProperties universityProperties;
 
-    public TimeService(TimeDao timeDao, UniversityConfigProperties universityProperties) {
-        this.timeDao = timeDao;
+    public TimeService(TimeRepository timeRepository, UniversityConfigProperties universityProperties) {
+        this.timeRepository = timeRepository;
         this.universityProperties = universityProperties;
     }
 
@@ -33,12 +33,12 @@ public class TimeService {
         verifyTimeUniqueness(time);
         verifyLessonDuration(time);
         verifyTimeCrossing(time);
-        timeDao.save(time);
+        timeRepository.save(time);
     }
 
     public Time getById(int id) throws EntityNotFoundException {
         logger.debug("Getting time with id = {}", id);
-        return timeDao.findById(id).orElseThrow(() ->
+        return timeRepository.findById(id).orElseThrow(() ->
             new EntityNotFoundException(format("Time with id = %s not found", id)));
     }
 
@@ -47,21 +47,21 @@ public class TimeService {
         verifyTimeUniqueness(time);
         verifyLessonDuration(time);
         verifyTimeCrossing(time);
-        timeDao.save(time);
+        timeRepository.save(time);
     }
 
     public void delete(int id) {
         logger.debug("Deleting time with id = {}", id);
-        timeDao.deleteById(id);
+        timeRepository.deleteById(id);
     }
 
     public List<Time> getAll() {
         logger.debug("Getting all times");
-        return timeDao.findAll();
+        return timeRepository.findAll();
     }
 
     private void verifyTimeUniqueness(Time time) throws NotUniqueTimeException {
-        if (timeDao.findByTime(time.getStartTime(), time.getEndTime())
+        if (timeRepository.findByStartTimeAndEndTime(time.getStartTime(), time.getEndTime())
             .filter(t -> t.getId() != time.getId())
             .isPresent()) {
             throw new NotUniqueTimeException(format("Time with start = %s and end = %s already exist",
@@ -79,7 +79,7 @@ public class TimeService {
     }
 
     private void verifyTimeCrossing(Time newTime) throws NotAvailableTimeException {
-        List<Time> times = timeDao.findAll();
+        List<Time> times = timeRepository.findAll();
         if (times.stream().anyMatch(time ->
             ((newTime.getStartTime().isAfter(time.getStartTime()) && newTime.getStartTime().isBefore(time.getEndTime()))
                 || (newTime.getStartTime().isBefore(time.getStartTime()) && (newTime.getEndTime().isBefore(time.getEndTime())

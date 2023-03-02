@@ -3,12 +3,12 @@ package ua.com.foxminded.university.dao;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import ua.com.foxminded.university.model.Group;
+import ua.com.foxminded.university.model.Holiday;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
-public interface GroupDao extends JpaRepository<Group, Integer> {
+public interface HolidayRepository extends JpaRepository<Holiday, Integer> {
 
-    @Query("SELECT c FROM Group c WHERE c.name = :name")
-    Optional<Group> findByName(@Param("name") String name);
+    Optional<Holiday> findByDate(@Param("date") LocalDate date);
 }

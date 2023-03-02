@@ -9,7 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import ua.com.foxminded.university.dao.TeacherDao;
+import ua.com.foxminded.university.dao.TeacherRepository;
 import ua.com.foxminded.university.exceptions.EntityNotFoundException;
 import ua.com.foxminded.university.exceptions.NotUniqueNameException;
 import ua.com.foxminded.university.model.Gender;
@@ -28,18 +28,18 @@ import static org.mockito.Mockito.*;
 public class TeacherServiceTest {
 
     @Mock
-    private TeacherDao teacherDao;
+    private TeacherRepository teacherRepository;
     @InjectMocks
     private TeacherService teacherService;
 
     @Test
     public void givenNewTeacher_whenCreate_thenCreated() throws NotUniqueNameException {
         Teacher teacher = TestData.teacher1;
-        when(teacherDao.findByFirstNameAndLastName(teacher.getFirstName(), teacher.getLastName())).thenReturn(Optional.empty());
+        when(teacherRepository.findByFirstNameAndLastName(teacher.getFirstName(), teacher.getLastName())).thenReturn(Optional.empty());
 
         teacherService.create(teacher);
 
-        verify(teacherDao).save(teacher);
+        verify(teacherRepository).save(teacher);
     }
 
     @Test
@@ -47,26 +47,26 @@ public class TeacherServiceTest {
         Teacher teacher = new Teacher();
         teacher.setFirstName(TestData.teacher1.getFirstName());
         teacher.setLastName(TestData.teacher1.getLastName());
-        when(teacherDao.findByFirstNameAndLastName(teacher.getFirstName(), teacher.getLastName())).thenReturn(Optional.of(TestData.teacher1));
+        when(teacherRepository.findByFirstNameAndLastName(teacher.getFirstName(), teacher.getLastName())).thenReturn(Optional.of(TestData.teacher1));
 
         Exception exception = assertThrows(NotUniqueNameException.class, () -> teacherService.create(teacher));
 
         String expectedMessage = format("Teacher with name %s %s already exist",
             teacher.getFirstName(), teacher.getLastName());
-        verify(teacherDao, never()).save(teacher);
+        verify(teacherRepository, never()).save(teacher);
         assertEquals(expectedMessage, exception.getMessage());
     }
 
     @Test
     public void givenExistentId_whenGetById_thenReturn() throws EntityNotFoundException {
-        when(teacherDao.findById(1)).thenReturn(Optional.of(TestData.teacher1));
+        when(teacherRepository.findById(1)).thenReturn(Optional.of(TestData.teacher1));
 
         assertEquals(TestData.teacher1, teacherService.getById(1));
     }
 
     @Test
     public void givenNotExistentId_whenGetById_thenEntityNotFoundExceptionThrow() {
-        when(teacherDao.findById(20)).thenReturn(Optional.empty());
+        when(teacherRepository.findById(20)).thenReturn(Optional.empty());
 
         Exception exception = assertThrows(EntityNotFoundException.class, () -> teacherService.getById(20));
 
@@ -76,24 +76,24 @@ public class TeacherServiceTest {
 
     @Test
     public void givenExistentTime_whenUpdate_thenUpdated() throws NotUniqueNameException, EntityNotFoundException {
-        when(teacherDao.findByFirstNameAndLastName(TestData.teacher1.getFirstName(), TestData.teacher1.getLastName()))
+        when(teacherRepository.findByFirstNameAndLastName(TestData.teacher1.getFirstName(), TestData.teacher1.getLastName()))
             .thenReturn(Optional.of(TestData.teacher1));
 
         teacherService.update(TestData.teacher1);
 
-        verify(teacherDao).save(TestData.teacher1);
+        verify(teacherRepository).save(TestData.teacher1);
     }
 
     @Test
     public void givenTeacherWithOtherTeacherName_whenUpdate_thenNotUniqueNameExceptionThrow() {
-        when(teacherDao.findByFirstNameAndLastName(TestData.teacher2.getFirstName(), TestData.teacher2.getLastName()))
+        when(teacherRepository.findByFirstNameAndLastName(TestData.teacher2.getFirstName(), TestData.teacher2.getLastName()))
             .thenReturn(Optional.of(TestData.teacher1));
 
         Exception exception = assertThrows(NotUniqueNameException.class, () -> teacherService.update(TestData.teacher2));
 
         String expectedMessage = format("Teacher with name %s %s already exist",
             TestData.teacher2.getFirstName(), TestData.teacher2.getLastName());
-        verify(teacherDao, never()).save(TestData.teacher2);
+        verify(teacherRepository, never()).save(TestData.teacher2);
         assertEquals(expectedMessage, exception.getMessage());
     }
 
@@ -101,7 +101,7 @@ public class TeacherServiceTest {
     public void givenExistentId_whenDelete_thenDeleted() {
         teacherService.delete(1);
 
-        verify(teacherDao).deleteById(1);
+        verify(teacherRepository).deleteById(1);
     }
 
     @Test
@@ -110,7 +110,7 @@ public class TeacherServiceTest {
         Pageable pageable = PageRequest.of(1, 10);
         Page<Teacher> teacherPage =
             new PageImpl<Teacher>(teachers, pageable, teachers.size());
-        when(teacherDao.findAll(pageable)).thenReturn(teacherPage);
+        when(teacherRepository.findAll(pageable)).thenReturn(teacherPage);
 
         assertEquals(teacherPage, teacherService.getAll(pageable));
     }
@@ -118,7 +118,7 @@ public class TeacherServiceTest {
     @Test
     public void whenGetAll_thenReturn() {
         List<Teacher> teachers = Arrays.asList(TestData.teacher1, TestData.teacher2);
-        when(teacherDao.findAll()).thenReturn(teachers);
+        when(teacherRepository.findAll()).thenReturn(teachers);
 
         assertEquals(teachers, teacherService.getAll());
     }

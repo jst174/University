@@ -19,16 +19,16 @@ import static org.junit.jupiter.api.Assertions.*;
 @DataJpaTest
 @Sql({"/create_address_test.sql", "/create_groups_test.sql", "/create_student_test.sql"})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public class StudentDaoTest {
+public class StudentRepositoryTest {
 
     @Autowired
-    private StudentDao studentDao;
+    private StudentRepository studentRepository;
 
     @Test
     public void givenFirstNameAndLastName_whenGetByFirstNameAndLastName_thenReturn() {
         Student student = TestData.student1;
 
-        Optional<Student> actual = studentDao.findByFirstNameAndLastName(student.getFirstName(), student.getLastName());
+        Optional<Student> actual = studentRepository.findByFirstNameAndLastName(student.getFirstName(), student.getLastName());
 
         assertEquals(student, actual.get());
     }

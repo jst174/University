@@ -20,16 +20,16 @@ import static org.junit.jupiter.api.Assertions.*;
 @DataJpaTest
 @Sql({"/create_lesson_test.sql" })
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public class LessonDaoTest {
+public class LessonRepositoryTest {
 
     @Autowired
-    private LessonDao lessonDao;
+    private LessonRepository lessonRepository;
 
     @Test
     public void givenDateAndTimeAndTeacher_whenGetByDateAndTimeAndTeacher_thenReturn() {
         Lesson expected = TestData.lesson;
 
-        Optional<Lesson> actual = lessonDao.findByDateAndTimeAndTeacher(LocalDate.of(2021, 9, 28),
+        Optional<Lesson> actual = lessonRepository.findByDateAndTimeIdAndTeacherId(LocalDate.of(2021, 9, 28),
             expected.getTime().getId(), expected.getTeacher().getId());
 
         assertEquals(expected, actual.get());
@@ -39,7 +39,7 @@ public class LessonDaoTest {
     public void givenDateAndTimeAndClassroom_whenGetByDateAndTimeAndClassroom_thenReturn() {
         Lesson expected = TestData.lesson;
 
-        Optional<Lesson> actual = lessonDao.findByDateAndTimeAndClassroom(LocalDate.of(2021, 9, 28),
+        Optional<Lesson> actual = lessonRepository.findByDateAndTimeIdAndClassroomId(LocalDate.of(2021, 9, 28),
             expected.getTime().getId(), expected.getClassroom().getId());
 
         assertEquals(expected, actual.get());
@@ -50,7 +50,7 @@ public class LessonDaoTest {
         List<Lesson> expected = Arrays.asList(TestData.lesson,
             new Lesson.Builder().clone(TestData.lesson).setId(2).setTime(TestData.time2).build());
 
-        List<Lesson> actual = lessonDao.findByGroupIdBetweenDates(
+        List<Lesson> actual = lessonRepository.findByGroupIdBetweenDates(
             1, LocalDate.of(2021, 9, 25),
             LocalDate.of(2021, 9, 30));
 
@@ -62,7 +62,7 @@ public class LessonDaoTest {
         List<Lesson> expected = Arrays.asList(TestData.lesson,
             new Lesson.Builder().clone(TestData.lesson).setId(2).setTime(TestData.time2).build());
 
-        List<Lesson> actual = lessonDao.findByTeacherIdBetweenDates(
+        List<Lesson> actual = lessonRepository.findByTeacherIdBetweenDates(
             1, LocalDate.of(2021, 9, 25),
             LocalDate.of(2021, 9, 30));
 
@@ -73,7 +73,7 @@ public class LessonDaoTest {
     public void givenDateAndTimeAndGroupId_whenGetByDateAndTimeAndGroupId_thenReturn() {
         List<Lesson> expected = Arrays.asList(TestData.lesson);
 
-        List<Lesson> actual = lessonDao.findByDateAndTimeAndGroupId(TestData.lesson.getDate(), TestData.lesson.getTime(),
+        List<Lesson> actual = lessonRepository.findByDateAndTimeAndGroupId(TestData.lesson.getDate(), TestData.lesson.getTime(),
             1);
 
         assertEquals(expected, actual);

@@ -5,28 +5,29 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
-import ua.com.foxminded.university.model.Holiday;
+import ua.com.foxminded.university.model.Time;
 
-import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 
 @DataJpaTest
-@Sql({"/create_holiday_test.sql"})
+@Sql({"/create_time_test.sql"})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public class HolidayDaoTest {
+public class TimeRepositoryTest {
 
     @Autowired
-    private HolidayDao holidayDao;
+    private TimeRepository timeRepository;
 
     @Test
-    public void givenHolidayDate_whenGetByDate_thenReturn() {
-        LocalDate date = LocalDate.of(2021, 12, 31);
-        Holiday expected = new Holiday("New Year", date);
+    public void givenStartAndEndTime_whenGetByTime_thenReturn() {
+        LocalTime start = LocalTime.of(8, 0);
+        LocalTime end = LocalTime.of(9, 30);
+        Time expected = new Time(start, end);
 
-        Optional<Holiday> actual = holidayDao.findByDate(LocalDate.of(2021, 12, 31));
+        Optional<Time> actual = timeRepository.findByStartTimeAndEndTime(start, end);
 
         assertEquals(expected, actual.get());
     }

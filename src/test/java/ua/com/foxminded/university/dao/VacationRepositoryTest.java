@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.transaction.annotation.Transactional;
 import ua.com.foxminded.university.model.*;
 
 import java.time.LocalDate;
@@ -16,20 +15,20 @@ import static org.junit.jupiter.api.Assertions.*;
 @DataJpaTest
 @Sql({"/create_vacation_test.sql"})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public class VacationDaoTest {
+public class VacationRepositoryTest {
 
     @Autowired
-    private VacationDao vacationDao;
+    private VacationRepository vacationRepository;
 
     @Test
     public void givenTeacherAndDate_whenGetByTeacherAndDate_thenReturn() {
-        assertEquals(TestData.vacation1, vacationDao.findByTeacherAndDate(TestData.teacher.getId(),
+        assertEquals(TestData.vacation1, vacationRepository.findByTeacherAndDate(TestData.teacher.getId(),
             LocalDate.of(2021, 10, 20)).get());
     }
 
     @Test
     public void givenVacation_whenGetByTeacherAndVacationDates_thenReturn() {
-        assertEquals(TestData.vacation1, vacationDao.findByTeacherAndVacationDates(TestData.teacher.getId(),
+        assertEquals(TestData.vacation1, vacationRepository.findByTeacherIdAndStartAndEnding(TestData.teacher.getId(),
             TestData.vacation1.getStart(), TestData.vacation1.getEnding()).get());
     }
 
