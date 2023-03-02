@@ -3,6 +3,12 @@ spring:
     url: jdbc:postgresql://localhost:5432/university
     username: postgres
     password: 1234
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
   data:
     web:
       pageable:
@@ -14,8 +20,7 @@ logging:
     name: logs/app.log
   level:
     root: DEBUG
-    org.org.springframework: WARN
-    org.hibernate: ERROR
+    org.springframework: WARN
   pattern:
     console: '%d{HH:mm:ss.SSS} [%thread] %-5level %logger{100} - %msg%n'
     file: '%d{HH:mm:ss.SSS} [%thread] %-5level %logger{100} - %msg%n'

@@ -6,11 +6,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.test.util.ReflectionTestUtils;
 import ua.com.foxminded.university.config.UniversityConfigProperties;
-import ua.com.foxminded.university.dao.TimeDao;
+import ua.com.foxminded.university.dao.TimeRepository;
 import ua.com.foxminded.university.exceptions.EntityNotFoundException;
 import ua.com.foxminded.university.exceptions.NotAvailableTimeException;
 import ua.com.foxminded.university.exceptions.NotUniqueTimeException;
@@ -29,7 +26,7 @@ import static org.mockito.Mockito.*;
 public class TimeServiceTest {
 
     @Mock
-    private TimeDao timeDao;
+    private TimeRepository timeRepository;
     @Mock
     private UniversityConfigProperties universityConfigProperties;
     @InjectMocks
@@ -53,23 +50,23 @@ public class TimeServiceTest {
         LocalTime end = LocalTime.of(13, 30);
         Time time = new Time(start, end);
         when(universityConfigProperties.getMinLessonDurationInMinutes()).thenReturn(30);
-        when(timeDao.getByTime(start, end)).thenReturn(Optional.empty());
-        when(timeDao.getAll()).thenReturn(times);
+        when(timeRepository.findByStartTimeAndEndTime(start, end)).thenReturn(Optional.empty());
+        when(timeRepository.findAll()).thenReturn(times);
 
         timeService.create(time);
 
-        verify(timeDao).create(time);
+        verify(timeRepository).save(time);
     }
 
     @Test
     public void givenExistentTime_whenCreate_thenNotUniqueTimeExceptionThrow() {
         Time time = new Time(times.get(0).getStartTime(), times.get(0).getEndTime());
-        when(timeDao.getByTime(time.getStartTime(), time.getEndTime())).thenReturn(Optional.of(times.get(0)));
+        when(timeRepository.findByStartTimeAndEndTime(time.getStartTime(), time.getEndTime())).thenReturn(Optional.of(times.get(0)));
 
         Exception exception = assertThrows(NotUniqueTimeException.class, () -> timeService.create(time));
 
         String expectedMessage = "Time with start = 08:00 and end = 09:30 already exist";
-        verify(timeDao, never()).create(time);
+        verify(timeRepository, never()).save(time);
         assertEquals(expectedMessage, exception.getMessage());
     }
 
@@ -79,12 +76,12 @@ public class TimeServiceTest {
         LocalTime end = LocalTime.of(12, 20);
         Time time = new Time(start, end);
         when(universityConfigProperties.getMinLessonDurationInMinutes()).thenReturn(30);
-        when(timeDao.getByTime(start, end)).thenReturn(Optional.empty());
+        when(timeRepository.findByStartTimeAndEndTime(start, end)).thenReturn(Optional.empty());
 
         Exception exception = assertThrows(NotAvailableTimeException.class, () -> timeService.create(time));
 
         String expectedMessage = "Duration less than 30 minute(s)";
-        verify(timeDao, never()).create(time);
+        verify(timeRepository, never()).save(time);
         assertEquals(expectedMessage, exception.getMessage());
     }
 
@@ -94,27 +91,27 @@ public class TimeServiceTest {
         LocalTime end = LocalTime.of(9, 20);
         Time time = new Time(start, end);
         when(universityConfigProperties.getMinLessonDurationInMinutes()).thenReturn(30);
-        when(timeDao.getByTime(start, end)).thenReturn(Optional.empty());
-        when(timeDao.getAll()).thenReturn(times);
+        when(timeRepository.findByStartTimeAndEndTime(start, end)).thenReturn(Optional.empty());
+        when(timeRepository.findAll()).thenReturn(times);
 
         Exception exception = assertThrows(NotAvailableTimeException.class, () -> timeService.create(time));
 
         String expectedMessage = "Time with start = 08:20 and end = 09:20 crossing with other time";
-        verify(timeDao, never()).create(time);
+        verify(timeRepository, never()).save(time);
         assertEquals(expectedMessage, exception.getMessage());
     }
 
     @Test
     public void givenExistentId_whenGetById_thenReturn() throws EntityNotFoundException {
         Time time = times.get(0);
-        when(timeDao.getById(1)).thenReturn(Optional.of(time));
+        when(timeRepository.findById(1)).thenReturn(Optional.of(time));
 
         assertEquals(time, timeService.getById(1));
     }
 
     @Test
     public void givenNotExistentId_whenGetById_thenEntityNotFoundExceptionThrow() {
-        when(timeDao.getById(20)).thenReturn(Optional.empty());
+        when(timeRepository.findById(20)).thenReturn(Optional.empty());
 
         Exception exception = assertThrows(EntityNotFoundException.class, () -> timeService.getById(20));
 
@@ -128,12 +125,12 @@ public class TimeServiceTest {
         time.setStartTime(LocalTime.of(12, 0));
         time.setEndTime(LocalTime.of(13, 30));
         when(universityConfigProperties.getMinLessonDurationInMinutes()).thenReturn(30);
-        when(timeDao.getByTime(time.getStartTime(), time.getEndTime())).thenReturn(Optional.of(time));
-        when(timeDao.getAll()).thenReturn(times);
+        when(timeRepository.findByStartTimeAndEndTime(time.getStartTime(), time.getEndTime())).thenReturn(Optional.of(time));
+        when(timeRepository.findAll()).thenReturn(times);
 
         timeService.update(time);
 
-        verify(timeDao).update(time);
+        verify(timeRepository).save(time);
     }
 
     @Test
@@ -141,12 +138,12 @@ public class TimeServiceTest {
         Time time = times.get(0);
         time.setStartTime(times.get(1).getStartTime());
         time.setEndTime(times.get(1).getEndTime());
-        when(timeDao.getByTime(time.getStartTime(), time.getEndTime())).thenReturn(Optional.of(times.get(1)));
+        when(timeRepository.findByStartTimeAndEndTime(time.getStartTime(), time.getEndTime())).thenReturn(Optional.of(times.get(1)));
 
         Exception exception = assertThrows(NotUniqueTimeException.class, () -> timeService.update(time));
 
         String expectedMessage = "Time with start = 10:00 and end = 11:30 already exist";
-        verify(timeDao, never()).update(time);
+        verify(timeRepository, never()).save(time);
         assertEquals(expectedMessage, exception.getMessage());
     }
 
@@ -156,12 +153,12 @@ public class TimeServiceTest {
         time.setStartTime(LocalTime.of(8, 0));
         time.setEndTime(LocalTime.of(8, 20));
         when(universityConfigProperties.getMinLessonDurationInMinutes()).thenReturn(30);
-        when(timeDao.getByTime(time.getStartTime(), time.getEndTime())).thenReturn(Optional.of(time));
+        when(timeRepository.findByStartTimeAndEndTime(time.getStartTime(), time.getEndTime())).thenReturn(Optional.of(time));
 
         Exception exception = assertThrows(NotAvailableTimeException.class, () -> timeService.update(time));
 
         String expectedMessage = "Duration less than 30 minute(s)";
-        verify(timeDao, never()).update(time);
+        verify(timeRepository, never()).save(time);
         assertEquals(expectedMessage, exception.getMessage());
     }
 
@@ -173,13 +170,13 @@ public class TimeServiceTest {
         time.setStartTime(start);
         time.setEndTime(end);
         when(universityConfigProperties.getMinLessonDurationInMinutes()).thenReturn(30);
-        when(timeDao.getByTime(time.getStartTime(), time.getEndTime())).thenReturn(Optional.of(time));
-        when(timeDao.getAll()).thenReturn(times);
+        when(timeRepository.findByStartTimeAndEndTime(time.getStartTime(), time.getEndTime())).thenReturn(Optional.of(time));
+        when(timeRepository.findAll()).thenReturn(times);
 
         Exception exception = assertThrows(NotAvailableTimeException.class, () -> timeService.update(time));
 
         String expectedMessage = "Time with start = 08:20 and end = 09:20 crossing with other time";
-        verify(timeDao, never()).update(time);
+        verify(timeRepository, never()).save(time);
         assertEquals(expectedMessage, exception.getMessage());
     }
 
@@ -187,12 +184,12 @@ public class TimeServiceTest {
     public void givenExistentId_whenDelete_thenDeleted() {
         timeService.delete(1);
 
-        verify(timeDao).delete(1);
+        verify(timeRepository).deleteById(1);
     }
 
     @Test
     public void whenGetAll_thenReturn() {
-        when(timeDao.getAll()).thenReturn(times);
+        when(timeRepository.findAll()).thenReturn(times);
 
         assertEquals(times, timeService.getAll());
     }
